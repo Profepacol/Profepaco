@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Guía CTE – Lineamientos Consejos Técnicos Escolares</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --navy:   #1a2e4a;
+  --forest: #2d5a3d;
+  --terra:  #c0533a;
+  --gold:   #b8922a;
+  --cream:  #f5f0e8;
+  --white:  #ffffff;
+  --muted:  #6b7565;
+  --light:  #eae5d8;
+  --shadow: 0 3px 18px rgba(26,46,74,0.10);
+  --r: 14px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width:100%; height:100%;
+  overflow:hidden;
+  font-family:'Source Sans 3', sans-serif;
+  background: var(--cream);
+  color: var(--navy);
+}
+
+/* ─── SHELL ─── */
+#app { width:100vw; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+/* ─── PROGRESS ─── */
+#pbar {
+  position:fixed; top:0; left:0; height:3px; z-index:100;
+  background: linear-gradient(90deg, var(--navy), var(--forest), var(--terra), var(--gold));
+  transition: width .4s ease;
+}
+
+/* ─── TOP NAV ─── */
+#topnav {
+  flex-shrink:0; display:flex; align-items:center; justify-content:space-between;
+  padding:8px 18px; background:var(--navy);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  z-index:10;
+}
+.dots { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
+.dot {
+  width:9px; height:9px; border-radius:50%;
+  background:rgba(255,255,255,0.25); cursor:pointer;
+  transition: background .3s, transform .3s;
+}
+.dot.active  { background:var(--gold); transform:scale(1.5); }
+.dot.visited { background:rgba(255,255,255,0.55); }
+.ntitle {
+  font-family:'Lora',serif; font-size:clamp(10px,1.8vw,13px);
+  font-weight:600; color:rgba(255,255,255,0.80);
+  text-align:center; flex:1; padding:0 10px;
+}
+.nctr { font-size:11px; color:rgba(255,255,255,0.55); font-weight:700; white-space:nowrap; }
+
+/* ─── SCREENS ─── */
+#swrap { flex:1; overflow:hidden; position:relative; }
+
+.screen {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  padding:14px 18px 8px;
+  opacity:0; pointer-events:none;
+  transition:none;
+  overflow:hidden;
+}
+.screen.active      { opacity:1; pointer-events:all; transform:translateX(0); }
+.enter-right        { opacity:0; transform:translateX(55px); }
+.enter-left         { opacity:0; transform:translateX(-55px); }
+.exit-slide-left    { opacity:0; transform:translateX(-55px); transition:opacity .3s ease,transform .3s ease; }
+.exit-slide-right   { opacity:0; transform:translateX(55px);  transition:opacity .3s ease,transform .3s ease; }
+.slide-in           { transition:opacity .3s ease,transform .3s ease; }
+
+/* ─── BOTTOM NAV ─── */
+#botnav {
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  gap:10px; padding:8px 18px;
+  background:var(--white);
+  box-shadow: 0 -1px 8px rgba(0,0,0,0.08);
+}
+.btn {
+  display:flex; align-items:center; gap:5px;
+  padding:8px 20px; border-radius:50px; border:none;
+  font-family:'Source Sans 3',sans-serif; font-weight:700;
+  font-size:13px; cursor:pointer; transition:all .2s;
+}
+.btn-p { background:var(--navy); color:var(--white); }
+.btn-p:hover { background:#27446e; transform:scale(1.03); }
+.btn-s { background:var(--light); color:var(--navy); }
+.btn-s:hover { background:#d6cfc0; transform:scale(1.03); }
+.btn:disabled { opacity:.35; pointer-events:none; }
+
+/* ─── FOOTER ─── */
+#foot {
+  flex-shrink:0; text-align:center;
+  font-size:10px; color:var(--muted); font-weight:600;
+  padding:4px 10px; background:var(--white);
+  border-top:1px solid var(--light); letter-spacing:.2px;
+}
+
+/* ─── SCREEN HEADER ─── */
+.sh { margin-bottom:10px; flex-shrink:0; }
+.badge {
+  display:inline-block; font-size:10px; font-weight:800;
+  text-transform:uppercase; letter-spacing:1.2px;
+  padding:2px 10px; border-radius:20px; color:var(--white); margin-bottom:5px;
+}
+.stitle {
+  font-family:'Lora',serif; font-weight:700;
+  font-size:clamp(17px,3.5vw,24px); line-height:1.2; color:var(--navy);
+}
+.ssub { font-size:clamp(11px,2vw,13px); color:var(--muted); margin-top:3px; font-weight:500; }
+
+/* ─── LAYOUT HELPERS ─── */
+.ca  { flex:1; overflow:hidden; display:flex; flex-direction:column; gap:9px; }
+.g2  { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+.g3  { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
+.g4  { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+.row { display:flex; gap:9px; }
+.grow{ flex:1; }
+
+/* ─── CARDS ─── */
+.card {
+  background:var(--white); border-radius:var(--r);
+  padding:12px 14px; box-shadow:var(--shadow);
+  transition:transform .2s;
+}
+.card:hover { transform:translateY(-2px); }
+.ci  { font-size:26px; margin-bottom:5px; }
+.ct  {
+  font-family:'Lora',serif; font-weight:700;
+  font-size:clamp(12px,2.2vw,15px); margin-bottom:3px;
+}
+.cd  { font-size:clamp(10px,1.7vw,12px); color:#555; line-height:1.5; font-weight:500; }
+
+.card.cn { color:var(--white); }
+.card.cn .cd { color:rgba(255,255,255,.85); }
+
+.hl {
+  border-left:4px solid; padding:9px 13px;
+  border-radius:0 12px 12px 0;
+  font-size:clamp(11px,1.8vw,13px); font-weight:600; line-height:1.5;
+}
+
+/* ─── ACCORDION ─── */
+.acc { border-radius:var(--r); overflow:hidden; box-shadow:var(--shadow); }
+.ai  { border-bottom:1px solid #ece8de; }
+.ai:last-child { border-bottom:none; }
+.ab  {
+  width:100%; text-align:left; padding:10px 14px;
+  background:var(--white); border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:space-between;
+  font-family:'Source Sans 3',sans-serif; font-weight:700;
+  font-size:clamp(12px,2vw,14px); color:var(--navy);
+  transition:background .2s;
+}
+.ab:hover { background:#faf8f3; }
+.ab .arr { transition:transform .3s; font-size:14px; color:var(--muted); }
+.ab.open .arr { transform:rotate(180deg); }
+.abody { max-height:0; overflow:hidden; transition:max-height .35s ease; background:#faf8f3; }
+.abody.open { max-height:180px; }
+.abinner { padding:9px 14px 12px; font-size:clamp(11px,1.7vw,13px); color:#555; line-height:1.6; font-weight:500; }
+
+/* ─── TABS ─── */
+.th {
+  display:flex; gap:4px; flex-wrap:nowrap;
+  background:var(--light); border-radius:12px; padding:4px; flex-shrink:0;
+}
+.tbtn {
+  flex:1; padding:7px 5px; border-radius:9px; border:none;
+  font-family:'Source Sans 3',sans-serif; font-weight:700;
+  font-size:clamp(10px,1.6vw,12px); cursor:pointer;
+  background:transparent; color:var(--muted);
+  transition:all .25s; white-space:nowrap;
+}
+.tbtn.active { background:var(--white); color:var(--navy); box-shadow:0 2px 8px rgba(0,0,0,.1); }
+.tc { display:none; flex:1; overflow:hidden; flex-direction:column; gap:8px; }
+.tc.active { display:flex; }
+
+/* ─── QUIZ ─── */
+.qq { font-family:'Lora',serif; font-weight:700; font-size:clamp(13px,2.4vw,17px); margin-bottom:10px; line-height:1.3; }
+.qopts { display:flex; flex-direction:column; gap:7px; }
+.qopt {
+  padding:9px 14px; border-radius:11px; border:2px solid #e0ddd4;
+  background:var(--white); cursor:pointer; text-align:left;
+  font-family:'Source Sans 3',sans-serif; font-weight:600;
+  font-size:clamp(11px,1.9vw,13px);
+  transition:all .2s; display:flex; align-items:center; gap:9px;
+}
+.qopt:hover { border-color:var(--navy); background:#f0f4f9; }
+.qopt.ok  { border-color:var(--forest); background:#f0faf3; color:#1a4228; }
+.qopt.err { border-color:var(--terra); background:#fdf3f0; color:#7a2416; }
+.qopt.dis { pointer-events:none; }
+.qfb {
+  padding:9px 14px; border-radius:11px; font-weight:700;
+  font-size:clamp(11px,1.8vw,13px); margin-top:8px; display:none;
+}
+.qfb.show { display:block; }
+.qfb.ok  { background:#f0faf3; color:#1a4228; border:2px solid var(--forest); }
+.qfb.err { background:#fdf3f0; color:#7a2416; border:2px solid var(--terra); }
+.qnav { display:flex; gap:8px; margin-top:8px; }
+
+/* ─── STEPS ─── */
+.steps { display:flex; flex-direction:column; gap:8px; }
+.step { display:flex; gap:11px; align-items:flex-start; }
+.snum {
+  width:30px; height:30px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:13px; color:var(--white);
+}
+.stb { flex:1; }
+.stt { font-weight:800; font-size:clamp(12px,2vw,14px); margin-bottom:2px; }
+.std { font-size:clamp(10px,1.7vw,12px); color:#555; line-height:1.4; font-weight:500; }
+
+/* ─── COVER ─── */
+#s0 {
+  background: linear-gradient(145deg, var(--navy) 0%, var(--forest) 55%, #1e4030 100%);
+  align-items:center; justify-content:center; text-align:center; padding:24px;
+}
+.ctag {
+  display:inline-block; background:rgba(255,255,255,.15);
+  color:rgba(255,255,255,.9); border-radius:20px; padding:4px 14px;
+  font-size:clamp(10px,1.8vw,12px); font-weight:700; letter-spacing:1.2px;
+  text-transform:uppercase; margin-bottom:14px;
+}
+.ctitle {
+  font-family:'Lora',serif; font-weight:700;
+  font-size:clamp(22px,4.5vw,38px); color:var(--white); line-height:1.15;
+  margin-bottom:8px;
+}
+.csub  { font-size:clamp(12px,2.2vw,16px); color:rgba(255,255,255,.78); font-weight:600; margin-bottom:6px; }
+.cauthor { font-size:clamp(11px,1.9vw,14px); color:rgba(255,255,255,.60); font-weight:600; margin-bottom:22px; }
+.cstart {
+  background:var(--gold); color:var(--white); border:none; border-radius:50px;
+  padding:11px 28px; font-family:'Lora',serif; font-weight:700;
+  font-size:clamp(13px,2.3vw,16px); cursor:pointer;
+  box-shadow:0 5px 18px rgba(0,0,0,.3);
+  transition:transform .2s, box-shadow .2s;
+}
+.cstart:hover { transform:scale(1.05); box-shadow:0 7px 22px rgba(0,0,0,.35); }
+.cico { font-size:clamp(38px,7vw,60px); margin-bottom:14px; animation:spin 8s linear infinite; }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+/* ─── COLOR VARIANTS ─── */
+.bg-navy   { background:var(--navy) !important; }
+.bg-forest { background:var(--forest) !important; }
+.bg-terra  { background:var(--terra) !important; }
+.bg-gold   { background:var(--gold) !important; }
+.bl-navy   { border-left:4px solid var(--navy)!important; background:#f0f4f9; }
+.bl-forest { border-left:4px solid var(--forest)!important; background:#f0faf3; }
+.bl-terra  { border-left:4px solid var(--terra)!important; background:#fdf3f0; }
+.bl-gold   { border-left:4px solid var(--gold)!important; background:#fdf8ec; }
+
+/* ─── TABLE ─── */
+.cmp-table { width:100%; border-collapse:collapse; font-size:clamp(10px,1.7vw,12px); }
+.cmp-table th {
+  padding:7px 10px; font-weight:800; font-size:clamp(11px,1.8vw,13px);
+  border-bottom:2px solid var(--light);
+}
+.cmp-table td { padding:7px 10px; border-bottom:1px solid var(--light); line-height:1.4; font-weight:500; }
+.cmp-table tr:last-child td { border-bottom:none; }
+.ok-cell { color:var(--forest); font-weight:700; }
+.no-cell { color:var(--terra); font-weight:700; }
+
+/* ─── SCORE CIRCLE ─── */
+.score-c {
+  width:75px; height:75px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Lora',serif; font-weight:700; font-size:26px;
+  color:var(--white); background:var(--forest); margin:0 auto 10px;
+  box-shadow:0 4px 14px rgba(45,90,61,.35);
+}
+
+/* ─── SUMMARY ─── */
+.sumwrap {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  flex:1; overflow-y:auto;
+}
+.sumwrap::-webkit-scrollbar { width:4px; }
+.sumwrap::-webkit-scrollbar-thumb { background:#ccc; border-radius:10px; }
+.sumi {
+  background:var(--white); border-radius:14px; padding:11px 13px;
+  box-shadow:var(--shadow); border-left:5px solid;
+  display:flex; flex-direction:column; gap:3px;
+}
+.sumit { font-weight:800; font-size:clamp(11px,2vw,13px); }
+.sumd  { font-size:clamp(10px,1.6vw,12px); color:#555; font-weight:500; line-height:1.4; }
+
+/* ─── SCROLL INSIDE PANEL ─── */
+.scr { overflow-y:auto; flex:1; }
+.scr::-webkit-scrollbar { width:4px; }
+.scr::-webkit-scrollbar-thumb { background:#ccc; border-radius:10px; }
+
+/* ─── TIMELINE HORIZONTAL ─── */
+.tl { display:flex; align-items:flex-start; gap:0; flex-shrink:0; }
+.tl-item { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; }
+.tl-item:not(:last-child)::after {
+  content:''; position:absolute; top:14px; left:50%; width:100%; height:3px;
+}
+.tl-dot {
+  width:28px; height:28px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:900; color:var(--white); flex-shrink:0; z-index:1;
+}
+.tl-label { font-size:clamp(9px,1.5vw,11px); font-weight:700; text-align:center; margin-top:4px; color:var(--navy); }
+.tl-sub   { font-size:clamp(8px,1.3vw,10px); font-weight:500; text-align:center; color:var(--muted); line-height:1.3; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width:600px) {
+  .g2 { grid-template-columns:1fr; }
+  .g3 { grid-template-columns:1fr 1fr; }
+  .g4 { grid-template-columns:1fr 1fr; }
+  .sumwrap { grid-template-columns:1fr; }
+  .th { overflow-x:auto; }
+  .row { flex-direction:column; }
+}
+@media (max-width:400px) {
+  .g3 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="pbar" style="width:0%"></div>
+
+  <!-- TOP NAV -->
+  <div id="topnav">
+    <div class="dots" id="dots"></div>
+    <div class="ntitle" id="ntitle">Portada</div>
+    <div class="nctr" id="nctr">1 / 12</div>
+  </div>
+
+  <!-- SCREENS WRAPPER -->
+  <div id="swrap">
+
+    <!-- S0 PORTADA -->
+    <div class="screen active" id="s0">
+      <div class="cico">⚙️</div>
+      <div class="ctag">Acuerdo 05/04/24 · Nueva Escuela Mexicana</div>
+      <div class="ctitle">Guía Maestra:<br>Lineamientos de los<br>Consejos Técnicos Escolares</div>
+      <div class="csub">Análisis visual y estructurado del ecosistema del CTE</div>
+      <div class="cauthor">👨‍🏫 Prof. Francisco De Jesús Luna Benitez</div>
+      <button class="cstart" onclick="goTo(1)">Iniciar Guía ▶</button>
+    </div>
+
+    <!-- S1 EL QUÉ – NATURALEZA DEL CTE -->
+    <div class="screen" id="s1">
+      <div class="sh">
+        <div class="badge bg-navy">El Qué</div>
+        <div class="stitle">El Corazón Pedagógico de la Escuela</div>
+        <div class="ssub">Naturaleza y propósito fundamental del CTE</div>
+      </div>
+      <div class="ca">
+        <div class="card bl-navy" style="flex-shrink:0">
+          <div class="ct">🏛️ ¿Qué es el CTE?</div>
+          <div class="cd">El <strong>Consejo Técnico Escolar (CTE)</strong> es el <strong>órgano colegiado de mayor decisión técnico-pedagógica</strong> de cada escuela. No es una reunión administrativa: es el espacio donde la autonomía profesional se encuentra con la realidad territorial.</div>
+        </div>
+        <div class="g3" style="flex-shrink:0">
+          <div class="card" style="text-align:center">
+            <div class="ci">🎯</div>
+            <div class="ct" style="font-size:12px">Objetivo Central</div>
+            <div class="cd">Máximo logro de aprendizajes en todos los estudiantes.</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="ci">💡</div>
+            <div class="ct" style="font-size:12px">Desarrollo Integral</div>
+            <div class="cd">Fomentar el pensamiento crítico en las y los estudiantes.</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="ci">🌍</div>
+            <div class="ct" style="font-size:12px">Enfoque Territorial</div>
+            <div class="cd">Fortalecer los lazos entre la escuela y su comunidad.</div>
+          </div>
+        </div>
+        <div class="hl bl-terra">
+          ⚠️ <strong>Idea clave:</strong> El CTE no es una obligación administrativa. Es el espacio donde la <strong>autonomía profesional docente</strong> se convierte en transformación real de la escuela.
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 PROPÓSITOS FUNDAMENTALES -->
+    <div class="screen" id="s2">
+      <div class="sh">
+        <div class="badge bg-forest">Propósitos</div>
+        <div class="stitle">5 Propósitos Fundamentales</div>
+        <div class="ssub">Todo el CTE apunta al Derecho Humano a la Educación</div>
+      </div>
+      <div class="ca">
+        <div class="acc" id="acc-prop">
+          <div class="ai">
+            <button class="ab" onclick="togAcc(this)">
+              <span>🔄 &nbsp;Mejora Continua</span><span class="arr">▾</span>
+            </button>
+            <div class="abody">
+              <div class="abinner">Analizar <strong>permanentemente</strong> el logro de aprendizajes y planear con equidad e inclusión. Este propósito convierte al CTE en un proceso vivo, no en una reunión puntual.</div>
+            </div>
+          </div>
+          <div class="ai">
+            <button class="ab" onclick="togAcc(this)">
+              <span>🎓 &nbsp;Autonomía Profesional</span><span class="arr">▾</span>
+            </button>
+            <div class="abody">
+              <div class="abinner">Propiciar espacios de formación para <strong>reinventar la docencia</strong>. Los maestros son profesionales con criterio propio, no ejecutores de instrucciones externas.</div>
+            </div>
+          </div>
+          <div class="ai">
+            <button class="ab" onclick="togAcc(this)">
+              <span>🗺️ &nbsp;Contextualización</span><span class="arr">▾</span>
+            </button>
+            <div class="abody">
+              <div class="abinner">Adaptar los programas sintéticos a la <strong>realidad territorial, ambiental y social</strong> de la escuela. El currículo se hace relevante cuando responde al contexto.</div>
+            </div>
+          </div>
+          <div class="ai">
+            <button class="ab" onclick="togAcc(this)">
+              <span>👦 &nbsp;Interés Superior</span><span class="arr">▾</span>
+            </button>
+            <div class="abody">
+              <div class="abinner">Priorizar a niñas, niños, adolescentes y jóvenes como <strong>ciudadanos democráticos</strong>. Los estudiantes son el centro, no las estadísticas ni los trámites.</div>
+            </div>
+          </div>
+          <div class="ai">
+            <button class="ab" onclick="togAcc(this)">
+              <span>🌈 &nbsp;Proyecto Diverso</span><span class="arr">▾</span>
+            </button>
+            <div class="abody">
+              <div class="abinner">Construir un proyecto educativo cimentado en la <strong>atención a las desigualdades</strong>. La equidad no es tratar a todos igual, sino dar más a quien más lo necesita.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card bl-gold" style="flex-shrink:0">
+          <div class="ct">🏅 El norte común de todos los propósitos</div>
+          <div class="cd">Todos los propósitos convergen en garantizar el <strong>Derecho Humano a la Educación</strong>. El CTE es el mecanismo institucional para hacerlo realidad en cada escuela.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 EL QUIÉN – COMITÉ -->
+    <div class="screen" id="s3">
+      <div class="sh">
+        <div class="badge bg-terra">El Quién</div>
+        <div class="stitle">Los Arquitectos de la Mejora</div>
+        <div class="ssub">Integración del Comité de Planeación y Evaluación</div>
+      </div>
+      <div class="ca">
+        <div class="g2" style="flex-shrink:0">
+          <div class="card cn bg-navy">
+            <div class="ci">👔</div>
+            <div class="ct" style="color:var(--white)">Directivo</div>
+            <div class="cd">Lidera e impulsa las condiciones para el <strong style="color:white">trabajo colegiado</strong>. Es el facilitador, no el controlador, del proceso.</div>
+          </div>
+          <div class="card cn bg-forest">
+            <div class="ci">👩‍🏫</div>
+            <div class="ct" style="color:var(--white)">Colectivo Docente</div>
+            <div class="cd">Elegidos por el propio colectivo durante la Fase Intensiva. El número se adapta al <strong style="color:white">tamaño de la escuela</strong>.</div>
+          </div>
+        </div>
+        <div class="card bl-gold" style="flex-shrink:0">
+          <div class="ct">🔁 Renovación Flexible (Art. 18)</div>
+          <div class="cd">El personal docente que forme parte del Comité <strong>podrá ser renovado cada ciclo escolar</strong>. Esto garantiza participación rotativa y corresponsabilidad colectiva, evitando la concentración del poder en pocas personas.</div>
+        </div>
+        <div class="g3" style="flex-shrink:0">
+          <div class="card" style="text-align:center">
+            <div class="ci">📋</div>
+            <div class="ct" style="font-size:12px">Formular y Evaluar</div>
+            <div class="cd">Coordinar el Programa de Mejora Continua.</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="ci">🔍</div>
+            <div class="ct" style="font-size:12px">Sistematizar Diagnóstico</div>
+            <div class="cd">Analizar información para definir metas.</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="ci">🤝</div>
+            <div class="ct" style="font-size:12px">Vincular Comunidad</div>
+            <div class="cd">Involucrar a familias y comunicar avances.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 FUNCIONES CLAVE DEL COMITÉ -->
+    <div class="screen" id="s4">
+      <div class="sh">
+        <div class="badge bg-navy">Funciones</div>
+        <div class="stitle">Funciones Clave del Comité</div>
+        <div class="ssub">Las 4 responsabilidades centrales del Comité de Planeación</div>
+      </div>
+      <div class="ca">
+        <div class="g2" style="flex:1">
+          <div class="card" style="border-top:4px solid var(--navy)">
+            <div class="ci">📐</div>
+            <div class="ct">Formular y Evaluar</div>
+            <div class="cd">Coordinar la creación y el <strong>seguimiento riguroso</strong> del Programa de Mejora Continua a lo largo del ciclo escolar.</div>
+          </div>
+          <div class="card" style="border-top:4px solid var(--forest)">
+            <div class="ci">🔬</div>
+            <div class="ct">Sistematizar el Diagnóstico</div>
+            <div class="cd">Analizar la información socioeducativa para <strong>identificar problemáticas prioritarias</strong> y definir metas concretas.</div>
+          </div>
+          <div class="card" style="border-top:4px solid var(--terra)">
+            <div class="ci">🤲</div>
+            <div class="ct">Vincular a la Comunidad</div>
+            <div class="cd">Involucrar a las familias en los objetivos y <strong>comunicar periódicamente</strong> los avances logrados.</div>
+          </div>
+          <div class="card" style="border-top:4px solid var(--gold)">
+            <div class="ci">🏗️</div>
+            <div class="ct">Gestionar Infraestructura</div>
+            <div class="cd">Presentar necesidades físicas y de equipamiento identificadas al <strong>CEAP</strong> (Comité Escolar de Administración Participativa).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 EL CÓMO – DIAGNÓSTICO SOCIOEDUCATIVO -->
+    <div class="screen" id="s5">
+      <div class="sh">
+        <div class="badge bg-forest">El Cómo · Fase 1</div>
+        <div class="stitle">El Diagnóstico Socioeducativo</div>
+        <div class="ssub">"Ninguna mejora florece sin entender primero la raíz" (Art. 22)</div>
+      </div>
+      <div class="ca">
+        <div class="card bl-forest" style="flex-shrink:0">
+          <div class="ct">🌱 El verdadero punto de partida</div>
+          <div class="cd">Incorpora una <strong>mirada territorial</strong> y reconoce la diversidad que converge en la escuela. No es un diagnóstico de escritorio: surge de la realidad viva de la comunidad.</div>
+        </div>
+        <div class="g2" style="flex-shrink:0">
+          <div class="card bl-navy">
+            <div class="ct">📚 Dimensión Académica</div>
+            <div class="cd">Retos en el aprendizaje y formación integral de los estudiantes.</div>
+          </div>
+          <div class="card bl-forest">
+            <div class="ct">🧑‍🏫 Dimensión Pedagógica</div>
+            <div class="cd">Desafíos en las prácticas docentes y directivas cotidianas.</div>
+          </div>
+          <div class="card bl-terra">
+            <div class="ct">🏫 Dimensión Estructural</div>
+            <div class="cd">Condiciones de infraestructura y carga administrativa.</div>
+          </div>
+          <div class="card bl-gold">
+            <div class="ct">🌎 Dimensión Territorial</div>
+            <div class="cd">Contexto social, económico, cultural y el rol vital de las familias.</div>
+          </div>
+        </div>
+        <div class="hl bl-terra" style="flex-shrink:0">
+          ⚠️ Las 4 dimensiones son <strong>interdependientes</strong>. Un buen diagnóstico integra todas para obtener una imagen completa de la escuela y su contexto.
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 EL CÓMO – PROGRAMA DE MEJORA CONTINUA -->
+    <div class="screen" id="s6">
+      <div class="sh">
+        <div class="badge bg-navy">El Cómo · Fase 2</div>
+        <div class="stitle">El Programa de Mejora Continua</div>
+        <div class="ssub">El espíritu del Artículo 25: proceso plurianual, gradual y contextualizado</div>
+      </div>
+      <div class="ca">
+        <div class="row" style="flex-shrink:0">
+          <div class="card cn bg-navy grow" style="text-align:center;">
+            <div style="font-size:28px; margin-bottom:5px">∞</div>
+            <div class="ct" style="color:white; font-size:13px">Ciclo Permanente</div>
+            <div class="cd">Planear → Implementar → Evaluar → Ajustar</div>
+          </div>
+          <div class="grow" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.8px">Proceso Plurianual · Art. 21</div>
+            <div class="hl bl-navy" style="font-size:11px">No termina en un ciclo. Se construye año a año con visión de largo plazo.</div>
+          </div>
+        </div>
+        <div style="background:var(--white); border-radius:var(--r); overflow:hidden; box-shadow:var(--shadow); flex-shrink:0;">
+          <table class="cmp-table">
+            <thead>
+              <tr>
+                <th style="background:#f0f4f9; color:var(--forest); text-align:left">✅ Lo que SÍ es</th>
+                <th style="background:#fdf3f0; color:var(--terra); text-align:left">❌ Lo que NO es</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ok-cell">Un documento de trabajo <em>vivo</em></td>
+                <td class="no-cell">Un formato con fines puramente burocráticos</td>
+              </tr>
+              <tr>
+                <td class="ok-cell">Una herramienta que surge desde, en y para la escuela</td>
+                <td class="no-cell">Un documento sujeto a control administrativo externo</td>
+              </tr>
+              <tr>
+                <td class="ok-cell">Una respuesta a problemáticas priorizadas</td>
+                <td class="no-cell">Un trámite para cumplir con la supervisión</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="hl bl-gold" style="flex-shrink:0">
+          🔑 El Programa de Mejora Continua <strong>nace del diagnóstico</strong> y vuelve a él cada vez que se evalúa. Es un documento que crece con la escuela.
+        </div>
+      </div>
+    </div>
+
+    <!-- S7 EL CUÁNDO – CALENDARIO ESTRATÉGICO -->
+    <div class="screen" id="s7">
+      <div class="sh">
+        <div class="badge bg-gold">El Cuándo</div>
+        <div class="stitle">El Ritmo del Trabajo Colegiado</div>
+        <div class="ssub">13 días estratégicos distribuidos en el ciclo escolar</div>
+      </div>
+      <div class="ca">
+        <div class="g2" style="flex-shrink:0">
+          <div class="card cn bg-terra">
+            <div class="ci">🚀</div>
+            <div class="ct" style="color:white">Fase Intensiva</div>
+            <div class="cd"><strong style="color:white">5 días hábiles</strong> previos al inicio del ciclo escolar. Momento clave para elegir al Comité, consolidar el Diagnóstico y trazar el plan anual.</div>
+          </div>
+          <div class="card cn bg-navy">
+            <div class="ci">📅</div>
+            <div class="ct" style="color:white">Fase Ordinaria</div>
+            <div class="cd"><strong style="color:white">8 días</strong> distribuidos a lo largo del ciclo escolar para seguimiento, evaluación de avances y ajustes al Programa.</div>
+          </div>
+        </div>
+        <div class="card" style="background:#fffaf0; border:2px solid var(--gold); flex-shrink:0">
+          <div class="ct">📊 Total: 13 días de trabajo técnico protegido</div>
+          <div class="cd">5 (Intensiva) + 8 (Ordinaria) = <strong>13 jornadas completas</strong> dedicadas exclusivamente al trabajo pedagógico colegiado.</div>
+        </div>
+        <div class="card" style="background:#fdf3f0; border:2px solid var(--terra); flex-shrink:0">
+          <div class="ct">⛔ Exclusividad del Tiempo (Art. 16)</div>
+          <div class="cd">Estos días abarcan el <strong>total de horas de la jornada escolar</strong>. Por ningún motivo se usarán para actividades sindicales, sociales, cívicas o festivales. Son tiempo blindado para la pedagogía.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S8 LAS 4 DIMENSIONES – TABS -->
+    <div class="screen" id="s8">
+      <div class="sh">
+        <div class="badge bg-forest">Las 4 Dimensiones</div>
+        <div class="stitle">El Ecosistema del CTE</div>
+        <div class="ssub">Explora cada dimensión del modelo</div>
+      </div>
+      <div class="ca">
+        <div class="th" style="flex-shrink:0">
+          <button class="tbtn active" onclick="swTab(this,'td1')" style="color:var(--navy)">🎯 Qué</button>
+          <button class="tbtn" onclick="swTab(this,'td2')" style="color:var(--terra)">👥 Quién</button>
+          <button class="tbtn" onclick="swTab(this,'td3')" style="color:var(--forest)">🔧 Cómo</button>
+          <button class="tbtn" onclick="swTab(this,'td4')" style="color:var(--gold)">📅 Cuándo</button>
+        </div>
+        <div class="tc active" id="td1">
+          <div class="hl bl-navy">El <strong>Consejo Técnico Escolar</strong> es el órgano colegiado de mayor decisión técnico-pedagógica de cada escuela.</div>
+          <div class="hl bl-navy">Su objetivo central es el <strong>máximo logro de aprendizajes</strong>, el desarrollo integral y el fortalecimiento de los lazos comunidad-escuela.</div>
+          <div class="hl bl-navy">No es una obligación administrativa: es donde la <strong>autonomía profesional</strong> se convierte en acción real.</div>
+        </div>
+        <div class="tc" id="td2">
+          <div class="hl bl-terra">Lo integran el <strong>Directivo</strong> (que lidera las condiciones) y el <strong>Colectivo Docente</strong> (elegido en Fase Intensiva).</div>
+          <div class="hl bl-terra">El número de integrantes docentes se <strong>adapta al tamaño</strong> de cada escuela para garantizar representatividad.</div>
+          <div class="hl bl-terra">El Comité puede <strong>renovarse cada ciclo</strong> (Art. 18), fomentando la participación rotativa de todo el colectivo.</div>
+        </div>
+        <div class="tc" id="td3">
+          <div class="hl bl-forest">Mediante el <strong>Diagnóstico Socioeducativo</strong> (4 dimensiones) y el <strong>Programa de Mejora Continua</strong>.</div>
+          <div class="hl bl-forest">El diagnóstico analiza lo académico, pedagógico, estructural y territorial para obtener una <strong>imagen completa</strong> de la escuela.</div>
+          <div class="hl bl-forest">El Programa es un <strong>documento vivo</strong>, plurianual y contextualizado. Nunca un trámite burocrático.</div>
+        </div>
+        <div class="tc" id="td4">
+          <div class="hl bl-gold"><strong>13 días estratégicos</strong> en el ciclo: 5 de Fase Intensiva + 8 de Fase Ordinaria distribuidos a lo largo del año.</div>
+          <div class="hl bl-gold">La Fase Intensiva es el momento para <strong>elegir al Comité</strong>, revisar el diagnóstico y trazar el plan anual.</div>
+          <div class="hl bl-gold">Art. 16: el tiempo es <strong>exclusivo para trabajo pedagógico</strong>. Ninguna actividad ajena puede usarlo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S9 EL ENGRANAJE COMPLETO -->
+    <div class="screen" id="s9">
+      <div class="sh">
+        <div class="badge bg-navy">Síntesis</div>
+        <div class="stitle">El Engranaje Completo</div>
+        <div class="ssub">Cuando los 4 elementos trabajan juntos, la escuela se transforma</div>
+      </div>
+      <div class="ca">
+        <div class="card cn bg-navy" style="flex-shrink:0">
+          <div class="ct" style="color:white; font-size:15px">⚙️ La metáfora del engranaje</div>
+          <div class="cd">El CTE no es una obligación administrativa; es el espacio donde la <strong style="color:white">autonomía profesional</strong> se encuentra con la <strong style="color:white">realidad territorial</strong>.</div>
+        </div>
+        <div class="steps" style="flex-shrink:0">
+          <div class="step">
+            <div class="snum bg-navy">🎯</div>
+            <div class="stb">
+              <div class="stt">El Comité (Quién) guía al Colectivo</div>
+              <div class="std">Con representatividad real y renovación flexible, asegura que todos participen en las decisiones pedagógicas.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="snum bg-terra">🔍</div>
+            <div class="stb">
+              <div class="stt">A través de un Diagnóstico real (Cómo)</div>
+              <div class="std">No suposiciones, sino datos: académicos, pedagógicos, estructurales y territoriales que revelan la verdad de la escuela.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="snum bg-gold">📅</div>
+            <div class="stb">
+              <div class="stt">En el tiempo protegido (Cuándo)</div>
+              <div class="std">13 días blindados solo para la pedagogía. Sin festivales, sin trámites: solo trabajo colegiado de calidad.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="snum bg-forest">✨</div>
+            <div class="stb">
+              <div class="stt">La escuela se transforma (Para qué)</div>
+              <div class="std">Un verdadero ecosistema de excelencia donde el Derecho Humano a la Educación se vive cotidianamente.</div>
+            </div>
+          </div>
+        </div>
+        <div class="hl bl-forest" style="flex-shrink:0; font-style:italic">
+          "La transformación educativa nace del diálogo colegiado." — <strong>Prof. Francisco De Jesús Luna Benitez</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- S10 AUTOEVALUACIÓN -->
+    <div class="screen" id="s10">
+      <div class="sh">
+        <div class="badge bg-terra">Autoevaluación</div>
+        <div class="stitle">¿Cuánto aprendiste? 🧠</div>
+        <div class="ssub">Responde las preguntas de repaso sobre el CTE</div>
+      </div>
+      <div class="ca">
+        <div class="card" id="qcard" style="flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="font-size:11px; color:var(--muted); font-weight:700; margin-bottom:7px;" id="qnum">Pregunta 1 de 5</div>
+            <div class="qq" id="qtext"></div>
+            <div class="qopts" id="qopts"></div>
+            <div class="qfb" id="qfb"></div>
+          </div>
+          <div class="qnav">
+            <button class="btn btn-p" id="qnext" onclick="nextQ()" style="display:none">Siguiente ▶</button>
+            <button class="btn btn-s" id="qretry" onclick="startQ()" style="display:none">🔄 Reintentar</button>
+          </div>
+        </div>
+        <div id="qresult" style="display:none; flex-direction:column; align-items:center; gap:9px;">
+          <div class="score-c" id="qscore">0/5</div>
+          <div style="font-family:'Lora',serif; font-size:18px; font-weight:700; text-align:center;" id="qmsg"></div>
+          <button class="btn btn-p" onclick="startQ()">🔄 Volver a intentar</button>
+          <button class="btn btn-s" onclick="goTo(11)">Ver Resumen Final ▶</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- S11 RESUMEN FINAL -->
+    <div class="screen" id="s11">
+      <div class="sh">
+        <div class="badge bg-forest">Resumen Final</div>
+        <div class="stitle">Todo el CTE en un vistazo 📌</div>
+        <div class="ssub">Guía de estudio completa para repasar</div>
+      </div>
+      <div class="ca">
+        <div class="sumwrap scr">
+          <div class="sumi" style="border-color:var(--navy)">
+            <div class="sumit">🎯 El Qué – Naturaleza del CTE</div>
+            <div class="sumd">Órgano colegiado de mayor decisión técnico-pedagógica. Objetivo: máximo aprendizaje, desarrollo integral y vínculos con la comunidad.</div>
+          </div>
+          <div class="sumi" style="border-color:var(--terra)">
+            <div class="sumit">👥 El Quién – Comité CPE</div>
+            <div class="sumd">Directivo + Colectivo Docente elegido en Fase Intensiva. Renovable cada ciclo (Art. 18). Se adapta al tamaño escolar.</div>
+          </div>
+          <div class="sumi" style="border-color:var(--forest)">
+            <div class="sumit">🌱 El Cómo (1) – Diagnóstico</div>
+            <div class="sumd">4 dimensiones: Académica · Pedagógica · Estructural · Territorial. Es el verdadero punto de partida (Art. 22).</div>
+          </div>
+          <div class="sumi" style="border-color:var(--gold)">
+            <div class="sumit">∞ El Cómo (2) – Mejora Continua</div>
+            <div class="sumd">Ciclo: Planear→Implementar→Evaluar→Ajustar. Proceso plurianual (Art. 21). Documento vivo, no burocrático.</div>
+          </div>
+          <div class="sumi" style="border-color:var(--terra)">
+            <div class="sumit">📅 El Cuándo – 13 Días</div>
+            <div class="sumd">5 días Fase Intensiva + 8 días Fase Ordinaria. Tiempo exclusivo para pedagogía (Art. 16). Sin festivales ni trámites.</div>
+          </div>
+          <div class="sumi" style="border-color:var(--navy)">
+            <div class="sumit">🎓 5 Propósitos Fundamentales</div>
+            <div class="sumd">Mejora Continua · Autonomía Profesional · Contextualización · Interés Superior · Proyecto Diverso → Derecho Humano a la Educación.</div>
+          </div>
+          <div class="sumi" style="border-color:var(--forest); grid-column:1/-1">
+            <div class="sumit">⚙️ El Engranaje Completo</div>
+            <div class="sumd">Cuando el Comité (Quién) guía al Colectivo (Qué) a través de un diagnóstico real (Cómo) en el tiempo protegido (Cuándo), la escuela se convierte en un <strong>ecosistema de excelencia</strong>. La transformación educativa nace del diálogo colegiado.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /swrap -->
+
+  <!-- BOTTOM NAV -->
+  <div id="botnav">
+    <button class="btn btn-s" id="bprev" onclick="nav(-1)" disabled>◀ Anterior</button>
+    <button class="btn btn-p" id="bnext" onclick="nav(1)">Siguiente ▶</button>
+  </div>
+
+  <div id="foot">Material educativo elaborado por Prof. Francisco De Jesús Luna Benitez</div>
+</div>
+
+<script>
+const TOTAL = 12;
+let cur = 0;
+const vis = new Set([0]);
+
+const titles = [
+  'Portada','El Qué – CTE','Propósitos Fundamentales',
+  'El Quién – Comité','Funciones del Comité',
+  'El Cómo – Diagnóstico','El Cómo – Mejora Continua',
+  'El Cuándo – Calendario','Las 4 Dimensiones',
+  'El Engranaje Completo','Autoevaluación','Resumen Final'
+];
+
+function buildDots(){
+  const c=document.getElementById('dots'); c.innerHTML='';
+  for(let i=0;i<TOTAL;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===cur?' active':vis.has(i)?' visited':'');
+    d.onclick=(()=>{const x=i;return()=>goTo(x);})();
+    c.appendChild(d);
+  }
+}
+
+function updateUI(){
+  buildDots();
+  document.getElementById('ntitle').textContent=titles[cur];
+  document.getElementById('nctr').textContent=(cur+1)+' / '+TOTAL;
+  const pct=Math.round((cur/(TOTAL-1))*100);
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('bprev').disabled=cur===0;
+  document.getElementById('bnext').disabled=cur===TOTAL-1;
+  document.getElementById('bnext').textContent=cur===TOTAL-1?'✅ Fin':'Siguiente ▶';
+}
+
+function goTo(n){
+  if(n<0||n>=TOTAL||n===cur)return;
+  const ss=document.querySelectorAll('.screen');
+  const prev=cur, fwd=n>prev;
+
+  // Place incoming off-screen instantly
+  ss[n].classList.remove('active','slide-in','exit-slide-left','exit-slide-right','enter-right','enter-left');
+  ss[n].classList.add(fwd?'enter-right':'enter-left');
+  void ss[n].offsetWidth; // force reflow
+
+  // Animate out current
+  ss[prev].classList.remove('active');
+  ss[prev].classList.add(fwd?'exit-slide-left':'exit-slide-right');
+
+  // Animate in new screen
+  ss[n].classList.remove('enter-right','enter-left');
+  ss[n].classList.add('slide-in','active');
+
+  setTimeout(()=>{ ss[prev].classList.remove('exit-slide-left','exit-slide-right'); }, 350);
+
+  cur=n; vis.add(n); updateUI();
+  if(n===10) startQ();
+}
+function nav(d){ goTo(cur+d); }
+
+// ─── ACCORDION ───
+function togAcc(btn){
+  const body=btn.nextElementSibling;
+  const wasOpen=body.classList.contains('open');
+  document.querySelectorAll('#acc-prop .abody').forEach(b=>{b.classList.remove('open');b.previousElementSibling.classList.remove('open');});
+  if(!wasOpen){body.classList.add('open');btn.classList.add('open');}
+}
+
+// ─── TABS ───
+function swTab(btn,id){
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── QUIZ ───
+const qs=[
+  {q:'¿Qué tipo de órgano es el Consejo Técnico Escolar?',
+   o:['Órgano de control administrativo','Órgano colegiado de mayor decisión técnico-pedagógica','Órgano sindical de docentes','Órgano de supervisión federal'],
+   c:1, fb:'✅ ¡Correcto! El CTE es el órgano colegiado de mayor decisión técnico-pedagógica de cada escuela, no un mecanismo de control administrativo.'},
+  {q:'¿Cuántos días en total tiene el trabajo colegiado del CTE en el ciclo escolar?',
+   o:['8 días','5 días','10 días','13 días'],
+   c:3, fb:'✅ ¡Exacto! 5 días de Fase Intensiva + 8 días de Fase Ordinaria = 13 días estratégicos (Art. 16).'},
+  {q:'¿Cuál es el verdadero propósito del Programa de Mejora Continua?',
+   o:['Cumplir con la supervisión escolar','Un trámite burocrático anual','Una herramienta viva que surge desde, en y para la escuela','Un formato con fines de control administrativo'],
+   c:2, fb:'✅ ¡Muy bien! El PMC es un documento vivo, plurianual y contextualizado. Nunca un formato burocrático (Art. 25).'},
+  {q:'¿Qué sucede con el Comité de Planeación y Evaluación según el Art. 18?',
+   o:['Solo el directivo puede cambiarlo','Permanece fijo los 6 años','Puede renovarse cada ciclo escolar','Lo designa la supervisión'],
+   c:2, fb:'✅ ¡Correcto! El personal docente del Comité puede ser renovado cada ciclo, garantizando participación rotativa de todo el colectivo.'},
+  {q:'¿Cuáles son las 4 dimensiones del Diagnóstico Socioeducativo?',
+   o:['Matemática, Lengua, Ciencias, Arte','Académica, Pedagógica, Estructural, Territorial','Nacional, Estatal, Municipal, Escolar','Física, Mental, Social, Cultural'],
+   c:1, fb:'✅ ¡Perfecto! Las 4 dimensiones son: Académica (aprendizajes), Pedagógica (práctica docente), Estructural (infraestructura) y Territorial (contexto comunitario).'}
+];
+
+let qi=0, sc=0, done=false;
+
+function startQ(){
+  qi=0; sc=0; done=false;
+  document.getElementById('qcard').style.display='flex';
+  document.getElementById('qresult').style.display='none';
+  renderQ();
+}
+
+function renderQ(){
+  const q=qs[qi];
+  document.getElementById('qnum').textContent='Pregunta '+(qi+1)+' de '+qs.length;
+  document.getElementById('qtext').textContent=q.q;
+  const op=document.getElementById('qopts'); op.innerHTML='';
+  q.o.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='qopt';
+    b.innerHTML='<span style="font-weight:900;color:var(--muted)">'+(String.fromCharCode(65+i))+'</span> '+o;
+    b.onclick=()=>answerQ(i);
+    op.appendChild(b);
+  });
+  const fb=document.getElementById('qfb');
+  fb.className='qfb'; fb.textContent='';
+  document.getElementById('qnext').style.display='none';
+  document.getElementById('qretry').style.display='none';
+  done=false;
+}
+
+function answerQ(idx){
+  if(done)return; done=true;
+  const q=qs[qi];
+  document.querySelectorAll('.qopt').forEach((o,i)=>{
+    o.classList.add('dis');
+    if(i===q.c)o.classList.add('ok');
+    else if(i===idx)o.classList.add('err');
+  });
+  const fb=document.getElementById('qfb');
+  if(idx===q.c){ sc++; fb.className='qfb show ok'; }
+  else { fb.className='qfb show err'; }
+  fb.textContent=q.fb;
+  const nb=document.getElementById('qnext');
+  nb.style.display='inline-flex';
+  nb.textContent=qi<qs.length-1?'Siguiente ▶':'Ver resultados 🎯';
+}
+
+function nextQ(){
+  qi++;
+  if(qi>=qs.length){ showResult(); return; }
+  renderQ();
+}
+
+function showResult(){
+  document.getElementById('qcard').style.display='none';
+  const r=document.getElementById('qresult'); r.style.display='flex';
+  const s=document.getElementById('qscore');
+  s.textContent=sc+'/'+qs.length;
+  s.style.background=sc>=4?'var(--forest)':sc>=2?'var(--gold)':'var(--terra)';
+  const msgs=['¡Sigue repasando el material! 💪','¡Vas bien! Revisa los temas de nuevo 📚','¡Excelente dominio del tema! 🏆'];
+  document.getElementById('qmsg').textContent=sc>=4?msgs[2]:sc>=2?msgs[1]:msgs[0];
+}
+
+// ─── INIT ───
+updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- =====================================================
+         META TAGS ESENCIALES
+         viewport: evita zoom automático en móviles
+         apple-mobile: permite pantalla completa en iOS
+    ====================================================== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Simulador USICAMM - Admisión Secundaria 2026</title>
+
+    <!-- Fuentes de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* =====================================================
+           VARIABLES CSS - PALETA BLANCO Y AZUL CLARO
+           Colores suaves con alto contraste para el texto
+        ====================================================== */
+        :root {
+            /* Azules principales */
+            --sky-darker:  #1e6fa8;  /* azul medio-oscuro para headers */
+            --sky-dark:    #2390d4;  /* azul principal */
+            --sky-mid:     #4caee8;  /* azul claro medio */
+            --sky-light:   #7dcef5;  /* azul muy claro */
+            --sky-pale:    #d0edfb;  /* azul pálido / fondos suaves */
+            --sky-bg:      #f5fbff;  /* blanco azulado (fondo principal) */
+            --sky-bg2:     #e6f4fc;  /* blanco azulado secundario */
+
+            /* Texto y neutros */
+            --white:       #ffffff;
+            --text-dark:   #0d3d5c;  /* azul muy oscuro para texto principal */
+            --text-mid:    #1a5276;  /* azul oscuro para texto secundario */
+            --gray:        #4a7fa0;  /* azul grisáceo para texto auxiliar */
+            --light-gray:  #c8e4f5;  /* borde claro */
+            --border:      rgba(35, 144, 212, 0.3);
+
+            /* Estados */
+            --correct:     #166534;  /* verde oscuro para correctas */
+            --incorrect:   #991b1b;  /* rojo oscuro para incorrectas */
+
+            --progress-bg: rgba(255,255,255,0.35);
+        }
+
+        /* =====================================================
+           RESET GLOBAL
+           box-sizing: border-box en todos los elementos
+           evita desbordamientos inesperados
+        ====================================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* quita flash azul en tap mobile */
+            touch-action: manipulation;               /* mejora respuesta táctil */
+        }
+
+        html {
+            height: 100%;
+            height: -webkit-fill-available; /* iOS Safari: altura real */
+            font-size: 16px;               /* base para unidades rem */
+        }
+
+        /* =====================================================
+           BODY - Contenedor principal
+           position:fixed + overflow:hidden evita el "bounce"
+           de scroll en iOS y mantiene la app estática
+        ====================================================== */
+        body {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%;
+            height: 100%;
+            height: var(--app-height, 100vh); /* altura dinámica calculada con JS */
+            overflow: hidden;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--sky-bg);
+            overscroll-behavior: none;
+            color: var(--text-dark);
+        }
+
+        /* =====================================================
+           PANTALLA DE BIENVENIDA
+           Ocupa toda la pantalla, scroll interno si es necesario
+        ====================================================== */
+        #welcomeScreen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 100;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            background: linear-gradient(160deg, #1e6fa8 0%, #2390d4 50%, #4caee8 100%);
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 1.25rem 1rem env(safe-area-inset-bottom, 1.25rem);
+        }
+
+        /* Fondo decorativo con gradientes */
+        .welcome-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(255,255,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(30,111,168,0.25) 0%, transparent 60%);
+        }
+
+        /* Cuadrícula decorativa de fondo */
+        .welcome-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.07) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px);
+            background-size: 2.5rem 2.5rem;
+        }
+
+        .welcome-card {
+            position: relative;
+            z-index: 2;
+            background: rgba(255,255,255,0.96);  /* casi blanco */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(125,206,245,0.5);
+            border-radius: 1.25rem;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 32.5rem;
+            text-align: center;
+            box-shadow:
+                0 1.875rem 5rem rgba(30,111,168,0.25),
+                0 0 0 1px rgba(125,206,245,0.2) inset;
+            margin: auto 0;
+        }
+
+        /* Badge animado "Examen Oficial 2026" */
+        .welcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(35,144,212,0.12);
+            border: 1px solid rgba(35,144,212,0.35);
+            border-radius: 3.125rem;
+            padding: 0.375rem 1rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--sky-dark);
+            margin-bottom: 1.375rem;
+        }
+
+        /* Punto parpadeante del badge */
+        .welcome-badge::before {
+            content: '';
+            width: 0.375rem;
+            height: 0.375rem;
+            border-radius: 50%;
+            background: var(--sky-dark);
+            animation: pulse 2s infinite;
+        }
+
+        /* Animación de pulso para el punto del badge */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        /* Título principal */
+        .welcome-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.2;
+            margin-bottom: 0.375rem;
+        }
+
+        .welcome-title span { color: var(--sky-dark); }
+
+        .welcome-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            margin-bottom: 0.25rem;
+            font-weight: 400;
+        }
+
+        .welcome-author {
+            font-size: 0.85rem;
+            color: var(--sky-dark);
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        /* Línea decorativa divisora */
+        .divider {
+            width: 3.75rem;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--sky-dark), transparent);
+            margin: 0 auto 2rem;
+        }
+
+        /* =====================================================
+           GRID DE INFORMACIÓN (preguntas, tiempo, etc.)
+           CSS Grid de 2 columnas, se adapta automáticamente
+        ====================================================== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 columnas iguales */
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-item {
+            background: var(--sky-bg2);
+            border: 1px solid rgba(35,144,212,0.25);
+            border-radius: 0.625rem;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .info-item .info-val {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--sky-dark);
+        }
+
+        .info-item .info-lbl {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray);
+            margin-top: 0.125rem;
+        }
+
+        /* =====================================================
+           CAMPO DE TEXTO - Nombre del sustentante
+        ====================================================== */
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--sky-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: var(--white);
+            border: 1.5px solid var(--light-gray);
+            border-radius: 0.625rem;
+            padding: 0.8125rem 1.125rem;
+            font-size: 0.95rem;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input::placeholder { color: rgba(74,127,160,0.45); }
+
+        .input-group input:focus {
+            border-color: var(--sky-dark);
+            box-shadow: 0 0 0 3px rgba(35,144,212,0.15);
+        }
+
+        /* Botón principal de inicio */
+        .btn-start {
+            width: 100%;
+            padding: 0.9375rem;
+            background: linear-gradient(135deg, var(--sky-dark) 0%, var(--sky-mid) 100%);
+            border: none;
+            border-radius: 0.625rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0.25rem 1.25rem rgba(14,165,233,0.4);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1.875rem rgba(14,165,233,0.55);
+        }
+
+        /* =====================================================
+           PANTALLA DEL EXAMEN (quiz)
+           Layout: flex column
+           Header fijo + cuerpo con sidebar + área principal
+        ====================================================== */
+        #quizScreen {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            height: 100%;
+            height: var(--app-height, 100vh);
+            overflow: hidden;
+        }
+
+        /* =====================================================
+           HEADER DEL EXAMEN
+           flex row, alineado horizontalmente
+           height fija en px mínimos para mantener proporción
+        ====================================================== */
+        .header {
+            background: linear-gradient(135deg, var(--sky-darker) 0%, var(--sky-dark) 100%);
+            border-bottom: 1px solid rgba(56,189,248,0.25);
+            padding: 0 0.875rem;
+            height: 3.75rem;
+            min-height: 3.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0; /* impide que el header se comprima */
+            position: relative;
+            gap: 0.5rem;
+        }
+
+        /* Línea decorativa inferior del header */
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--sky-light), transparent);
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* permite que el texto se trunque en móvil */
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* "..." si no cabe en pantalla */
+        }
+
+        .header-title span { color: var(--sky-light); }
+
+        .header-sub {
+            font-size: 0.65rem;
+            color: rgba(186,230,253,0.5);
+            margin-top: 0.125rem;
+            display: none; /* oculto en móvil, visible en desktop */
+        }
+
+        .header-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            flex: 1;             /* ocupa el espacio central */
+            min-width: 0;
+        }
+
+        .student-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--sky-light);
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 12rem;    /* evita desbordamiento en nombres largos */
+        }
+
+        /* Barra de progreso mini en el header */
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar-mini {
+            width: 7.5rem;       /* rem para escalar con fuente base */
+            height: 4px;
+            background: rgba(255,255,255,0.12);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill-mini {
+            height: 100%;
+            background: linear-gradient(90deg, var(--sky-mid), var(--sky-light));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-label {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.45);
+            min-width: 2.5rem;
+            text-align: right;
+        }
+
+        /* =====================================================
+           TEMPORIZADOR (SVG ring + texto)
+        ====================================================== */
+        .timer-wrap {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            flex-shrink: 0;
+        }
+
+        .timer-ring {
+            position: relative;
+            width: 2.875rem;
+            height: 2.875rem;
+        }
+
+        .timer-ring svg {
+            transform: rotate(-90deg); /* empieza desde arriba */
+            width: 2.875rem;
+            height: 2.875rem;
+        }
+
+        /* Círculo de fondo del timer */
+        .timer-ring .ring-bg {
+            fill: none;
+            stroke: rgba(255,255,255,0.1);
+            stroke-width: 3;
+        }
+
+        /* Círculo de progreso del timer */
+        .timer-ring .ring-fill {
+            fill: none;
+            stroke: var(--sky-light);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 125.66;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear, stroke 1s;
+        }
+
+        /* Texto del tiempo dentro del ring */
+        .timer-display {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.02em;
+        }
+
+        .timer-label {
+            font-size: 0.7rem;
+            color: rgba(186,230,253,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* Estados del timer: urgente (rojo) y advertencia (naranja) */
+        .timer-urgent .ring-fill { stroke: #ef4444; }
+        .timer-urgent .timer-display { color: #ef4444; }
+        .timer-warn .ring-fill { stroke: #f59e0b; }
+
+        @keyframes timerFlash {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.5; }
+        }
+        .timer-urgent { animation: timerFlash 1s infinite; }
+
+        /* =====================================================
+           CUERPO DEL QUIZ
+           flex row: sidebar izquierda + contenido principal
+        ====================================================== */
+        .quiz-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            background: var(--sky-bg);
+        }
+
+        /* =====================================================
+           SIDEBAR DE NAVEGACIÓN (visible solo en desktop)
+           Oculta en móvil con display:none
+           Se muestra en pantallas ≥640px
+        ====================================================== */
+        .sidebar {
+            width: 12.5rem;
+            flex-shrink: 0;
+            background: var(--white);
+            border-right: 1px solid var(--light-gray);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 0.875rem 1rem 0.625rem;
+            border-bottom: 1px solid var(--light-gray);
+            background: var(--sky-bg2);
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--sky-dark);
+            font-weight: 700;
+        }
+
+        .sidebar-stats {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.375rem;
+        }
+
+        .sidebar-stat {
+            font-size: 0.72rem;
+            color: var(--gray);
+        }
+
+        .sidebar-stat span {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* =====================================================
+           GRILLA DE PREGUNTAS (sidebar desktop)
+           CSS Grid de 5 columnas
+        ====================================================== */
+        .question-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.75rem;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.375rem;
+            align-content: start;
+        }
+
+        /* Scrollbar delgada personalizada */
+        .question-grid::-webkit-scrollbar { width: 4px; }
+        .question-grid::-webkit-scrollbar-track { background: transparent; }
+        .question-grid::-webkit-scrollbar-thumb {
+            background: rgba(56,189,248,0.25);
+            border-radius: 2px;
+        }
+
+        /* Punto/botón de cada pregunta en la grilla */
+        .q-dot {
+            aspect-ratio: 1;
+            border-radius: 0.375rem;
+            background: var(--sky-bg2);
+            border: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+
+        .q-dot:hover {
+            background: var(--sky-pale);
+            border-color: var(--sky-mid);
+            color: var(--sky-darker);
+        }
+
+        .q-dot.answered {
+            background: var(--sky-pale);
+            border-color: var(--sky-dark);
+            color: var(--sky-darker);
+            font-weight: 700;
+        }
+
+        .q-dot.current {
+            background: var(--sky-dark);
+            border-color: var(--sky-darker);
+            color: var(--white);
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(35,144,212,0.35);
+        }
+
+        /* =====================================================
+           CONTENIDO PRINCIPAL - Área de preguntas
+        ====================================================== */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--sky-bg);
+            min-width: 0; /* evita overflow horizontal en flex */
+        }
+
+        /* Área scrollable de la pregunta activa */
+        .question-area {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 1rem;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .question-area::-webkit-scrollbar { width: 3px; }
+        .question-area::-webkit-scrollbar-track { background: transparent; }
+        .question-area::-webkit-scrollbar-thumb {
+            background: rgba(14,165,233,0.18);
+            border-radius: 3px;
+        }
+
+        /* Cada bloque de pregunta, por defecto oculto */
+        .question-container {
+            display: none;
+            animation: fadeUp 0.25s ease;
+        }
+
+        .question-container.active { display: block; }
+
+        /* Animación suave al cambiar pregunta */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Etiqueta "Pregunta X / 92" */
+        .q-number-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--sky-dark);
+            color: var(--sky-pale);
+            padding: 0.3125rem 0.875rem;
+            border-radius: 3.125rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.875rem;
+        }
+
+        /* Texto de la pregunta */
+        .question-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.02rem;
+            line-height: 1.65;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
+            white-space: pre-line; /* respeta saltos de línea en el texto */
+        }
+
+        /* =====================================================
+           OPCIONES DE RESPUESTA
+           flex column para stack vertical
+        ====================================================== */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.625rem;
+        }
+
+        .option {
+            background: var(--white);
+            border: 1.5px solid var(--light-gray);
+            border-radius: 0.625rem;
+            padding: 0.875rem 1.125rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+            box-shadow: 0 1px 3px rgba(14,165,233,0.06);
+        }
+
+        .option:hover {
+            border-color: rgba(14,165,233,0.45);
+            background: #f0f9ff;
+            box-shadow: 0 2px 8px rgba(14,165,233,0.12);
+        }
+
+        /* Opción seleccionada por el usuario */
+        .option.selected {
+            background: var(--sky-dark);
+            border-color: var(--sky-dark);
+            color: var(--white);
+            box-shadow: 0 4px 14px rgba(3,105,161,0.28);
+        }
+
+        /* Círculo con la letra de la opción (A, B, C) */
+        .option-label {
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
+            background: rgba(14,165,233,0.1);
+            border: 1.5px solid rgba(14,165,233,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.78rem;
+            color: var(--sky-dark);
+            flex-shrink: 0; /* no se encoje */
+            transition: all 0.2s;
+        }
+
+        .option.selected .option-label {
+            background: rgba(56,189,248,0.22);
+            border-color: var(--sky-light);
+            color: var(--sky-light);
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            padding-top: 0.25rem;
+        }
+
+        /* =====================================================
+           FOOTER DE NAVEGACIÓN (anterior / siguiente / finalizar)
+        ====================================================== */
+        .nav-footer {
+            padding: 0.625rem 0.875rem calc(0.625rem + env(safe-area-inset-bottom, 0px));
+            background: var(--white);
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0; /* no se comprime */
+            gap: 0.625rem;
+        }
+
+        /* Botones de navegación */
+        .btn {
+            padding: 0.6875rem 1.125rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        /* Botón secundario (anterior) */
+        .btn-sec {
+            background: var(--sky-bg2);
+            color: var(--sky-dark);
+            border: 1px solid rgba(14,165,233,0.2);
+        }
+        .btn-sec:hover { background: var(--sky-pale); }
+
+        /* Botón primario (siguiente) */
+        .btn-pri {
+            background: var(--sky-dark);
+            color: var(--white);
+        }
+        .btn-pri:hover {
+            background: var(--sky-darker);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(3,105,161,0.35);
+        }
+
+        /* Botón finalizar (gold→sky) */
+        .btn-finish {
+            background: linear-gradient(135deg, var(--sky-mid), var(--sky-light));
+            color: var(--sky-darker);
+            display: none;
+        }
+        .btn-finish:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(14,165,233,0.45);
+        }
+
+        /* Botón deshabilitado */
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
+
+        .nav-counter {
+            font-size: 0.82rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        /* =====================================================
+           PANTALLA DE RESULTADOS
+        ====================================================== */
+        #resultsScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            height: 100%;
+            height: var(--app-height, 100vh);
+            overflow: hidden;
+            flex-direction: column;
+            background: var(--sky-bg);
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--sky-darker) 0%, var(--sky-dark) 100%);
+            border-bottom: 1px solid rgba(125,206,245,0.3);
+            padding: 0.875rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .results-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--white);
+            font-size: 1.1rem;
+        }
+
+        .results-body {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Panel de puntuación */
+        .results-summary {
+            flex-shrink: 0;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--light-gray);
+            align-items: center;
+        }
+
+        .score-circle {
+            grid-column: span 1;
+            text-align: center;
+        }
+
+        .score-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--sky-dark);
+            line-height: 1;
+        }
+
+        .score-total {
+            font-size: 0.65rem;
+            color: var(--gray);
+            margin-top: 0.125rem;
+        }
+
+        .score-pct {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-top: 0.125rem;
+        }
+
+        .score-msg {
+            font-style: italic;
+            font-family: 'Playfair Display', serif;
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: var(--sky-bg2);
+            border-radius: 0.5rem;
+            font-size: 0.76rem;
+        }
+
+        .stat-row .lbl { color: var(--gray); }
+        .stat-row .val { color: var(--text-dark); font-weight: 700; }
+
+        .btn-reset {
+            grid-column: span 3;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--sky-darker), var(--sky-dark));
+            color: var(--white);
+            border: none;
+            border-radius: 0.625rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(14,165,233,0.4);
+        }
+
+        /* Área scrollable con revisión de respuestas */
+        .results-review {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            padding: 0.875rem 1rem calc(0.875rem + env(safe-area-inset-bottom, 0px));
+            background: var(--sky-bg);
+        }
+
+        .results-review::-webkit-scrollbar { width: 3px; }
+        .results-review::-webkit-scrollbar-thumb {
+            background: rgba(14,165,233,0.18);
+            border-radius: 3px;
+        }
+
+        /* Tarjeta individual de revisión */
+        .review-item {
+            background: var(--white);
+            border-radius: 0.625rem;
+            padding: 0.875rem 1.125rem;
+            margin-bottom: 0.625rem;
+            border-left: 4px solid var(--light-gray);
+            font-size: 0.85rem;
+        }
+
+        .review-item.correct-item   { border-left-color: var(--correct); }
+        .review-item.incorrect-item { border-left-color: var(--incorrect); }
+
+        .review-q  { font-weight: 600; color: var(--text-dark); margin-bottom: 0.375rem; font-size: 0.82rem; }
+        .review-a  { color: var(--gray); font-size: 0.8rem; }
+        .tag-correct   { color: var(--correct); font-weight: 700; }
+        .tag-incorrect { color: var(--incorrect); font-weight: 700; }
+
+        /* =====================================================
+           GRILLA MÓVIL DE NAVEGACIÓN (bottom sheet colapsable)
+           Solo visible en móvil (≤639px)
+        ====================================================== */
+        .mob-grid-wrap {
+            background: var(--white);
+            border-top: 1px solid var(--light-gray);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .mob-grid-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border: none;
+            background: var(--sky-bg2);
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .mob-grid-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--sky-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .mob-grid-stats {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+
+        .mob-grid-stats span { color: var(--text-dark); font-weight: 700; }
+
+        .mob-grid-arrow {
+            font-size: 0.7rem;
+            color: var(--sky-dark);
+            transition: transform 0.2s;
+        }
+
+        .mob-grid-arrow.open { transform: rotate(180deg); }
+
+        .mob-grid-inner {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 0.25rem;
+            padding: 0 0.75rem 0.625rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s;
+            background: var(--white);
+        }
+
+        .mob-grid-inner.open {
+            max-height: 12.5rem;
+            padding: 0 0.75rem 0.625rem;
+        }
+
+        /* =====================================================
+           BANNER DINÁMICO DE MOTIVACIÓN
+           Elemento extra con JavaScript (requisito #9)
+           Aparece al marcar 25%, 50%, 75% del examen
+        ====================================================== */
+        #motivationBanner {
+            display: none;
+            position: fixed;
+            top: 4.375rem;      /* justo bajo el header */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            background: linear-gradient(135deg, var(--sky-dark), var(--sky-mid));
+            color: var(--white);
+            padding: 0.625rem 1.5rem;
+            border-radius: 3.125rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(14,165,233,0.45);
+            white-space: nowrap;
+            animation: bannerSlide 0.4s ease;
+        }
+
+        @keyframes bannerSlide {
+            from { top: 2.5rem; opacity: 0; }
+            to   { top: 4.375rem; opacity: 1; }
+        }
+
+        /* =====================================================
+           MEDIA QUERIES - DISEÑO RESPONSIVE
+
+           Breakpoint 1: ≥640px (tablet y desktop)
+           - Muestra sidebar de navegación
+           - Oculta grilla móvil
+           - Amplía paddings y fuentes
+        ====================================================== */
+        @media (min-width: 40rem) { /* 640px en rem */
+
+            /* Bienvenida: centrar verticalmente en pantallas grandes */
+            #welcomeScreen { align-items: center; }
+
+            /* Tarjeta de bienvenida con más padding */
+            .welcome-card { padding: 2.5rem 2.75rem; margin: 0; }
+
+            /* Header más alto */
+            .header { padding: 0 1.5rem; height: 4.25rem; }
+
+            /* Muestra el subtítulo del header */
+            .header-sub { display: block; }
+
+            /* MUESTRA el sidebar en desktop */
+            .sidebar { display: flex; }
+
+            /* OCULTA la grilla móvil en desktop */
+            .mob-grid-wrap { display: none; }
+
+            /* Más padding en el área de preguntas */
+            .question-area { padding: 1.5rem 1.75rem; }
+
+            .nav-footer { padding: 0.75rem 1.75rem; }
+
+            /* En desktop, resultados se muestran en dos columnas */
+            .results-body { flex-direction: row; }
+
+            .results-summary {
+                width: 17.5rem;
+                flex-shrink: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                border-bottom: none;
+                border-right: 1px solid var(--light-gray);
+                padding: 1.5rem 1.25rem;
+                background: var(--white);
+            }
+
+            .results-summary .score-circle { grid-column: unset; }
+            .results-summary .score-msg {
+                grid-column: unset;
+                flex-direction: column;
+                font-size: 0.9rem;
+            }
+            .results-summary .btn-reset {
+                grid-column: unset;
+                margin-top: auto;
+            }
+            .results-summary .stat-row { font-size: 0.8rem; }
+            .score-num  { font-size: 3.2rem; }
+            .score-pct  { font-size: 1.2rem; }
+        }
+
+        /* Breakpoint 2: ≥1024px (desktop grande) */
+        @media (min-width: 64rem) {
+            .welcome-title { font-size: 2.4rem; }
+            .question-text { font-size: 1.1rem; }
+            .option-text   { font-size: 0.95rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- =====================================================
+     PANTALLA DE BIENVENIDA
+     Aparece al cargar la página
+====================================================== -->
+<div id="welcomeScreen">
+    <!-- Capas decorativas de fondo -->
+    <div class="welcome-bg"></div>
+    <div class="welcome-grid"></div>
+
+    <!-- Tarjeta principal centrada -->
+    <div class="welcome-card">
+
+        <!-- Badge animado -->
+        <div class="welcome-badge">Examen Oficial 2026</div>
+
+        <!-- Título y subtítulo -->
+        <h1 class="welcome-title">Simulador <span>USICAMM</span></h1>
+        <p class="welcome-subtitle">Admisión Secundaria 2026</p>
+        <p class="welcome-author">Mtro. Francisco De Jesús Luna Benítez</p>
+
+        <div class="divider"></div>
+
+        <!-- Datos del examen en grid 2x2 -->
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-val">92</div>
+                <div class="info-lbl">Preguntas</div>
+            </div>
+            <div class="info-item">
+                <div class="info-val">180</div>
+                <div class="info-lbl">Minutos</div>
+            </div>
+            <div class="info-item">
+                <div class="info-val">3</div>
+                <div class="info-lbl">Opciones</div>
+            </div>
+            <div class="info-item">
+                <div class="info-val">70%</div>
+                <div class="info-lbl">Mín. Aprobatorio</div>
+            </div>
+        </div>
+
+        <!-- Campo de nombre (Enter también inicia) -->
+        <div class="input-group">
+            <label>Nombre del sustentante</label>
+            <input type="text" id="nameInput"
+                   placeholder="Escribe tu nombre completo..."
+                   autocomplete="off" />
+        </div>
+
+        <!-- Botón de inicio -->
+        <button class="btn-start" onclick="startQuiz()">Iniciar Examen →</button>
+
+    </div><!-- /welcome-card -->
+</div><!-- /welcomeScreen -->
+
+
+<!-- =====================================================
+     PANTALLA DEL EXAMEN
+     Oculta por defecto, se muestra al iniciar
+====================================================== -->
+<div id="quizScreen" style="display:none; flex-direction:column;">
+
+    <!-- HEADER: Logo | Nombre+Progreso | Timer -->
+    <div class="header">
+        <div class="header-left">
+            <div class="header-title">Simulador <span>USICAMM</span></div>
+            <div class="header-sub">Admisión Secundaria 2026 · Mtro. Francisco De Jesús Luna Benítez</div>
+        </div>
+
+        <div class="header-center">
+            <div class="student-name" id="headerName"></div>
+            <div class="progress-wrap">
+                <div class="progress-bar-mini">
+                    <div class="progress-fill-mini" id="progressFill"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">0/92</div>
+            </div>
+        </div>
+
+        <!-- Ring SVG del temporizador -->
+        <div class="timer-wrap">
+            <div class="timer-ring" id="timerRing">
+                <svg viewBox="0 0 46 46">
+                    <circle class="ring-bg"   cx="23" cy="23" r="20"/>
+                    <circle class="ring-fill" id="ringFill" cx="23" cy="23" r="20"/>
+                </svg>
+                <div class="timer-display" id="timerDisplay">180:00</div>
+            </div>
+            <div class="timer-label">Tiempo</div>
+        </div>
+    </div><!-- /header -->
+
+    <!-- CUERPO: Sidebar + Contenido Principal -->
+    <div class="quiz-body">
+
+        <!-- Sidebar de navegación (solo desktop) -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Navegación</div>
+                <div class="sidebar-stats">
+                    <div class="sidebar-stat">Respondidas: <span id="sideAnswered">0</span></div>
+                    <div class="sidebar-stat">Restantes: <span id="sideRemaining">92</span></div>
+                </div>
+            </div>
+            <!-- Grilla de puntos de preguntas -->
+            <div class="question-grid" id="questionGrid"></div>
+        </div><!-- /sidebar -->
+
+        <!-- Área principal de preguntas -->
+        <div class="main-content">
+
+            <!-- Contenedor scrollable de la pregunta activa -->
+            <div class="question-area" id="questionsContainer"></div>
+
+            <!-- Footer de navegación -->
+            <div class="nav-footer" id="navigation">
+                <button class="btn btn-sec" id="prevBtn" onclick="previousQuestion()">← Ant.</button>
+                <div class="nav-counter" id="navCounter">1 / 92</div>
+                <button class="btn btn-pri"    id="nextBtn"   onclick="nextQuestion()">Sig. →</button>
+                <button class="btn btn-finish" id="finishBtn" onclick="finishQuiz()">Finalizar ✓</button>
+            </div>
+
+            <!-- Grilla móvil de preguntas (colapsable, solo móvil) -->
+            <div class="mob-grid-wrap" id="mobGridWrap">
+                <button class="mob-grid-toggle" onclick="toggleMobGrid()">
+                    <span class="mob-grid-label">Ir a pregunta</span>
+                    <span class="mob-grid-stats">Respondidas: <span id="mobAnswered">0</span> / 92</span>
+                    <span class="mob-grid-arrow" id="mobArrow">▲</span>
+                </button>
+                <div class="mob-grid-inner" id="mobGridInner"></div>
+            </div>
+
+        </div><!-- /main-content -->
+    </div><!-- /quiz-body -->
+</div><!-- /quizScreen -->
+
+
+<!-- =====================================================
+     PANTALLA DE RESULTADOS
+     Oculta hasta que se finaliza el examen
+====================================================== -->
+<div id="resultsScreen" style="display:none; flex-direction:column;">
+
+    <div class="results-header">
+        <h2>Resultado del Examen</h2>
+        <div style="font-size:0.8rem; color:rgba(255,255,255,0.75);">
+            Simulador USICAMM · Admisión Secundaria 2026
+        </div>
+    </div>
+
+    <div class="results-body">
+
+        <!-- Columna izquierda: puntuación y estadísticas -->
+        <div class="results-summary">
+            <div class="score-circle">
+                <div class="score-num" id="scoreNum">—</div>
+                <div class="score-total" id="scoreTot">de 92 correctas</div>
+                <div class="score-pct" id="scorePct">0%</div>
+            </div>
+
+            <div class="score-msg" id="scoreMsg">
+                <div class="stat-row">
+                    <span class="lbl">Correctas</span>
+                    <span class="val tag-correct" id="statCorrect">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="lbl">Incorrectas</span>
+                    <span class="val tag-incorrect" id="statWrong">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="lbl">Sin resp.</span>
+                    <span class="val" id="statBlank">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="lbl">Tiempo</span>
+                    <span class="val" id="statTime">—</span>
+                </div>
+                <div id="scoreMsgText"
+                     style="font-family:'Playfair Display',serif; font-size:0.82rem;
+                            color:var(--sky-dark); text-align:center;
+                            font-style:italic; margin-top:0.25rem; font-weight:600;">
+                </div>
+            </div>
+
+            <button class="btn-reset" onclick="resetQuiz()">↩ Reiniciar</button>
+        </div><!-- /results-summary -->
+
+        <!-- Columna derecha: revisión de respuestas -->
+        <div class="results-review" id="reviewContainer"></div>
+
+    </div><!-- /results-body -->
+</div><!-- /resultsScreen -->
+
+
+<!-- Banner flotante de motivación (elemento dinámico JS) -->
+<div id="motivationBanner"></div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     Toda la lógica del simulador en un solo bloque
+====================================================== -->
+<script>
+
+/* -------------------------------------------------------
+   FIX DE ALTURA EN iOS
+   Calcula la altura real del viewport (sin barra de URL)
+   y la guarda en --app-height para usarla en el CSS
+------------------------------------------------------- */
+function setAppHeight() {
+    document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+}
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', () => setTimeout(setAppHeight, 300));
+setAppHeight();
+
+
+/* -------------------------------------------------------
+   BANCO DE PREGUNTAS
+   Array con 92 objetos: { number, text, options[], correctAnswer }
+------------------------------------------------------- */
+const questions = [
+    { number:1,  text:"¿Cuál de las siguientes acciones o actividades responde a un diseño universal de aprendizaje?", options:[{label:"A",text:"La maestra Verónica realiza adecuaciones a sus situaciones didácticas para que Nelly pueda realizar el trabajo de la misma forma que el resto del grupo"},{label:"B",text:"La maestra Flor diversifica las actividades planeadas de tal forma que atienden las diversas características de su grupo"},{label:"C",text:"La maestra Rocío realiza ajustes razonables para que los estudiantes con discapacidad participen en igualdad de condiciones"}], correctAnswer:"B"},
+    { number:2,  text:"¿Qué planteamiento de la estrategia socioemocional del Plan de Estudio para la Educación Preescolar, Primaria y Secundaria expresa: Plantear los avances que las niñas, los niños y adolescentes pueden alcanzar en un determinado periodo, facilita identificar qué se quiere lograr al finalizar los procesos formativos?", options:[{label:"A",text:"Plantear metas de aprendizaje"},{label:"B",text:"Determinar ejes temáticos"},{label:"C",text:"Situaciones de aprendizaje"}], correctAnswer:"A"},
+    { number:3,  text:"¿Cuál es uno de los propósitos de la estrategia socioemocional del Plan de Estudio para la Educación Preescolar, Primaria y Secundaria?", options:[{label:"A",text:"Promover que en el colectivo docente se vea a las niñas, niños y adolescentes como personas con todo el potencial para desarrollar diversas capacidades"},{label:"B",text:"Gestionar la disciplina del alumnado mediante lineamientos del sistema educativo, para tener orden en el aula"},{label:"C",text:"Reemplazar la función tutorial de los padres de familia para que actúen como mediadores en la educación emocional, tomando en consideración los cambios familiares que existen en la actualidad"}], correctAnswer:"A"},
+    { number:4,  text:"¿Cuál de las siguientes acciones corresponde al eje formativo del Programa Nacional de Convivencia Escolar de Apego a las Normas?", options:[{label:"A",text:"Cero tolerancia a la violencia"},{label:"B",text:"Límites como oportunidad formativa"},{label:"C",text:"Participación de la comunidad educativa"}], correctAnswer:"B"},
+    { number:5,  text:"Son tipos de conocimiento esenciales para lograr una formación integral", options:[{label:"A",text:"Declarativos, procedimentales y actitudinales"},{label:"B",text:"Empíricos, sistemáticos y científicos"},{label:"C",text:"Previo, activo e innovador"}], correctAnswer:"A"},
+    { number:6,  text:"¿Qué estrategia propuesta en el marco del Plan de Estudio para la Educación Preescolar, Primaria y Secundaria es el conjunto de situaciones didácticas articuladas e integradas que permiten la colaboración de maestras, maestros y las NNA en la resolución de un problema de su comunidad o interés particular, y la obtención de algún producto?", options:[{label:"A",text:"Aprendizaje colaborativo"},{label:"B",text:"Aprendizaje basado en problemas"},{label:"C",text:"Aprendizaje basado en proyectos"}], correctAnswer:"C"},
+    { number:7,  text:"Selecciona el eje articulador que es más transversal que el resto pues tiende líneas hacia todos los campos formativos", options:[{label:"A",text:"Pensamiento crítico"},{label:"B",text:"Artes y experiencias estéticas"},{label:"C",text:"Educación ambiental"}], correctAnswer:"A"},
+    { number:8,  text:"¿Cuál es la situación de aprendizaje que se deriva del Programa de Estudios de la asignatura de Nuestros Saberes referente al contenido curricular ¿Cuál es mi responsabilidad con el lugar en que vivo?", options:[{label:"A",text:"Investigar uno o más servicios públicos de las personas de su localidad"},{label:"B",text:"Participar en actividades para el cuidado de su localidad"},{label:"C",text:"Identificar problemas que afectan el cuidado de espacios públicos y otros lugares de la localidad"}], correctAnswer:"B"},
+    { number:9,  text:"¿Qué campo formativo reconoce las características físicas que conforman nuestro planeta Tierra, así como la gran cantidad de sistemas y procesos que ocurren en él, e identifica a la geografía como la ciencia que los estudia?", options:[{label:"A",text:"Saberes y Pensamiento Científico"},{label:"B",text:"Ética, Naturaleza y Sociedades"},{label:"C",text:"De lo Humano y lo Comunitario"}], correctAnswer:"B"},
+    { number:10, text:"¿Cuál es el contenido curricular del grado o fase al que hace referencia el siguiente enunciado: Exploración de las relaciones empáticas, de reciprocidad y de ayuda con compañeras y compañeros?", options:[{label:"A",text:"Segundo grado de primaria"},{label:"B",text:"Segundo de preescolar"},{label:"C",text:"Fase 3, grado 1"}], correctAnswer:"B"},
+    { number:11, text:"¿Qué proceso de desarrollo de aprendizaje de los campos formativos del Plan de Estudio para la Educación Preescolar, Primaria y Secundaria expresa: Indagar las regularidades del campo o disciplina para profundizar en ellas y construir comunidades de aprendizaje que trabajen en resolver problemas abiertos sobre el campo o la disciplina y su relación con otros campos?", options:[{label:"A",text:"Conectar"},{label:"B",text:"Problematizar"},{label:"C",text:"Elaborar"}], correctAnswer:"C"},
+    { number:12, text:"Elige el orden correcto de las fases para el desarrollo del Consejo Técnico Escolar y de zona en el Sistema Educativo Mexicano\n\n- Evaluación\n- Planeación\n- Seguimiento\n- Implementación", options:[{label:"A",text:"Planeación-Implementación-Seguimiento-Evaluación"},{label:"B",text:"Planeación-Seguimiento-Evaluación-Implementación"},{label:"C",text:"Evaluación-Planeación-Implementación-Seguimiento"}], correctAnswer:"A"},
+    { number:13, text:"Selecciona la opción que aborda correctamente la concepción de \"El estudiante como centro del proceso educativo\"", options:[{label:"A",text:"Se favorece el desarrollo de capacidades humanas mediante la generación de ambientes de aprendizaje incluyentes, equitativos y solidarios, bajo una perspectiva del enfoque humanista."},{label:"B",text:"Se favorece la comprensión del conocimiento histórico, científico, tecnológico y el de las humanidades reconociendo los aportes realizados desde los saberes de nuestros pueblos originarios"},{label:"C",text:"Se favorece el trabajo en comunidad para el diálogo, participación y co-construcción de la vida comunitaria a partir de la gestión de experiencias cotidianas de aprendizaje, su implicación histórica, cultural, social, política y territorial."}], correctAnswer:"A"},
+    { number:14, text:"¿A qué hace referencia la acepción de promover un entorno de aprendizaje que considere las experiencias de vida de las NNA y el reconocimiento de sus capacidades físicas, sociales, culturales, emocionales, así como lingüísticas y cognitivas, como puntos de partida del proceso de enseñanza-aprendizaje?", options:[{label:"A",text:"Atención y valoración de la diversidad"},{label:"B",text:"Inclusión y equidad"},{label:"C",text:"Enfoque de derechos humanos"}], correctAnswer:"B"},
+    { number:15, text:"¿A qué se refiere la Norma General para la evaluación de los aprendizajes esperados, acreditación, regularización, promoción y certificación de los educandos de la educación básica, publicada en 2019, cuando aborda el concepto de 'evaluación auténtica'?", options:[{label:"A",text:"Se evalúan los resultados que arroja el programa educativo y la práctica educativa del personal docente-directivo-supervisión-administrativa, procurando que sean significativas para niñas, niños, adolescentes, docentes, madres, padres y comunidad escolar"},{label:"B",text:"Realiza procesos de evaluación, acreditación y certificación que se ajustan a las particularidades de las y los estudiantes, para favorecer su desarrollo académico, procurando que sean congruentes y signifiquen un nivel de madurez adquirido de acuerdo a su edad"},{label:"C",text:"Se refiere a una evaluación de desempeño. Se solicita al estudiantado que use lo aprendido en contextos de la vida real y plantea desafíos que estimulan el uso pertinente del conocimiento y el desarrollo de habilidades complejas"}], correctAnswer:"C"},
+    { number:16, text:"¿A qué se refiere el principio de máxima autonomía dentro del Programa Nacional de Convivencia Escolar?", options:[{label:"A",text:"A la libertad de actuar acorde a la ley sin subordinación a otro u otros"},{label:"B",text:"A que todos los actores de una comunidad escolar pueden participar con libertad de acción e ideas dentro de los mecanismos regulados por las normas"},{label:"C",text:"A promover que las NNA se apropien del conocimiento necesario para tomar decisiones y actuar por sí mismos, lo que requiere que interactúen con otros, evalúen las opciones que tienen, se informen en fuentes confiables y construyan gradualmente ese principio"}], correctAnswer:"C"},
+    { number:17, text:"En relación a la transversalidad educativa del Plan de Estudios para la Educación Preescolar, Primaria y Secundaria en su publicación de agosto del 2022, ¿cuáles son los ejes articuladores a través de los cuales los contenidos se ponen en contacto y movimiento?", options:[{label:"A",text:"Pensamiento crítico, Interculturalidad crítica, Igualdad de género, Vida saludable, Apropiación de las culturas a través de la lectura y la escritura, Artes y experiencias estéticas"},{label:"B",text:"Pensamiento crítico, Interculturalidad crítica, Igualdad de género, Vida saludable, Apropiación de las culturas a través de la lectura y la escritura, Artes y experiencias estéticas, Inclusión"},{label:"C",text:"Pensamiento crítico, Interculturalidad crítica, Igualdad de género, Fomento a la salud, Apropiación de las culturas a través de la lectura y la escritura, Artes y experiencias estéticas, Inclusión"}], correctAnswer:"B"},
+    { number:18, text:"En el Plan de Estudios para la Educación Preescolar, Primaria y Secundaria, dentro del apartado de Principios generales para la organización curricular del Sistema Educativo Nacional, ¿qué debe de orientar el proyecto educativo en búsqueda de la justicia y de proporcionar una formación como parte del derecho a la educación?", options:[{label:"A",text:"Derecho humano a la educación, revalorización de los saberes comunitarios, formación integral"},{label:"B",text:"Derecho humano a la educación, revalorización de los saberes comunitarios, valores compartidos"},{label:"C",text:"Revalorización de los saberes comunitarios, formación integral, valores compartidos"}], correctAnswer:"A"},
+    { number:19, text:"Selecciona la opción en donde se señale correctamente cuáles son los campos formativos que se planean en el marco del Plan de Estudio para la Educación Preescolar, Primaria y Secundaria de agosto de 2022", options:[{label:"A",text:"Lenguajes; saberes y pensamiento científico; ética, naturaleza y sociedades; de lo humano y lo comunitario"},{label:"B",text:"Lenguajes; saberes y pensamiento científico; ética, naturaleza y sociedades"},{label:"C",text:"Pensamiento matemático; saberes y pensamiento científico; ética, naturaleza y sociedades; de lo humano y lo comunitario"}], correctAnswer:"A"},
+    { number:20, text:"De las siguientes situaciones que se describen, identifica en cuál de ellas se ejerce violencia simbólica", options:[{label:"A",text:"La maestra Nancy tiene por costumbre mencionar a sus estudiantes que como ella es la maestra, sabe lo que hace y por lo tanto, aunque los estudiantes quieran opinar respecto a cómo trabajar, la que decide es ella"},{label:"B",text:"El profesor Emiliano acostumbra realizar debates entre los estudiantes, con base en la división por género"},{label:"C",text:"El profesor Oswaldo motiva a sus estudiantes a que sean ellos mismos pues está bien que se equivoquen, que es parte del aprendizaje y que está para apoyarlos cuando cometen errores"}], correctAnswer:"A"},
+    { number:21, text:"Si el maestro Luis pregunta a sus estudiantes por los aprendizajes que fueron obteniendo durante el ciclo escolar y sus impresiones respecto del mismo, nos habla de que está realizando una...", options:[{label:"A",text:"Autoevaluación"},{label:"B",text:"Coevaluación"},{label:"C",text:"Heteroevaluación"}], correctAnswer:"A"},
+    { number:22, text:"El maestro Alexis va a trabajar con sus estudiantes algunas operaciones matemáticas por medio de la elaboración de galletas, esto favorece directamente el aspecto...", options:[{label:"A",text:"Práctico"},{label:"B",text:"Teórico"},{label:"C",text:"Valoral"}], correctAnswer:"A"},
+    { number:23, text:"El director Alejandro ha decidido que, de manera conjunta con el colectivo docente de su escuela, determinarán la manera de trabajar y elaborar un Plan de Atención y algunos lineamientos para dar atención a la situación problemática específica que presenta su escuela, dicha decisión hace uso del...", options:[{label:"A",text:"Consejo Técnico Escolar"},{label:"B",text:"Programa Nacional de Consejo Escolar"},{label:"C",text:"Programas de Mejora Continua"}], correctAnswer:"A"},
+    { number:24, text:"¿A qué se refiere cuando en el marco de la evaluación de la práctica educativa, específicamente en la evaluación del aprendizaje y del actuar docente, se atiende a los siguientes criterios de selección: pertinencia, utilidad, objetividad, transparencia y rigurosidad?", options:[{label:"A",text:"A criterios de selección de instrumentos de evaluación"},{label:"B",text:"A criterios de evaluación"},{label:"C",text:"A criterios de herramientas de evaluación"}], correctAnswer:"A"},
+    { number:25, text:"Identifica el párrafo que señala a qué se refiere en el marco del Programa Escolar de Mejora Continua a la evaluación interna", options:[{label:"A",text:"Es la evaluación que realiza el personal docente de la escuela para valorar los contenidos a abordar durante el ciclo escolar, tomando como base de referencia la evaluación diagnóstica grupal y las características del grupo"},{label:"B",text:"Es la evaluación que realiza el colectivo docente en la que se analizan los resultados derivados de los procesos de mejora de la gestión escolar, del avance de los objetivos y metas, del cumplimiento de las acciones planteadas, así como de los mecanismos de rendición de cuentas"},{label:"C",text:"Es la evaluación de carácter formativa que el colectivo docente realiza del proceso de enseñanza - aprendizaje de sus estudiantes para, a partir de los resultados obtenidos, diseñar estrategias que permitan favorecer el desarrollo de aprendizajes en los estudiantes"}], correctAnswer:"B"},
+    { number:26, text:"¿Qué ejemplo señala una evaluación de tipo diagnóstico?", options:[{label:"A",text:"El profesor Osmar al finalizar el mes solicita a sus estudiantes que preparen un cartel sobre el tema visto"},{label:"B",text:"La maestra Rosalba, al iniciar el ciclo escolar, solicita a sus estudiantes que realicen una producción de texto donde la puedan realizar de manera autónoma con la finalidad de conocer sus conocimientos iniciales"},{label:"C",text:"La maestra Alicia, durante el análisis de un tema, ha realizado algunas interrogantes a sus estudiantes sobre lo visto en esa sesión"}], correctAnswer:"B"},
+    { number:27, text:"En el grupo de la profesora Alaydi, realizarán un proyecto donde se abordará la temática de la importancia de preservar e impulsar el conocimiento de las culturas indígenas de nuestro país por los miembros de la comunidad escolar ¿Qué eje formativo del Programa Nacional de Convivencia Escolar abona la anterior situación?", options:[{label:"A",text:"Apego a las raíces históricas"},{label:"B",text:"Identidad cultural"},{label:"C",text:"Convivencia armónica, pacífica e inclusiva"}], correctAnswer:"C"},
+    { number:28, text:"¿Qué tipo de barreras para el aprendizaje y la participación se definen como acciones de enseñanza y prácticas de aprendizaje de los educadores que no corresponden al ritmo ni al estilo de aprendizaje del educando?", options:[{label:"A",text:"Barreras pedagógicas"},{label:"B",text:"Barreras de enseñanza"},{label:"C",text:"Barreras didácticas"}], correctAnswer:"C"},
+    { number:29, text:"¿Qué tipo de evaluación centra su atención en las actividades, formas, medios y dinámicas en que el aprendizaje se produce, para concretarse emplea escalas nominales y de orden jerárquico, como categorías, caracteres y atributos, entre otras?", options:[{label:"A",text:"Evaluación cuantitativa"},{label:"B",text:"Evaluación cualitativa"},{label:"C",text:"Evaluación cuali-cuantitativa"}], correctAnswer:"B"},
+    { number:30, text:"Selecciona la opción que señale correctamente los principios orientadores de la labor docente del día a día en el marco de la Nueva Escuela Mexicana\n\nI.- La creación de políticas educativas de inclusión\nII.- El derecho de las niñas, niños, adolescentes y jóvenes a la educación significa que son sujetos activos en el desarrollo de sus potencialidades.\nIII.- Atención a la diversidad cultural, lingüística, de género, de aprendizaje, de grupos sociales\nIV.- El trabajo individual como forma de potenciar el aprendizaje situado\nV.- Vinculación con la comunidad inmediata para enriquecer la labor de la escuela, los procesos formativos, y revitalizar el lazo social.", options:[{label:"A",text:"I, II, V"},{label:"B",text:"II, III, IV"},{label:"C",text:"II, III, V"}], correctAnswer:"C"},
+    { number:31, text:"¿Qué tipo de evaluación de la práctica profesional docente es aquella en la que se posibilita involucrar a otros actores educativos como estudiantes, padres o docentes para evaluar la práctica profesional?", options:[{label:"A",text:"Autoevaluación"},{label:"B",text:"Heteroevaluación"},{label:"C",text:"Coevaluación"}], correctAnswer:"C"},
+    { number:32, text:"¿Qué tipo de barreras de aprendizaje y participación se presentan cuando la enseñanza presenta desafíos o exigencias que están por debajo o por encima de las expectativas de las y los estudiantes?", options:[{label:"A",text:"Barreras didácticas"},{label:"B",text:"Barreras pedagógicas"},{label:"C",text:"Barreras administrativas"}], correctAnswer:"A"},
+    { number:33, text:"¿A qué hace referencia la categoría de 'Educación pública, gratuita, laica y obligatoria' que establece el Artículo 3° Constitucional?", options:[{label:"A",text:"Es laica cuando se imparta de acuerdo con los lineamientos establecidos en los documentos curriculares y normativos oficiales, los cuales se han construido sobre la base de los avances del conocimiento científico"},{label:"B",text:"Es laica cuando la educación se mantenga por completo ajena a cualquier doctrina religiosa, y por tanto la educación en el país debe estar libre de credos"},{label:"C",text:"Es laica cuando es imparcial y no exalta ni privilegia ningún credo, creencia o doctrina religiosa"}], correctAnswer:"C"},
+    { number:34, text:"¿Qué material educativo del Programa Nacional de Convivencia Escolar (PNCE) está diseñado para atender la diversidad escolar y familiar de la población, así como de ambientes escolares desfavorables con un sesgo preventivo de prácticas de violencia, acoso escolar entre pares, la violencia del personal de las escuelas hacia las y los estudiantes, y violencia familiar?", options:[{label:"A",text:"Fichas didácticas"},{label:"B",text:"Manual de trabajo"},{label:"C",text:"Cuaderno de actividades para el alumno"}], correctAnswer:"B"},
+    { number:35, text:"¿Qué propósito del Programa Escolar de Mejora Continua hace referencia a: 'Generar ambientes de aprendizaje en los que se propicie la inclusión y equidad, el respeto a los derechos humanos, la cultura de paz, la participación democrática, la interculturalidad crítica y la perspectiva de género, para garantizar el desarrollo integral de las y los estudiantes y la comunidad escolar'?", options:[{label:"A",text:"Convivencia escolar sana, pacífica y formativa"},{label:"B",text:"Inclusión de la comunidad escolar"},{label:"C",text:"Avance de los aprendizajes esperados"}], correctAnswer:"A"},
+    { number:36, text:"Elige qué acción cumple con el indicador del Programa Escolar de Mejora Continua 'Solicita la participación de las y los estudiantes y sus familias en el desarrollo de acciones a favor de la mejora de los aprendizajes'", options:[{label:"A",text:"Un maestro de educación física solicita a los padres de familia que acompañen a sus hijos a que realicen 15 minutos de ejercicio en casa al día"},{label:"B",text:"Una maestra pide a los padres de familia para que le apoyen poniendo a sus hijos a escribir planas y mejorar así su letra"},{label:"C",text:"Un maestro involucra a padres de familia en el desarrollo de proyectos relacionados con el medio ambiente para sensibilizar a la comunidad escolar sobre su cuidado y preservación"}], correctAnswer:"C"},
+    { number:37, text:"¿Qué tipo de instrumento de evaluación se define como: 'sirve para registrar la presencia o ausencia de un determinado rasgo, conducta o secuencia de acciones, organiza el trabajo al enfocarse en aspectos específicos de aprendizajes claves a observar y señala los elementos que son relevantes'?", options:[{label:"A",text:"Lista de cotejo"},{label:"B",text:"Rúbrica"},{label:"C",text:"Guía de observación"}], correctAnswer:"A"},
+    { number:38, text:"Maestra: 'Muy bien, entonces, Sebastián ¿qué cambiarias de tu trabajo para que sea más claro?' Esto que menciona la maestra ¿de qué tipo de retroalimentación es?", options:[{label:"A",text:"Elemental"},{label:"B",text:"Descriptiva"},{label:"C",text:"Por descubrimiento o reflexiva"}], correctAnswer:"C"},
+    { number:39, text:"Selecciona del siguiente listado de acciones, la que corresponda a una acción de tutoría y asesoría\n\nI.- Estrategias para identificar estudiantes en riesgo\nII.- Diseño y aplicación de actividades académicas diferenciadas\nIII.- Implementación de técnicas y dinámicas para mejorar el ambiente de trabajo\nIV.- Conocimiento de las y los estudiantes a partir de un seguimiento individual\nV.- Conocimiento de las y los estudiantes a partir de un seguimiento grupal", options:[{label:"A",text:"I, II, IV"},{label:"B",text:"I, III, V"},{label:"C",text:"II, III, IV"}], correctAnswer:"A"},
+    { number:40, text:"La profesora Ana se da cuenta que una de sus alumnas presenta varios moretones en los brazos y piernas. La profesora Ana decidió preguntarle directamente a la alumna sobre los moretones y la niña comenta que su mamá la golpeó porque no realizó una tarea. De acuerdo con el Manual para la aplicación del Protocolo de Atención en casos de Violencia de Género en el Ámbito Escolar, ¿qué tipo de violencia está experimentando la alumna de Ana?", options:[{label:"A",text:"Violencia verbal"},{label:"B",text:"Violencia física"},{label:"C",text:"Violencia familiar"}], correctAnswer:"C"},
+    { number:41, text:"¿Qué eje del PEMC corresponde al enunciado 'Acciones emprendidas por el colectivo docente para promover espacios de reflexión y toma de decisiones orientadas a la mejora escolar'?", options:[{label:"A",text:"Gestión escolar"},{label:"B",text:"Carga administrativa"},{label:"C",text:"Prácticas docentes y directivas"}], correctAnswer:"C"},
+    { number:42, text:"¿Cuál de los siguientes elementos debe utilizar el docente para diseñar proyectos de aprendizaje-servicio?", options:[{label:"A",text:"Objetivos de aprendizaje del servicio a desarrollar"},{label:"B",text:"Participación de personas o instituciones vinculadas con el tema o problemática trabajada"},{label:"C",text:"Diseño y aplicación del instrumento de evaluación"}], correctAnswer:"B"},
+    { number:43, text:"¿Qué campo formativo aborda: 'Identificar el carácter simbólico de la comunicación humana, es decir, reconocer que se vive y se produce significados a través de sistemas de signos, pero, sobre todo, que se actúa a partir de estos'?", options:[{label:"A",text:"Saberes y pensamiento científico"},{label:"B",text:"Lenguajes"},{label:"C",text:"Ética, naturaleza y sociedades"}], correctAnswer:"B"},
+    { number:44, text:"¿Cuál de las siguientes situaciones ejemplifica el apego al eje articulador de Inclusión?", options:[{label:"A",text:"Una profesora trabaja con sus estudiantes el derecho al voto libre y secreto como un ejercicio democrático en nuestro país"},{label:"B",text:"Una profesora integra en sus actividades didácticas las propuestas de los estudiantes para la generación de conocimientos"},{label:"C",text:"Un profesor solicita a los estudiantes de su grupo que investiguen y expongan las diversas formas de vida en el territorio nacional"}], correctAnswer:"B"},
+    { number:45, text:"Identifica cuál de los siguientes elementos corresponde a un componente del Programa Escolar de Mejora Continua", options:[{label:"A",text:"Organización"},{label:"B",text:"Atención educativa"},{label:"C",text:"Objetivos y metas"}], correctAnswer:"C"},
+    { number:46, text:"A partir del siguiente esquema, identifica qué fase de la evaluación formativa está representada:\n\n¿Cuál es la meta de aprendizaje?\n¿A dónde vamos?\n↓\n¿Cuál es el nivel actual de progreso de mis estudiantes?\n¿Dónde estamos ahora?\n↓\n¿Qué retroalimentación permitirá a mis estudiantes avanzar?\n¿Cómo podemos llegar ahí?", options:[{label:"A",text:"Fases del ciclo de la evaluación formativa"},{label:"B",text:"Instrumentos para valorar el logro de aprendizajes"},{label:"C",text:"Identificación de los aprendizajes esperados"}], correctAnswer:"A"},
+    { number:47, text:"¿Qué implica la comunicación de los logros de aprendizaje desde una perspectiva de evaluación formativa?", options:[{label:"A",text:"Reportar los avances observables de los aprendizajes del alumnado de manera individual y grupal a los padres"},{label:"B",text:"Informar a los padres de familia los resultados obtenidos por medio de la asignación de calificaciones y reportes cualitativos"},{label:"C",text:"Comunicar a estudiantes y familias sobre lo que van progresando y aprendiendo los estudiantes en un determinado periodo"}], correctAnswer:"C"},
+    { number:48, text:"Elige de las siguientes opciones aquella que menciona correctamente una de las estrategias de enseñanza-aprendizaje propuestas en el Plan de Estudios de Educación Básica en su publicación del 2022", options:[{label:"A",text:"Aprendizaje situado"},{label:"B",text:"Aprendizaje cooperativo"},{label:"C",text:"Aprendizaje basado en proyectos comunitarios"}], correctAnswer:"C"},
+    { number:49, text:"Del siguiente listado de contenidos, elige aquellos correspondientes a la asignatura de Nuestros Saberes: Historias, Culturas y Naturaleza de Nuestras Comunidades de sexto grado\n\nI.- ¿Por qué vivimos donde vivimos?\nII.- ¿Cómo conocemos la historia regional?\nIII.- ¿Qué pasa en nuestro mundo?\nIV.- ¿Cuáles son los retos que enfrenta el mundo en el presente?", options:[{label:"A",text:"I, II"},{label:"B",text:"I, III"},{label:"C",text:"II, IV"}], correctAnswer:"C"},
+    { number:50, text:"¿Qué campo formativo del Plan de Estudios de Educación Básica contiene la asignatura de Proyectos de Aula?", options:[{label:"A",text:"Saberes y pensamiento científico"},{label:"B",text:"De lo humano y lo comunitario"},{label:"C",text:"Lenguajes"}], correctAnswer:"B"},
+    { number:51, text:"Lee el siguiente fragmento del programa de estudio de Proyectos de Aula de tercer grado de primaria: 'En estos proyectos las niñas y niños eligen temas o situaciones de su vida cotidiana y buscan información, analizan, reflexionan, proponen soluciones a partir de diferentes fuentes de información y realizan acciones concretas.'\n\n¿A qué tipo de proyecto hace referencia el fragmento anterior?", options:[{label:"A",text:"Proyecto Aprendizaje Basado en Indagación STEAM como enfoque"},{label:"B",text:"Proyecto Comunitario"},{label:"C",text:"Proyecto Escolares"}], correctAnswer:"C"},
+    { number:52, text:"¿Cuál de las siguientes opciones corresponde al propósito del campo formativo Lenguajes para cuarto grado de primaria?", options:[{label:"A",text:"Participa en diversas situaciones comunicativas, utilizando los elementos que ofrece el lenguaje, para interactuar con diferentes personas en distintos ámbitos, contextos y con diversos propósitos"},{label:"B",text:"Participa en diversas situaciones comunicativas, las cuales le ayudan a descubrir las posibilidades expresivas del lenguaje para relacionarse con diferentes personas en distintos ámbitos, contextos y con diversos propósitos"},{label:"C",text:"Participa en diversas situaciones comunicativas, las cuales les ayudan a descubrir las posibilidades expresivas del lenguaje para construir e intercambiar significados de manera consciente e intencionada"}], correctAnswer:"B"},
+    { number:53, text:"¿Qué término es entendido como el conjunto de características de una persona o grupo que facilitan los procesos de aprendizaje y participación, así como los elementos del contexto familiar, comunitario, escolar, social y político con los que también se interactúa y en donde se desarrollan y fortalecen dichas características?", options:[{label:"A",text:"Entorno propicio para el aprendizaje"},{label:"B",text:"Condiciones de educabilidad"},{label:"C",text:"Perspectiva situacional del aprendizaje"}], correctAnswer:"B"},
+    { number:54, text:"¿Cuántas sesiones de Consejo Técnico Escolar se tienen programadas para el ciclo escolar 2024-2025?", options:[{label:"A",text:"8 sesiones ordinarias"},{label:"B",text:"7 sesiones ordinarias"},{label:"C",text:"9 sesiones ordinarias"}], correctAnswer:"A"},
+    { number:55, text:"¿A qué hace referencia el término 'Inclusión' en el Plan de estudios 2022?", options:[{label:"A",text:"Proceso mediante el cual las niñas, niños, adolescentes y jóvenes logran la integración y la participación en igualdad de oportunidades, en los servicios educativos que les permiten aprender y desarrollarse en un ambiente de bienestar"},{label:"B",text:"Hace referencia al proceso de identificar y responder a la diversidad de necesidades especiales de todo el estudiantado"},{label:"C",text:"A que todas las niñas, niños, adolescentes y jóvenes aprenden juntos, independientemente de su origen, sus condiciones personales, sociales o culturales"}], correctAnswer:"C"},
+    { number:56, text:"¿A qué se refiere el término de violencia vicaria?", options:[{label:"A",text:"Es aquella que se ejerce sobre las niñas, niños u otras personas significativas para las víctimas, con el fin de causarles daño o sufrimiento"},{label:"B",text:"Es aquella que se manifiesta en todas aquellas acciones u omisiones que dañan tanto la autoestima, como la identidad o el desarrollo de la persona"},{label:"C",text:"Es aquella que se manifiesta a través del uso o restricción del dinero, los bienes o recursos económicos de la mujer o de las niñas, incluyendo también amenazas, limitaciones encaminadas a controlar el ingreso de sus percepciones económicas"}], correctAnswer:"A"},
+    { number:57, text:"Dentro de la segunda sesión ordinaria de Consejo Técnico Escolar ciclo escolar 2024-2025, ¿cuál era el propósito de dicha sesión?", options:[{label:"A",text:"Valorar colectivamente las estrategias de atención implementadas para fortalecer los aprendizajes de las y los estudiantes y establecer acciones de mejora"},{label:"B",text:"Fortalecer las estrategias de atención para el logro de los aprendizajes de las y los estudiantes mediante procesos de colaboración entre los docentes de la escuela y de la zona"},{label:"C",text:"Valorar las acciones del PEMC realizadas hasta el momento y plantear estrategias a implementar para la segunda mitad del ciclo escolar"}], correctAnswer:"B"},
+    { number:58, text:"¿Qué momento o fase del Programa Escolar de Mejora Continua implica la definición de los objetivos y las metas asociadas a cada uno de ellos, las cuales deben estar vinculadas con la problemática detectada en el diagnóstico?", options:[{label:"A",text:"Momento 1: diagnóstico"},{label:"B",text:"Momento 2: prioridades educativas"},{label:"C",text:"Momento 3: objetivos, metas y acciones"}], correctAnswer:"C"},
+    { number:59, text:"¿Cuál de las siguientes opciones describe mejor una situación donde se realiza evaluación diagnóstica?", options:[{label:"A",text:"La maestra Gloria al iniciar el ciclo escolar aplica instrumentos de evaluación, además de realizar observaciones, con la finalidad de obtener información valiosa acerca de los conocimientos, habilidades y actitudes con las que cuentan los estudiantes con respecto a los contenidos de estudio"},{label:"B",text:"La maestra Josefina, durante el desarrollo de los contenidos de aprendizaje, aplica ejercicios y realiza preguntas a los estudiantes para verificar su comprensión"},{label:"C",text:"La maestra Socorro, al término de una serie de actividades de aprendizaje, solicita a los estudiantes que elaboren un producto integrador para valorar su nivel de avance"}], correctAnswer:"A"},
+    { number:60, text:"En la _________________ las y los docentes son responsables de comunicar los logros de aprendizaje alcanzados por las niñas, niños y adolescentes a lo largo del ciclo escolar.", options:[{label:"A",text:"valoración cualitativa"},{label:"B",text:"conclusión del ciclo escolar"},{label:"C",text:"evaluación formativa"}], correctAnswer:"B"},
+    { number:61, text:"¿A qué etapa de los cuatro momentos del Programa Escolar de Mejora Continua corresponde el siguiente enunciado?\n\n'Es el momento en el que el colectivo docente utiliza los resultados de la evaluación interna, analiza y determina los avances en el logro de los objetivos y las metas en beneficio de las y los estudiantes'", options:[{label:"A",text:"Planeación"},{label:"B",text:"Seguimiento"},{label:"C",text:"Evaluación"}], correctAnswer:"C"},
+    { number:62, text:"La maestra Rocío solicita a sus compañeros que le recomienden un instrumento de evaluación que le permita analizar el avance de sus estudiantes a lo largo de un periodo de tiempo con base en sus producciones ¿Qué instrumento es el que necesita?", options:[{label:"A",text:"Portafolio"},{label:"B",text:"Carpeta de evaluación"},{label:"C",text:"Matriz de valoración"}], correctAnswer:"A"},
+    { number:63, text:"El profesor Arnulfo menciona que ha observado que en su escuela existen diversas problemáticas en cuanto a la convivencia entre los estudiantes, situación que el docente de Educación Física ha informado con anterioridad. Del siguiente listado de temas de los materiales ¿Cuáles pudiera priorizar para el trabajo áulico para la atención de dicha problemática?\n\nI. Autoestima. Me conozco y me quiero como soy.\nII. Expreso y manejo mis emociones\nIII. Convivo con los demás y los respeto.\nIV. Las reglas: acuerdos de convivencia.\nV. Resolución pacífica de conflictos.\nVI. Todas las familias son importantes.", options:[{label:"A",text:"I, II, VI"},{label:"B",text:"II, III, VI"},{label:"C",text:"III, IV, V"}], correctAnswer:"C"},
+    { number:64, text:"Son las modificaciones y adaptaciones necesarias y adecuadas que no impongan una carga desproporcionada o indebida, cuando se requieran en un caso particular, para garantizar a las personas con discapacidad el goce o ejercicio, en igualdad de condiciones con las demás, de todos los derechos humanos y libertades fundamentales", options:[{label:"A",text:"Adecuaciones curriculares"},{label:"B",text:"Adecuaciones didácticas"},{label:"C",text:"Ajustes razonables"}], correctAnswer:"C"},
+    { number:65, text:"¿Qué función de la evaluación se relaciona con la selección, la acreditación, y la certificación de los aprendizajes de los estudiantes?", options:[{label:"A",text:"Función social"},{label:"B",text:"Función pedagógica"},{label:"C",text:"Función valorativa"}], correctAnswer:"A"},
+    { number:66, text:"Selecciona el ámbito de los principios de la Nueva Escuela Mexicana que se concibe como un proceso que construye información del ámbito escolar para retroalimentar y tomar decisiones orientadas a la mejora continua en distintos rubros.", options:[{label:"A",text:"Diagnóstico del grupo"},{label:"B",text:"Conocer a nuestros estudiantes"},{label:"C",text:"Evaluación"}], correctAnswer:"C"},
+    { number:67, text:"Con base en el indicador \"Realiza ajustes en el desarrollo de las actividades didácticas a partir de los avances y dificultades de sus alumnos, para evitar la creación de barreras en su aprendizaje y participación\" ¿En qué ejemplo NO se está atendiendo?", options:[{label:"A",text:"Una maestra comenta que en su grupo cuenta con una estudiante sordomudo que sólo se comunica mediante señas, por ello ha decido que todo el grupo aprenda a comunicarse mediante la Lengua de Señas Mexicana"},{label:"B",text:"Un docente comenta que requiere apoyo y asesoría debido a que cuenta con estudiantes en cuarto grado de primaria que no han podido consolidar su proceso de lectoescritura y necesita saber cómo atenderlos"},{label:"C",text:"Un profesor informa a los padres de familia que en su grupo se ha detectado a muchos estudiantes con rezago por lo que, en la idea de atender la situación, él dará los temas que les corresponde en clase a todos por igual y los padres deberán de trabajar actividades desde casa para reforzar los aprendizajes"}], correctAnswer:"C"},
+    { number:68, text:"El profesor Dante, junto a sus estudiantes, ha diseñado un proyecto donde se busca generar conciencia sobre el respeto de las señales de tránsito al conducir para el cuidado de todos los miembros de la comunidad ¿Qué tipo de proyecto deberá de emplear?", options:[{label:"A",text:"Aprendizaje basado en indagación STEAM como enfoque"},{label:"B",text:"Aprendizaje Servicio"},{label:"C",text:"Aprendizaje ciudadano"}], correctAnswer:"B"},
+    { number:69, text:"En la escuela primaria \"Venustiano Carranza\" se ha convocado a toda la comunidad escolar a participar en un concurso de redacción y declamación de poemas alusivo al personaje histórico que lleva por nombre su escuela ¿Qué eje articulador se está atendiendo?", options:[{label:"A",text:"Educación artísticas en la comunidad"},{label:"B",text:"Artes y humanismo"},{label:"C",text:"Artes y experiencias estéticas"}], correctAnswer:"C"},
+    { number:70, text:"Una maestra de preescolar comenta que percibe que en su grupo, los estudiantes manifiestan dificultadores para convivir, para ello y con la finalidad de contar con mayor información para atender las necesidades de sus estudiantes, invita a la maestra Araceli, quien se desempeña como Subdirectora Académica en la misma escuela, para que observe su clase haciendo uso de una escala de actitudes. Tomando en cuenta el ejemplo anterior ¿A qué forma de evaluación se refiere?", options:[{label:"A",text:"Evaluación sumativa"},{label:"B",text:"Observación de clases"},{label:"C",text:"Evaluación participativa"}], correctAnswer:"C"},
+    { number:71, text:"Este instrumento se basa en una lista de indicadores que pueden redactarse como afirmaciones o preguntas, que orientan el trabajo de observación dentro del aula señalando los aspectos que son relevantes al observar.", options:[{label:"A",text:"Rúbrica"},{label:"B",text:"Guía de observación"},{label:"C",text:"Escala de actitudes"}], correctAnswer:"B"},
+    { number:72, text:"¿Cuál es el propósito de los talleres para madres, padres y tutores propuestos en el Manual de trabajo?", options:[{label:"A",text:"Fortalecer el importante vínculo de la familia con los docentes y directores, con el fin de promover estrategias y prácticas de crianza que mejoren la convivencia familiar y contribuyan a la convivencia armónica, pacífica e inclusiva en la escuela."},{label:"B",text:"Ser un referente de comunicación para la evaluación auténtica de los ejes que componen el Programa Nacional de Convivencia Escolar"},{label:"C",text:"Establecer protocolos de actuación de cómo las madres, padres y tutores deben de actuar conforme a un manual que delimita sus acciones para homogeneizar sus respuestas ante los conflictos que se puedan vivir desde los hogares"}], correctAnswer:"A"},
+    { number:73, text:"El estudiante Jorge vive en una zona de difícil acceso y sus padres no cuentan con vehículo, por dicha situación frecuentemente no puede asistir frecuentemente a la escuela. Por ello, la maestra Flor gestionó una beca de transporte, favoreciendo así el derecho a la educación de su estudiante. Con base en la Estrategia Nacional de Inclusión Educativa ¿Qué acción realizó la maestra Flor?", options:[{label:"A",text:"Ajustes razonables"},{label:"B",text:"Medidas específicas"},{label:"C",text:"Diseño universal para el aprendizaje"}], correctAnswer:"B"},
+    { number:74, text:"¿A qué se refiere la evaluación criterial?", options:[{label:"A",text:"Cuando la referencia del aprendizaje se encuentra implícita en los aprendizajes esperados o contenidos curriculares"},{label:"B",text:"Cuando la evaluación se aplica en diferentes momentos y con propósitos distintos, por lo que puede ser diagnóstica, formativa y sumativa"},{label:"C",text:"A la evaluación basada en los resultados de aprendizaje. Se toman de referencia puntos de corte a partir de juicios especializados para saber en qué nivel de logro se encuentra el educando"}], correctAnswer:"A"},
+    { number:75, text:"¿Qué tipo de evaluación tiene un carácter formativo en donde los estudiantes, solos o en colaboración con sus pares, identifican sus fortalezas, errores y áreas de mejora, revisan estrategias para comprender como aprenden?", options:[{label:"A",text:"Autoevaluación"},{label:"B",text:"Coevaluación"},{label:"C",text:"Heteroevaluación"}], correctAnswer:"A"},
+    { number:76, text:"En la propuesta del Programa de Educación Preescolar, Primaria y Secundaria, ¿qué forma parte de la organización curricular de la educación primaria?", options:[{label:"A",text:"Procesos de desarrollo de aprendizaje"},{label:"B",text:"Unidades de aprendizaje"},{label:"C",text:"Ejes articuladores"}], correctAnswer:"C"},
+    { number:77, text:"Seleccione la opción que menciona los momentos del proceso de evaluación", options:[{label:"A",text:"Valoración del aprendizaje, comunicación del progreso de los aprendizajes, comunicación de los logros de aprendizaje a familias y conclusión del proceso"},{label:"B",text:"Evaluación diagnóstica, comunicación del progreso del aprendizaje, valoración del aprendizaje"},{label:"C",text:"Retroalimentación, comunicación de progresos, valoración del aprendizaje, socialización"}], correctAnswer:"A"},
+    { number:78, text:"¿Cuál es el propósito del campo formativo De lo humano y lo comunitario para sexto grado?", options:[{label:"A",text:"Analiza y participa en diversos espacios de interacción del lugar donde vive desde una perspectiva comunitaria, y reflexiona cómo la historia familiar y comunitaria influye en su identidad"},{label:"B",text:"Analiza y participa en diversos espacios de interacción del lugar donde vive desde una perspectiva comunitaria, histórica, política y social, como parte del desarrollo de la conciencia de ser en el mundo"},{label:"C",text:"Analiza y participa en diversos espacios de interacción del lugar donde vive desde una perspectiva de identidad y pertenencia comunitaria, reflexionando sobre la importancia de su participación activa en la comunidad"}], correctAnswer:"B"},
+    { number:79, text:"Identifica el proceso de desarrollo de aprendizaje del campo formativo Saberes y pensamiento científico que hace referencia a: Interesarse por comprender el mundo, basándose en datos y evidencias, reconociendo que el desarrollo del conocimiento en este campo es colectivo y tiene un carácter histórico", options:[{label:"A",text:"Conciencia de lo comunitario"},{label:"B",text:"Pensamiento crítico"},{label:"C",text:"Cultura científica"}], correctAnswer:"C"},
+    { number:80, text:"El maestro Dante trabaja con su grupo de cuarto grado el contenido curricular: 'Uso de las tecnologías de la información, comunicación, conocimiento y aprendizaje digital'. ¿A qué campo formativo pertenece este contenido?", options:[{label:"A",text:"Saberes y pensamiento científico"},{label:"B",text:"Ética, naturaleza y sociedades"},{label:"C",text:"Lenguajes"}], correctAnswer:"C"},
+    { number:81, text:"La maestra Fernanda Luz de primer grado está trabajando el contenido 'Números, ¿Para qué contamos? contamos y aprendemos'. ¿A qué campo formativo corresponde?", options:[{label:"A",text:"Saberes y pensamiento científico"},{label:"B",text:"Ética, naturaleza y sociedades"},{label:"C",text:"De lo humano y lo comunitario"}], correctAnswer:"A"},
+    { number:82, text:"La profesora Julieta comenta que en su grupo cuenta con tres estudiantes en los que ha detectado que durante la realización de las actividades escolares constantemente realizan comentarios que señalan una valoración muy negativa sobre ellos mismos, acentuado principalmente tras cometer algún error. Con base en el Plan de Estudio y Marco Curricular para la Educación Preescolar, Primaria y Secundaria ¿Qué proceso de formación socioemocional se vincula más con la situación descrita?", options:[{label:"A",text:"Autoestima"},{label:"B",text:"Identidad"},{label:"C",text:"Colaboración"}], correctAnswer:"A"},
+    { number:83, text:"¿Cuál es uno de los principios orientadores de la Nueva Escuela Mexicana?", options:[{label:"A",text:"Inclusión y equidad"},{label:"B",text:"Derecho humano a la educación"},{label:"C",text:"Diversidad e interculturalidad"}], correctAnswer:"B"},
+    { number:84, text:"Identifica qué principio del Programa Nacional de Convivencia Escolar hace referencia a un concepto ético que alude al comportamiento humano que se puede calificar como bueno o malo en determinados aspectos.", options:[{label:"A",text:"Respeto de la dignidad de las personas"},{label:"B",text:"Máxima autonomía"},{label:"C",text:"Cultura de paz"}], correctAnswer:"A"},
+    { number:85, text:"De acuerdo con el Programa Nacional de Convivencia Escolar ¿Qué componente de los materiales se proponen como referentes para la evaluación auténtica de los ejes que lo componen?", options:[{label:"A",text:"Cuaderno de actividades para el alumno"},{label:"B",text:"Fichas didácticas"},{label:"C",text:"Manual de trabajo"}], correctAnswer:"B"},
+    { number:86, text:"De acuerdo con la Estrategia Nacional de Educación Inclusiva ¿Qué documento o herramienta hace referencia a 'El proceso mediante el cual el personal de educación especial, en vinculación con el personal docente, directivo, de supervisión, asesora al personal de educación básica y a las familias, con el objetivo de eliminar o minimizar las BAP que enfrentan las y los estudiantes desde la práctica pedagógica, didáctica, la gestión escolar y/o con apoyo de las familias'?", options:[{label:"A",text:"Diseño universal para el aprendizaje"},{label:"B",text:"Acompañamiento de estrategias de apoyo"},{label:"C",text:"Ajustes razonables"}], correctAnswer:"B"},
+    { number:87, text:"¿Qué situación de violencia del ambiente escolar corresponde a aquella dinámica relacional entre docentes y estudiantes donde el docente provoca daño en el estudiantado afectando su dignidad con base en su posición de poder dentro del ambiente escolar?", options:[{label:"A",text:"Maltrato escolar entre pares"},{label:"B",text:"Maltrato y violencia escolar de personal de la escuela hacia estudiantes"},{label:"C",text:"Maltrato de madres, padres o tutores hacia el personal de las escuelas"}], correctAnswer:"B"},
+    { number:88, text:"El maestro Andrés se ha presentado ante las autoridades de su supervisión con el objetivo de solicitar apoyo para atender una situación de su grupo. El maestro comenta que tiene una estudiante con discapacidad auditiva y requiere saber cómo es que la puede atender, pero más importante aún, cómo puede hacer que ella pueda aprender, pues siente que no cuenta con las habilidades para tratar con ella en clase. Con base en el artículo 3° de la Constitución Política de los Estados Unidos Mexicanos ¿Con qué criterio educativo se vincula principalmente la situación descrita?", options:[{label:"A",text:"Educación inclusiva"},{label:"B",text:"Enfoque de derechos humanos"},{label:"C",text:"Educación de excelencia"}], correctAnswer:"A"},
+    { number:89, text:"¿Qué estrategia didáctica del Plan de Estudio hace referencia al planteamiento de problemas abiertos que priorizan el interés de las y los estudiantes, por ejemplo, el análisis de condiciones de vida en el mundo, la discriminación, el cambio climático, con el objetivo de dialogar, conocer y explorar la realidad?", options:[{label:"A",text:"Aprendizaje situado"},{label:"B",text:"Aprendizaje dialógico"},{label:"C",text:"Aprendizaje basado en proyectos comunitarios"}], correctAnswer:"B"},
+    { number:90, text:"De acuerdo con el Plan de Estudio 2022 ¿Cuántas fases de aprendizaje contempla la educación primaria?", options:[{label:"A",text:"4 Fases"},{label:"B",text:"3 Fases"},{label:"C",text:"2 Fases"}], correctAnswer:"B"},
+    { number:91, text:"El maestro Alfonso está revisando el documento curricular de Múltiples Lenguajes y comenta que en dicho documento observa en la descripción del campo formativo que es esencial enfocar la actividad de enseñanza y aprendizaje en comprender, representar y construir la realidad mediante el uso de sistemas simbólicos diversos que permitan la comunicación y la expresión. Con base en ello ¿A qué rasgo del perfil de egreso de la educación primaria corresponde el aprendizaje que señala?", options:[{label:"A",text:"Se comunica en español e inglés, utiliza el lenguaje para comprender y expresar ideas, sentimientos y construir conocimiento con creatividad en diversos contextos y para múltiples propósitos"},{label:"B",text:"Reconoce el valor de las lenguas originarias de México, contribuye a su preservación y valora el bilingüismo"},{label:"C",text:"Se comunica en español, utiliza el lenguaje para comprender y expresar ideas, sentimientos y construir conocimiento con creatividad en diversos contextos y para múltiples propósitos"}], correctAnswer:"C"},
+    { number:92, text:"La profesora Rouse comenta que este año en el grupo que tiene a su cargo, implementará junto con sus estudiantes un proyecto comunitario escolar que atienda una necesidad identificada en la escuela. Además, menciona que el proyecto tiene la intención de vincular el trabajo con la comunidad escolar. Con base en la descripción ¿A qué campo formativo corresponde el trabajo que desarrollará?", options:[{label:"A",text:"De lo humano y lo comunitario"},{label:"B",text:"Saberes y pensamiento científico"},{label:"C",text:"Ética, naturaleza y sociedades"}], correctAnswer:"A"}
+];
+
+
+/* -------------------------------------------------------
+   ESTADO GLOBAL DEL SIMULADOR
+------------------------------------------------------- */
+let currentQuestion = 0;   // índice de pregunta actual
+let userAnswers    = {};    // { índice: 'A'|'B'|'C' }
+let timerInterval  = null;  // referencia al setInterval del timer
+let secondsLeft    = 10800; // 180 minutos en segundos
+let startTime      = null;  // timestamp de inicio
+let studentName    = '';    // nombre del sustentante
+let shownBanners   = [];    // banners de motivación ya mostrados
+
+
+/* -------------------------------------------------------
+   PANTALLA DE BIENVENIDA
+   Enter en el input también inicia el examen
+------------------------------------------------------- */
+document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startQuiz();
+});
+
+
+/* -------------------------------------------------------
+   startQuiz()
+   Valida el nombre, transiciona a la pantalla del quiz
+------------------------------------------------------- */
+function startQuiz() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) {
+        // Resalta el campo en rojo si está vacío
+        const input = document.getElementById('nameInput');
+        input.style.borderColor = '#ef4444';
+        input.focus();
+        return;
+    }
+    studentName = name;
+    document.getElementById('headerName').textContent = name;
+    document.getElementById('welcomeScreen').style.display = 'none';
+
+    const qs = document.getElementById('quizScreen');
+    qs.style.display = 'flex';
+    startTime = Date.now();
+
+    renderQuestionGrid();
+    renderMobGrid();
+    renderQuestions();
+    showQuestion(0);
+    startTimer();
+}
+
+
+/* -------------------------------------------------------
+   TEMPORIZADOR
+   Cuenta regresiva desde 60 min, actualiza ring SVG
+------------------------------------------------------- */
+function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+        secondsLeft--;
+        updateTimerDisplay();
+        if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            alert('¡Tiempo agotado! El examen se enviará automáticamente.');
+            finishQuiz();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const mins = Math.floor(secondsLeft / 60);
+    const secs = secondsLeft % 60;
+    const display = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    document.getElementById('timerDisplay').textContent = display;
+
+    // Actualiza el stroke-dashoffset del ring SVG
+    const ring        = document.getElementById('ringFill');
+    const circumference = 125.66;
+    const pct         = secondsLeft / 10800;
+    ring.style.strokeDashoffset = circumference * (1 - pct);
+
+    // Cambia color según urgencia
+    const wrap = document.getElementById('timerRing');
+    wrap.classList.remove('timer-urgent', 'timer-warn');
+    if      (secondsLeft <= 600)  wrap.classList.add('timer-urgent'); // últimos 10 min
+    else if (secondsLeft <= 1800) wrap.classList.add('timer-warn');   // últimos 30 min
+}
+
+
+/* -------------------------------------------------------
+   GRILLA MÓVIL DE PREGUNTAS
+   Toggle: expande/colapsa el panel inferior en móvil
+------------------------------------------------------- */
+let mobGridOpen = false;
+
+function toggleMobGrid() {
+    mobGridOpen = !mobGridOpen;
+    document.getElementById('mobGridInner').classList.toggle('open', mobGridOpen);
+    document.getElementById('mobArrow').classList.toggle('open', mobGridOpen);
+}
+
+function renderMobGrid() {
+    const inner = document.getElementById('mobGridInner');
+    inner.innerHTML = '';
+    questions.forEach((q, i) => {
+        const dot       = document.createElement('div');
+        dot.className   = 'q-dot';
+        dot.textContent = q.number;
+        dot.id          = `mdot-${i}`;
+        dot.onclick     = () => {
+            showQuestion(i);
+            if (mobGridOpen) toggleMobGrid();
+        };
+        inner.appendChild(dot);
+    });
+}
+
+
+/* -------------------------------------------------------
+   GRILLA DE SIDEBAR (desktop)
+------------------------------------------------------- */
+function renderQuestionGrid() {
+    const grid  = document.getElementById('questionGrid');
+    grid.innerHTML = '';
+    questions.forEach((q, i) => {
+        const dot       = document.createElement('div');
+        dot.className   = 'q-dot';
+        dot.textContent = q.number;
+        dot.id          = `dot-${i}`;
+        dot.onclick     = () => showQuestion(i);
+        grid.appendChild(dot);
+    });
+}
+
+
+/* -------------------------------------------------------
+   RENDERIZAR PREGUNTAS
+   Genera el HTML de cada pregunta y lo agrega al DOM
+------------------------------------------------------- */
+function renderQuestions() {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+    questions.forEach((q, i) => {
+        const div     = document.createElement('div');
+        div.className = 'question-container';
+        div.id        = `question-${i}`;
+        div.innerHTML = `
+            <div class="q-number-tag">Pregunta ${q.number} / ${questions.length}</div>
+            <div class="question-text">${q.text}</div>
+            <div class="options">
+                ${q.options.map(opt => `
+                    <div class="option" onclick="selectAnswer(${i},'${opt.label}')">
+                        <div class="option-label">${opt.label}</div>
+                        <div class="option-text">${opt.text}</div>
+                    </div>
+                `).join('')}
+            </div>`;
+        container.appendChild(div);
+    });
+}
+
+
+/* -------------------------------------------------------
+   showQuestion(index)
+   Activa la pregunta visible, actualiza grillas y nav
+------------------------------------------------------- */
+function showQuestion(index) {
+    // Oculta todas las preguntas
+    document.querySelectorAll('.question-container').forEach(q => q.classList.remove('active'));
+    document.getElementById(`question-${index}`).classList.add('active');
+
+    // Actualiza punto activo en las grillas
+    document.querySelectorAll('.q-dot').forEach(d => d.classList.remove('current'));
+    const sd = document.getElementById(`dot-${index}`);
+    const md = document.getElementById(`mdot-${index}`);
+    if (sd) sd.classList.add('current');
+    if (md) md.classList.add('current');
+
+    currentQuestion = index;
+
+    // Restaura la selección previa del usuario
+    if (userAnswers[index]) {
+        const qDiv = document.getElementById(`question-${index}`);
+        qDiv.querySelectorAll('.option').forEach(opt => {
+            const lbl = opt.querySelector('.option-label').textContent;
+            opt.classList.toggle('selected', lbl === userAnswers[index]);
+        });
+    }
+
+    updateNavigation();
+    updateStats();
+    document.getElementById('questionsContainer').scrollTop = 0;
+}
+
+
+/* -------------------------------------------------------
+   selectAnswer(qi, answer)
+   Registra la respuesta del usuario y actualiza la UI
+------------------------------------------------------- */
+function selectAnswer(qi, answer) {
+    userAnswers[qi] = answer;
+
+    // Marca visualmente la opción seleccionada
+    const qDiv = document.getElementById(`question-${qi}`);
+    qDiv.querySelectorAll('.option').forEach(opt => {
+        opt.classList.toggle('selected',
+            opt.querySelector('.option-label').textContent === answer);
+    });
+
+    // Marca el punto como respondido en ambas grillas
+    document.getElementById(`dot-${qi}`).classList.add('answered');
+    const md2 = document.getElementById(`mdot-${qi}`);
+    if (md2) md2.classList.add('answered');
+
+    updateStats();
+    /* --------------------------------------------------
+       CONTENIDO DINÁMICO (requisito #9)
+       Muestra un banner motivacional al completar
+       el 25%, 50% y 75% del examen
+    -------------------------------------------------- */
+    checkMotivation();
+}
+
+
+/* -------------------------------------------------------
+   checkMotivation() — FUNCIÓN DINÁMICA DE JS (Req. #9)
+   Muestra un banner flotante según el avance del examen
+------------------------------------------------------- */
+const motivationMessages = {
+    25: '🎯 ¡25% completado! Sigue adelante',
+    50: '⭐ ¡Mitad del examen! Vas muy bien',
+    75: '🚀 ¡75% listo! Ya casi terminas'
+};
+
+function checkMotivation() {
+    const answered = Object.keys(userAnswers).length;
+    const pct      = Math.floor((answered / questions.length) * 100);
+
+    // Umbrales a los que mostrar el banner
+    [25, 50, 75].forEach(threshold => {
+        if (pct >= threshold && !shownBanners.includes(threshold)) {
+            shownBanners.push(threshold);
+            showBanner(motivationMessages[threshold]);
+        }
+    });
+}
+
+function showBanner(msg) {
+    const banner = document.getElementById('motivationBanner');
+    banner.textContent = msg;
+    banner.style.display = 'block';
+    // Auto-oculta después de 2.5 segundos
+    setTimeout(() => { banner.style.display = 'none'; }, 2500);
+}
+
+
+/* -------------------------------------------------------
+   NAVEGACIÓN ENTRE PREGUNTAS
+------------------------------------------------------- */
+function nextQuestion()     { if (currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1); }
+function previousQuestion() { if (currentQuestion > 0) showQuestion(currentQuestion - 1); }
+
+function updateNavigation() {
+    document.getElementById('prevBtn').disabled = currentQuestion === 0;
+    const isLast = currentQuestion === questions.length - 1;
+    document.getElementById('nextBtn').style.display   = isLast ? 'none'         : 'inline-block';
+    document.getElementById('finishBtn').style.display = isLast ? 'inline-block' : 'none';
+    document.getElementById('navCounter').textContent  = `${currentQuestion + 1} / ${questions.length}`;
+}
+
+
+/* -------------------------------------------------------
+   ESTADÍSTICAS EN TIEMPO REAL
+   Actualiza barras de progreso y contadores
+------------------------------------------------------- */
+function updateStats() {
+    const answered  = Object.keys(userAnswers).length;
+    const remaining = questions.length - answered;
+    document.getElementById('sideAnswered').textContent  = answered;
+    document.getElementById('sideRemaining').textContent = remaining;
+    document.getElementById('mobAnswered').textContent   = answered;
+
+    const pct = (answered / questions.length) * 100;
+    document.getElementById('progressFill').style.width   = pct + '%';
+    document.getElementById('progressLabel').textContent  = `${answered}/${questions.length}`;
+}
+
+
+/* -------------------------------------------------------
+   finishQuiz()
+   Calcula resultados, genera HTML de revisión y muestra
+   la pantalla de resultados
+------------------------------------------------------- */
+function finishQuiz() {
+    // Advertencia si hay preguntas sin responder
+    const unanswered = questions.length - Object.keys(userAnswers).length;
+    if (unanswered > 0) {
+        if (!confirm(`Tienes ${unanswered} pregunta(s) sin responder. ¿Deseas finalizar de todos modos?`)) return;
+    }
+    clearInterval(timerInterval);
+
+    let correct    = 0;
+    let reviewHTML = '';
+
+    questions.forEach((q, i) => {
+        const ua = userAnswers[i] || '—';
+        const ok = ua === q.correctAnswer;
+        if (ok) correct++;
+
+        reviewHTML += `
+            <div class="review-item ${ok ? 'correct-item' : 'incorrect-item'}">
+                <div class="review-q">
+                    ${ok ? '✓' : '✗'} Pregunta ${q.number}:
+                    <span class="${ok ? 'tag-correct' : 'tag-incorrect'}">
+                        ${ok ? 'Correcta' : 'Incorrecta'}
+                    </span>
+                </div>
+                <div class="review-a">
+                    Tu respuesta: <strong>${ua}</strong>
+                    &nbsp;·&nbsp;
+                    Correcta: <strong>${q.correctAnswer}</strong>
+                </div>
+            </div>`;
+    });
+
+    // Cálculo de métricas finales
+    const pct     = ((correct / questions.length) * 100).toFixed(1);
+    const wrong   = Object.keys(userAnswers).filter(i => userAnswers[i] !== questions[i].correctAnswer).length;
+    const blank   = questions.length - Object.keys(userAnswers).length;
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    const em      = Math.floor(elapsed / 60);
+    const es      = elapsed % 60;
+
+    // Mensaje según porcentaje
+    let msg = '';
+    if      (pct >= 90) msg = '¡Excelente desempeño!';
+    else if (pct >= 70) msg = '¡Buen trabajo, aprobado!';
+    else if (pct >= 50) msg = 'Aprobado, puedes mejorar';
+    else                msg = 'Necesitas reforzar el estudio';
+
+    // Inyecta resultados en el DOM
+    document.getElementById('scoreNum').textContent      = correct;
+    document.getElementById('scorePct').textContent      = `${pct}%`;
+    document.getElementById('scoreMsgText').textContent  = msg;
+    document.getElementById('statCorrect').textContent   = correct;
+    document.getElementById('statWrong').textContent     = wrong;
+    document.getElementById('statBlank').textContent     = blank;
+    document.getElementById('statTime').textContent      = `${String(em).padStart(2,'0')}:${String(es).padStart(2,'0')}`;
+    document.getElementById('reviewContainer').innerHTML = reviewHTML;
+
+    // Transición a pantalla de resultados
+    document.getElementById('quizScreen').style.display = 'none';
+    const rs = document.getElementById('resultsScreen');
+    rs.style.display = 'flex';
+}
+
+
+/* -------------------------------------------------------
+   resetQuiz()
+   Reinicia todo el estado y regresa a la bienvenida
+------------------------------------------------------- */
+function resetQuiz() {
+    currentQuestion = 0;
+    userAnswers     = {};
+    secondsLeft     = 10800;
+    mobGridOpen     = false;
+    shownBanners    = [];
+    clearInterval(timerInterval);
+
+    document.getElementById('resultsScreen').style.display  = 'none';
+    document.getElementById('welcomeScreen').style.display  = 'flex';
+    document.getElementById('quizScreen').style.display     = 'none';
+    document.getElementById('nameInput').value              = '';
+
+    const inner = document.getElementById('mobGridInner');
+    if (inner) inner.classList.remove('open');
+    const arrow = document.getElementById('mobArrow');
+    if (arrow) arrow.classList.remove('open');
+}
+
+</script>
+</body>
+</html>

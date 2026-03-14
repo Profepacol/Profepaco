@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía Interactiva – Programa Sintético Fase 2 | Preescolar</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
+
+  :root {
+    --rojo:    #E84855;
+    --azul:    #3A86FF;
+    --verde:   #3BB273;
+    --morado:  #8B5CF6;
+    --amarillo:#F9C74F;
+    --naranja: #F77F00;
+    --bg:      #F5F0EB;
+    --card:    #FFFFFF;
+    --texto:   #1a1a2e;
+    --sombra:  0 8px 32px rgba(0,0,0,.10);
+    --radio:   18px;
+    --trans:   .35s cubic-bezier(.4,0,.2,1);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Nunito',sans-serif;
+    background:var(--bg);
+    color:var(--texto);
+    overflow-x:hidden;
+  }
+
+  /* ── TOP NAV ─────────────────────────────────────── */
+  #topnav{
+    position:sticky;top:0;z-index:999;
+    background:rgba(255,255,255,.92);
+    backdrop-filter:blur(12px);
+    border-bottom:2px solid #e2ddd8;
+    padding:10px 20px;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  #topnav .brand{
+    font-family:'Fredoka One',cursive;
+    font-size:1.1rem;color:var(--rojo);
+    margin-right:auto;white-space:nowrap;
+  }
+  .navbtn{
+    background:none;border:2px solid transparent;
+    border-radius:30px;padding:6px 14px;
+    font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;
+    cursor:pointer;transition:var(--trans);white-space:nowrap;
+  }
+  .navbtn:hover,.navbtn.active{
+    background:var(--rojo);color:#fff;border-color:var(--rojo);
+  }
+
+  /* ── SECCIONES GENERALES ─────────────────────────── */
+  section{display:none;padding:40px 20px 60px;max-width:960px;margin:0 auto;}
+  section.visible{display:block;animation:fadeUp .45s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+  h1.section-title{
+    font-family:'Fredoka One',cursive;
+    font-size:clamp(1.7rem,5vw,2.6rem);
+    margin-bottom:6px;line-height:1.2;
+  }
+  .subtitle{font-size:1rem;opacity:.65;margin-bottom:32px;font-weight:600;}
+
+  /* ── PORTADA ─────────────────────────────────────── */
+  #portada{
+    display:flex;flex-direction:column;align-items:center;
+    text-align:center;padding:60px 20px;max-width:800px;margin:0 auto;
+  }
+  #portada .cover-badge{
+    background:linear-gradient(135deg,var(--rojo),var(--naranja));
+    color:#fff;border-radius:30px;padding:8px 22px;
+    font-size:.85rem;font-weight:800;letter-spacing:.04em;
+    margin-bottom:24px;display:inline-block;
+  }
+  #portada h1{
+    font-family:'Fredoka One',cursive;
+    font-size:clamp(2rem,7vw,3.2rem);
+    line-height:1.15;margin-bottom:12px;
+    background:linear-gradient(135deg,var(--rojo) 0%,var(--azul) 60%,var(--morado) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  #portada .cover-sub{
+    font-size:1.1rem;opacity:.7;margin-bottom:10px;font-weight:700;
+  }
+  #portada .author-chip{
+    background:var(--texto);color:#fff;
+    border-radius:40px;padding:12px 28px;
+    font-size:1rem;font-weight:800;margin:24px 0 32px;
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .puzzle-row{
+    display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+    margin-bottom:36px;
+  }
+  .puzzle-chip{
+    border-radius:14px;padding:10px 18px;
+    font-size:.88rem;font-weight:800;color:#fff;
+    display:flex;align-items:center;gap:6px;
+  }
+  .start-btn{
+    background:linear-gradient(135deg,var(--rojo),var(--naranja));
+    color:#fff;border:none;border-radius:40px;
+    padding:16px 42px;font-size:1.1rem;font-weight:900;
+    cursor:pointer;transition:var(--trans);box-shadow:0 6px 24px rgba(232,72,85,.35);
+    font-family:'Nunito',sans-serif;
+  }
+  .start-btn:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(232,72,85,.45);}
+
+  /* ── TARJETAS ─────────────────────────────────────── */
+  .cards-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:20px;margin-top:24px;
+  }
+  .card{
+    background:var(--card);border-radius:var(--radio);
+    padding:24px 22px;box-shadow:var(--sombra);
+    border-top:5px solid var(--rojo);
+    transition:var(--trans);
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,.13);}
+  .card .icon{font-size:2rem;margin-bottom:10px;}
+  .card h3{font-size:1.05rem;font-weight:800;margin-bottom:8px;}
+  .card p{font-size:.9rem;opacity:.75;line-height:1.6;}
+
+  /* ── CAMPO CARDS ──────────────────────────────────── */
+  .campo-card{
+    background:var(--card);border-radius:var(--radio);
+    overflow:hidden;box-shadow:var(--sombra);margin-bottom:22px;
+    transition:var(--trans);
+  }
+  .campo-header{
+    padding:18px 24px;cursor:pointer;
+    display:flex;align-items:center;gap:14px;
+    user-select:none;
+  }
+  .campo-header .campo-icon{
+    width:46px;height:46px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.4rem;flex-shrink:0;
+  }
+  .campo-header h3{font-size:1.1rem;font-weight:900;flex:1;}
+  .campo-header .caret{
+    font-size:1rem;transition:var(--trans);opacity:.5;
+    flex-shrink:0;
+  }
+  .campo-body{
+    max-height:0;overflow:hidden;
+    transition:max-height .5s cubic-bezier(.4,0,.2,1);
+  }
+  .campo-body.open{max-height:600px;}
+  .campo-body-inner{padding:0 24px 24px;}
+  .campo-pillars{display:flex;flex-direction:column;gap:14px;}
+  .pillar{
+    background:#f8f6f4;border-radius:12px;padding:14px 16px;
+    border-left:4px solid var(--rojo);
+  }
+  .pillar h4{font-size:.95rem;font-weight:800;margin-bottom:4px;}
+  .pillar p{font-size:.86rem;opacity:.75;line-height:1.55;}
+
+  /* ── ESPIRAL PDA ──────────────────────────────────── */
+  .spiral-steps{
+    display:flex;flex-direction:column;gap:0;
+    position:relative;margin:8px 0 24px;
+  }
+  .spiral-steps::before{
+    content:'';position:absolute;left:22px;top:0;bottom:0;
+    width:3px;background:linear-gradient(to bottom,var(--rojo),var(--azul),var(--morado));
+    border-radius:3px;
+  }
+  .spiral-step{
+    display:flex;gap:18px;align-items:flex-start;
+    padding:0 0 28px 56px;position:relative;
+  }
+  .spiral-step .dot{
+    position:absolute;left:12px;top:0;
+    width:22px;height:22px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:.75rem;font-weight:900;
+    flex-shrink:0;
+  }
+  .spiral-step .step-content{flex:1;}
+  .spiral-step h4{font-size:1rem;font-weight:800;margin-bottom:4px;}
+  .spiral-step p{font-size:.88rem;opacity:.72;line-height:1.55;}
+
+  /* ── ARQUITECTURA ─────────────────────────────────── */
+  .arch-flow{
+    display:flex;flex-wrap:wrap;align-items:center;
+    gap:10px;margin:20px 0;
+  }
+  .arch-box{
+    background:var(--card);border-radius:14px;padding:18px 20px;
+    box-shadow:var(--sombra);text-align:center;flex:1;min-width:160px;
+  }
+  .arch-box .arch-icon{font-size:1.8rem;margin-bottom:6px;}
+  .arch-box h4{font-size:.95rem;font-weight:800;margin-bottom:4px;}
+  .arch-box p{font-size:.8rem;opacity:.65;line-height:1.5;}
+  .arch-arrow{font-size:1.6rem;opacity:.4;flex-shrink:0;}
+
+  /* ── HIGHLIGHT BOX ────────────────────────────────── */
+  .highlight{
+    border-radius:14px;padding:18px 20px;margin:20px 0;
+    display:flex;gap:14px;align-items:flex-start;
+  }
+  .highlight .hi-icon{font-size:1.6rem;flex-shrink:0;margin-top:2px;}
+  .highlight .hi-text h4{font-size:.97rem;font-weight:800;margin-bottom:4px;}
+  .highlight .hi-text p{font-size:.88rem;line-height:1.6;opacity:.82;}
+  .highlight.blue{background:#EBF4FF;}
+  .highlight.green{background:#E8F7F0;}
+  .highlight.yellow{background:#FFF8E8;}
+  .highlight.red{background:#FEF0F1;}
+  .highlight.purple{background:#F3EFFE;}
+
+  /* ── TABS ─────────────────────────────────────────── */
+  .tabs-wrap{margin-top:20px;}
+  .tab-btns{
+    display:flex;flex-wrap:wrap;gap:8px;
+    border-bottom:2px solid #e2ddd8;padding-bottom:0;margin-bottom:20px;
+  }
+  .tab-btn{
+    background:none;border:none;cursor:pointer;
+    font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
+    padding:10px 16px;border-radius:10px 10px 0 0;
+    transition:var(--trans);opacity:.5;
+    border-bottom:3px solid transparent;margin-bottom:-2px;
+  }
+  .tab-btn.active{opacity:1;border-bottom-color:var(--rojo);color:var(--rojo);}
+  .tab-pane{display:none;}
+  .tab-pane.active{display:block;animation:fadeUp .35s ease both;}
+
+  /* ── QUIZ ─────────────────────────────────────────── */
+  .quiz-wrap{max-width:720px;margin:0 auto;}
+  .quiz-progress-bar{
+    background:#e2ddd8;border-radius:30px;height:8px;margin-bottom:28px;overflow:hidden;
+  }
+  .quiz-progress-fill{
+    background:linear-gradient(90deg,var(--rojo),var(--naranja));
+    height:100%;border-radius:30px;transition:width .4s ease;
+  }
+  .quiz-question-block{animation:fadeUp .4s ease both;}
+  .quiz-question-block h3{
+    font-size:1.1rem;font-weight:800;margin-bottom:18px;line-height:1.5;
+  }
+  .quiz-options{display:flex;flex-direction:column;gap:12px;}
+  .quiz-opt{
+    background:var(--card);border:2px solid #e2ddd8;
+    border-radius:14px;padding:14px 18px;
+    cursor:pointer;transition:var(--trans);
+    font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:600;
+    text-align:left;
+  }
+  .quiz-opt:hover{border-color:var(--azul);background:#EBF4FF;}
+  .quiz-opt.correct{border-color:var(--verde);background:#E8F7F0;color:var(--verde);}
+  .quiz-opt.wrong{border-color:var(--rojo);background:#FEF0F1;color:var(--rojo);}
+  .quiz-opt:disabled{cursor:default;}
+  .quiz-feedback{
+    margin-top:16px;padding:14px 18px;border-radius:14px;
+    font-size:.92rem;font-weight:700;display:none;
+  }
+  .quiz-feedback.show{display:block;}
+  .quiz-feedback.ok{background:#E8F7F0;color:#2d8a5e;}
+  .quiz-feedback.bad{background:#FEF0F1;color:#c0392b;}
+  .quiz-nav{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:24px;flex-wrap:wrap;gap:12px;
+  }
+  .quiz-counter{font-size:.88rem;opacity:.55;font-weight:700;}
+  .btn-quiz{
+    border:none;border-radius:30px;padding:12px 28px;
+    font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:800;
+    cursor:pointer;transition:var(--trans);
+  }
+  .btn-primary{background:var(--rojo);color:#fff;}
+  .btn-primary:hover{background:#c73641;transform:translateY(-2px);}
+  .btn-secondary{background:#e2ddd8;color:var(--texto);}
+  .quiz-score-card{
+    background:linear-gradient(135deg,var(--rojo),var(--naranja));
+    color:#fff;border-radius:20px;padding:40px 30px;text-align:center;
+    display:none;
+  }
+  .quiz-score-card.show{display:block;animation:fadeUp .5s ease both;}
+  .quiz-score-card .big-score{font-size:4rem;font-weight:900;line-height:1;}
+  .quiz-score-card h3{font-size:1.3rem;margin:10px 0 6px;font-weight:800;}
+  .quiz-score-card p{opacity:.85;font-size:.95rem;}
+  .btn-restart{
+    background:#fff;color:var(--rojo);
+    border:none;border-radius:30px;padding:12px 30px;
+    font-size:.95rem;font-weight:800;cursor:pointer;
+    margin-top:20px;transition:var(--trans);font-family:'Nunito',sans-serif;
+  }
+  .btn-restart:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.15);}
+
+  /* ── RESUMEN ──────────────────────────────────────── */
+  .resumen-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:16px;margin-bottom:28px;
+  }
+  .res-chip{
+    border-radius:14px;padding:16px;
+    text-align:center;
+  }
+  .res-chip .res-icon{font-size:1.8rem;margin-bottom:6px;}
+  .res-chip h4{font-size:.9rem;font-weight:800;margin-bottom:2px;}
+  .res-chip p{font-size:.78rem;opacity:.7;line-height:1.5;}
+
+  /* ── FOOTER ───────────────────────────────────────── */
+  footer{
+    background:var(--texto);color:#fff;
+    text-align:center;padding:24px 20px;
+    font-size:.88rem;opacity:.9;line-height:1.8;
+    margin-top:40px;
+  }
+  footer strong{color:var(--amarillo);}
+
+  /* ── BADGES & PILLS ───────────────────────────────── */
+  .badge{
+    display:inline-block;border-radius:20px;
+    padding:4px 12px;font-size:.78rem;font-weight:800;
+    margin-right:6px;margin-bottom:6px;
+  }
+
+  /* ── COMPARE TABLE ────────────────────────────────── */
+  .compare-table{
+    width:100%;border-collapse:collapse;margin:16px 0;
+    font-size:.88rem;
+  }
+  .compare-table th{
+    background:var(--texto);color:#fff;
+    padding:10px 14px;text-align:left;font-weight:800;
+  }
+  .compare-table td{
+    padding:10px 14px;border-bottom:1px solid #e2ddd8;
+  }
+  .compare-table tr:nth-child(even) td{background:#f8f6f4;}
+  .compare-table .bad-col{color:var(--rojo);font-weight:700;}
+  .compare-table .good-col{color:var(--verde);font-weight:700;}
+
+  /* ── SECTION HEADER BAND ──────────────────────────── */
+  .sec-band{
+    border-radius:16px;padding:20px 24px;margin-bottom:28px;
+    display:flex;align-items:center;gap:14px;
+  }
+  .sec-band .band-icon{font-size:2.2rem;flex-shrink:0;}
+  .sec-band h2{font-family:'Fredoka One',cursive;font-size:1.6rem;margin-bottom:4px;}
+  .sec-band p{font-size:.9rem;opacity:.75;line-height:1.5;}
+
+  /* ── RESPONSIVE ───────────────────────────────────── */
+  @media(max-width:600px){
+    #topnav .navbtn{padding:5px 10px;font-size:.75rem;}
+    .arch-flow{flex-direction:column;}
+    .arch-arrow{transform:rotate(90deg);}
+    .cards-grid{grid-template-columns:1fr;}
+    .tab-btns{gap:4px;}
+    .tab-btn{font-size:.8rem;padding:8px 10px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════ TOP NAV -->
+<nav id="topnav">
+  <span class="brand">📚 Fase 2</span>
+  <button class="navbtn active" onclick="showSection('portada',this)">🏠 Inicio</button>
+  <button class="navbtn" onclick="showSection('fundamentos',this)">🎯 Fundamentos</button>
+  <button class="navbtn" onclick="showSection('curriculo',this)">📐 Currículo</button>
+  <button class="navbtn" onclick="showSection('campos',this)">🧩 Campos</button>
+  <button class="navbtn" onclick="showSection('programa',this)">🗺️ Programa</button>
+  <button class="navbtn" onclick="showSection('quiz',this)">✏️ Repaso</button>
+  <button class="navbtn" onclick="showSection('resumen',this)">📋 Resumen</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════ PORTADA -->
+<section id="portada" class="visible">
+  <div class="cover-badge">✨ NUEVA ESCUELA MEXICANA · PREESCOLAR</div>
+  <h1>Guía de Estudio<br>Programa Sintético<br>Fase 2</h1>
+  <p class="cover-sub">Del Modelo Nacional a la Práctica en el Aula</p>
+
+  <div class="author-chip">
+    👩‍🏫 Prof. Francisco De Jesús Luna Benitez
+  </div>
+
+  <div class="puzzle-row">
+    <span class="puzzle-chip" style="background:var(--rojo)">🗣️ Lenguajes</span>
+    <span class="puzzle-chip" style="background:var(--azul)">🔬 Saberes Científicos</span>
+    <span class="puzzle-chip" style="background:var(--verde)">🌿 Ética y Naturaleza</span>
+    <span class="puzzle-chip" style="background:var(--morado)">💜 Humano y Comunitario</span>
+  </div>
+
+  <p style="max-width:560px;line-height:1.7;opacity:.72;font-size:.95rem;margin-bottom:32px;">
+    Esta guía interactiva te acompañará paso a paso en la comprensión del
+    <strong>Programa Sintético Fase 2</strong> para Educación Preescolar, sus
+    campos formativos, el modelo curricular y cómo llevarlo al aula.
+  </p>
+
+  <button class="start-btn" onclick="showSection('fundamentos',document.querySelectorAll('.navbtn')[1])">
+    Comenzar la Guía →
+  </button>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ FUNDAMENTOS -->
+<section id="fundamentos">
+  <div class="sec-band" style="background:linear-gradient(135deg,#FEF0F1,#FFF6F6);">
+    <div class="band-icon">🎯</div>
+    <div>
+      <h2 style="color:var(--rojo);">El Corazón de la Fase 2</h2>
+      <p>De la Fragmentación a la Integración – ¿Qué cambia con la Nueva Escuela Mexicana?</p>
+    </div>
+  </div>
+
+  <div class="highlight yellow">
+    <div class="hi-icon">💡</div>
+    <div class="hi-text">
+      <h4>Idea central</h4>
+      <p>La <strong>Nueva Escuela Mexicana</strong> cancela la visión instrumentalista y
+      descontextualizada. El aprendizaje ahora coloca a la <strong>comunidad</strong> como
+      el núcleo integrador del desarrollo integral.</p>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="font-size:1.4rem;margin-bottom:16px;">
+    ¿Cuál es la diferencia fundamental?
+  </h2>
+
+  <div style="overflow-x:auto;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>📌 Aspecto</th>
+          <th>❌ Modelo anterior</th>
+          <th>✅ Nueva Escuela Mexicana</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Organización</strong></td>
+          <td class="bad-col">Asignaturas aisladas (fragmentación)</td>
+          <td class="good-col">Campos formativos integrados</td>
+        </tr>
+        <tr>
+          <td><strong>Núcleo integrador</strong></td>
+          <td class="bad-col">El contenido disciplinar</td>
+          <td class="good-col">La comunidad</td>
+        </tr>
+        <tr>
+          <td><strong>Visión</strong></td>
+          <td class="bad-col">Instrumentalista / descontextualizada</td>
+          <td class="good-col">Humanista: justicia, libertad, felicidad</td>
+        </tr>
+        <tr>
+          <td><strong>Finalidad</strong></td>
+          <td class="bad-col">Aprender para la escuela</td>
+          <td class="good-col">Aprender para la vida comunitaria</td>
+        </tr>
+        <tr>
+          <td><strong>Diversidad</strong></td>
+          <td class="bad-col">No contemplada explícitamente</td>
+          <td class="good-col">Infancias plurales, lenguas indígenas, discapacidad</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="section-title" style="font-size:1.4rem;margin:28px 0 16px;">
+    Los 3 pilares filosóficos
+  </h2>
+
+  <div class="cards-grid">
+    <div class="card" style="border-top-color:var(--rojo)">
+      <div class="icon">❤️</div>
+      <h3>Visión Humanista</h3>
+      <p>La educación está orientada a la justicia, la libertad y la felicidad de cada niña y niño.</p>
+    </div>
+    <div class="card" style="border-top-color:var(--azul)">
+      <div class="icon">🤝</div>
+      <h3>Diversidad</h3>
+      <p>Reconocimiento de infancias plurales, lenguas indígenas y personas con discapacidad como parte esencial del aula.</p>
+    </div>
+    <div class="card" style="border-top-color:var(--verde)">
+      <div class="icon">🏘️</div>
+      <h3>Derecho Humano</h3>
+      <p>Aprender no solo para la escuela, sino para la vida comunitaria. Educación como derecho universal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ CURRÍCULO -->
+<section id="curriculo">
+  <div class="sec-band" style="background:linear-gradient(135deg,#EBF4FF,#F0F7FF);">
+    <div class="band-icon">📐</div>
+    <div>
+      <h2 style="color:var(--azul);">Anatomía del Currículo</h2>
+      <p>Conoce los elementos clave del nuevo diseño curricular y cómo se conectan.</p>
+    </div>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="tab-btns">
+      <button class="tab-btn active" onclick="openTab('t-elementos',this)">🧱 Elementos Clave</button>
+      <button class="tab-btn" onclick="openTab('t-pda',this)">🌀 PDA en Espiral</button>
+      <button class="tab-btn" onclick="openTab('t-ecosistema',this)">🌐 Ecosistema</button>
+    </div>
+
+    <!-- TAB 1 -->
+    <div class="tab-pane active" id="t-elementos">
+      <div class="highlight blue">
+        <div class="hi-icon">📦</div>
+        <div class="hi-text">
+          <h4>3 Componentes del Currículo</h4>
+          <p>El nuevo programa se articula en tres capas que se conectan entre sí para generar aprendizajes significativos.</p>
+        </div>
+      </div>
+
+      <div class="spiral-steps">
+        <div class="spiral-step">
+          <div class="dot" style="background:var(--rojo)">1</div>
+          <div class="step-content">
+            <h4>Campos Formativos</h4>
+            <p>Desplazan a las asignaturas tradicionales. Conectan diversas disciplinas para abordar problemas reales de la comunidad.</p>
+          </div>
+        </div>
+        <div class="spiral-step">
+          <div class="dot" style="background:var(--azul)">2</div>
+          <div class="step-content">
+            <h4>Contenidos</h4>
+            <p>Conocimientos y saberes que cobran sentido al vincularse con hechos concretos de la realidad del niño y su entorno.</p>
+          </div>
+        </div>
+        <div class="spiral-step">
+          <div class="dot" style="background:var(--morado)">3</div>
+          <div class="step-content">
+            <h4>Procesos de Desarrollo de Aprendizaje (PDA)</h4>
+            <p>Los recorridos posibles que dan cuenta de cómo las niñas y niños se apropian del aprendizaje. No son lineales ni rígidos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2 -->
+    <div class="tab-pane" id="t-pda">
+      <div class="highlight purple">
+        <div class="hi-icon">🔑</div>
+        <div class="hi-text">
+          <h4>Clave del PDA</h4>
+          <p>El aprendizaje <strong>no es lineal ni está atado rígidamente a la edad</strong>; se complejiza integrando lo previo. Cada grado suma, no repite.</p>
+        </div>
+      </div>
+
+      <div class="spiral-steps" style="margin-top:20px;">
+        <div class="spiral-step">
+          <div class="dot" style="background:var(--naranja)">1°</div>
+          <div class="step-content">
+            <h4>1° Preescolar – Introducción Intuitiva</h4>
+            <p><strong>Lenguaje:</strong> Evoca y narra fragmentos de historias.<br>
+            <strong>Matemáticas:</strong> Usa conteo en su entorno inmediato de forma exploratoria.</p>
+          </div>
+        </div>
+        <div class="spiral-step">
+          <div class="dot" style="background:var(--azul)">2°</div>
+          <div class="step-content">
+            <h4>2° Preescolar – Colaboración y Complejidad</h4>
+            <p><strong>Lenguaje:</strong> Narra con secuencia lógica.<br>
+            <strong>Matemáticas:</strong> Usa números con distintos propósitos.</p>
+          </div>
+        </div>
+        <div class="spiral-step" style="padding-bottom:0;">
+          <div class="dot" style="background:var(--morado)">3°</div>
+          <div class="step-content">
+            <h4>3° Preescolar – Análisis y Creación</h4>
+            <p><strong>Lenguaje:</strong> Inventa historias con inicio/desarrollo/final.<br>
+            <strong>Matemáticas:</strong> Construye colecciones y usa estrategias matemáticas propias.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3 -->
+    <div class="tab-pane" id="t-ecosistema">
+      <div class="highlight green">
+        <div class="hi-icon">🌱</div>
+        <div class="hi-text">
+          <h4>Los campos no son asignaturas aisladas</h4>
+          <p>Un solo proyecto puede activar <strong>todos los campos simultáneamente</strong>.
+          El alumno es el centro del ecosistema.</p>
+        </div>
+      </div>
+
+      <div style="background:var(--card);border-radius:16px;padding:22px;box-shadow:var(--sombra);margin-top:16px;">
+        <h3 style="font-weight:800;margin-bottom:14px;">📌 Ejemplo: Crear un huerto escolar</h3>
+        <div class="cards-grid" style="grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;">
+          <div style="background:#FEF0F1;border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:6px;">🗣️</div>
+            <div style="font-weight:800;font-size:.85rem;color:var(--rojo)">Lenguajes</div>
+            <div style="font-size:.8rem;opacity:.7;margin-top:4px;">Nombrar las plantas</div>
+          </div>
+          <div style="background:#EBF4FF;border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:6px;">🔬</div>
+            <div style="font-weight:800;font-size:.85rem;color:var(--azul)">Saberes</div>
+            <div style="font-size:.8rem;opacity:.7;margin-top:4px;">Medir el agua</div>
+          </div>
+          <div style="background:#E8F7F0;border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:6px;">🌿</div>
+            <div style="font-weight:800;font-size:.85rem;color:var(--verde)">Ética</div>
+            <div style="font-size:.8rem;opacity:.7;margin-top:4px;">Cuidar la naturaleza</div>
+          </div>
+          <div style="background:#F3EFFE;border-radius:12px;padding:14px;text-align:center;">
+            <div style="font-size:1.5rem;margin-bottom:6px;">💜</div>
+            <div style="font-weight:800;font-size:.85rem;color:var(--morado)">Humano</div>
+            <div style="font-size:.8rem;opacity:.7;margin-top:4px;">Trabajar en equipo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ CAMPOS -->
+<section id="campos">
+  <div class="sec-band" style="background:linear-gradient(135deg,#F3EFFE,#F8F5FF);">
+    <div class="band-icon">🧩</div>
+    <div>
+      <h2 style="color:var(--morado);">Los 4 Campos Formativos</h2>
+      <p>Haz clic en cada campo para desplegar su información detallada.</p>
+    </div>
+  </div>
+
+  <!-- CAMPO 1 -->
+  <div class="campo-card">
+    <div class="campo-header" onclick="toggleCampo(this)" style="background:#FEF0F1;">
+      <div class="campo-icon" style="background:var(--rojo);">🗣️</div>
+      <div>
+        <h3 style="color:var(--rojo)">Campo 1: Lenguajes</h3>
+        <p style="font-size:.82rem;opacity:.65;margin-top:2px;">Construcciones cognitivas, sociales y dinámicas</p>
+      </div>
+      <span class="caret">▼</span>
+    </div>
+    <div class="campo-body">
+      <div class="campo-body-inner">
+        <div style="margin-bottom:12px;">
+          <span class="badge" style="background:#FEF0F1;color:var(--rojo)">🎯 Objeto</span>
+          <span style="font-size:.9rem;opacity:.75;">Construcciones cognitivas, sociales y dinámicas del lenguaje.</span>
+        </div>
+        <div style="margin-bottom:18px;">
+          <span class="badge" style="background:#FEF0F1;color:var(--rojo)">🔍 Enfoque</span>
+          <span style="font-size:.9rem;opacity:.75;">Expresión oral, escrita, artística, Lengua de Señas Mexicana (LSM) y lenguas indígenas.</span>
+        </div>
+        <div class="campo-pillars">
+          <div class="pillar" style="border-left-color:var(--rojo)">
+            <h4>🖌️ Más allá de la palabra</h4>
+            <p>Los lenguajes son herramientas para pensar, representar e interactuar. Incluye lenguajes artísticos: cantar, bailar, pintar.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--rojo)">
+            <h4>🌍 Inclusión Radical</h4>
+            <p>Incorpora activamente el aprendizaje gradual del español, lenguas indígenas, inglés y Lengua de Señas Mexicana (LSM).</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--rojo)">
+            <h4>📖 Apropiación Cultural</h4>
+            <p>Fomenta la lectura y escritura no como ejercicios mecánicos, sino descubriendo el valor de los textos en la vida diaria comunitaria.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPO 2 -->
+  <div class="campo-card">
+    <div class="campo-header" onclick="toggleCampo(this)" style="background:#EBF4FF;">
+      <div class="campo-icon" style="background:var(--azul);">🔬</div>
+      <div>
+        <h3 style="color:var(--azul)">Campo 2: Saberes y Pensamiento Científico</h3>
+        <p style="font-size:.82rem;opacity:.65;margin-top:2px;">Exploración del entorno y fenómenos naturales</p>
+      </div>
+      <span class="caret">▼</span>
+    </div>
+    <div class="campo-body">
+      <div class="campo-body-inner">
+        <div style="margin-bottom:12px;">
+          <span class="badge" style="background:#EBF4FF;color:var(--azul)">🎯 Objeto</span>
+          <span style="font-size:.9rem;opacity:.75;">Exploración del entorno y los fenómenos naturales.</span>
+        </div>
+        <div style="margin-bottom:18px;">
+          <span class="badge" style="background:#EBF4FF;color:var(--azul)">🔍 Enfoque</span>
+          <span style="font-size:.9rem;opacity:.75;">Indagación, matemáticas, clasificación y modelado.</span>
+        </div>
+        <div class="campo-pillars">
+          <div class="pillar" style="border-left-color:var(--azul)">
+            <h4>🔭 Indagación Natural</h4>
+            <p>Las niñas y niños aprenden a interpretar el mundo usando sus sentidos para explorar, cuestionar y clasificar fenómenos naturales.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--azul)">
+            <h4>🔢 Herramientas Matemáticas</h4>
+            <p>Los saberes numéricos (conteo, peso, formas, tiempo y espacio) se usan como herramientas para resolver situaciones cotidianas del entorno.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--azul)">
+            <h4>🏠 Saberes Familiares</h4>
+            <p>Se validan los conocimientos comunitarios, contrastándolos respetuosamente con otras perspectivas y con el lenguaje científico inicial.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPO 3 -->
+  <div class="campo-card">
+    <div class="campo-header" onclick="toggleCampo(this)" style="background:#E8F7F0;">
+      <div class="campo-icon" style="background:var(--verde);">🌿</div>
+      <div>
+        <h3 style="color:var(--verde)">Campo 3: Ética, Naturaleza y Sociedades</h3>
+        <p style="font-size:.82rem;opacity:.65;margin-top:2px;">Relación e interacción sustentable y pacífica</p>
+      </div>
+      <span class="caret">▼</span>
+    </div>
+    <div class="campo-body">
+      <div class="campo-body-inner">
+        <div style="margin-bottom:12px;">
+          <span class="badge" style="background:#E8F7F0;color:var(--verde)">🎯 Objeto</span>
+          <span style="font-size:.9rem;opacity:.75;">Relación e interacción sustentable y pacífica con la naturaleza y la sociedad.</span>
+        </div>
+        <div style="margin-bottom:18px;">
+          <span class="badge" style="background:#E8F7F0;color:var(--verde)">🔍 Enfoque</span>
+          <span style="font-size:.9rem;opacity:.75;">Derechos humanos, cuidado ambiental y diversidad familiar.</span>
+        </div>
+        <div class="campo-pillars">
+          <div class="pillar" style="border-left-color:var(--verde)">
+            <h4>🌎 Conciencia Socioambiental</h4>
+            <p>Comprender que las personas son parte de la naturaleza. Fomenta acciones de cuidado, regeneración y bajo impacto ambiental.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--verde)">
+            <h4>🕊️ Cultura de Paz y Diversidad</h4>
+            <p>Reconocimiento de que las familias y comunidades tienen distintas costumbres y formas de vida, promoviendo la inclusión y el respeto mutuo.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--verde)">
+            <h4>⚖️ Derechos Humanos</h4>
+            <p>Principios éticos democráticos (justicia, libertad, empatía) vividos en el aula a través de la convivencia y el cumplimiento de acuerdos.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAMPO 4 -->
+  <div class="campo-card">
+    <div class="campo-header" onclick="toggleCampo(this)" style="background:#F3EFFE;">
+      <div class="campo-icon" style="background:var(--morado);">💜</div>
+      <div>
+        <h3 style="color:var(--morado)">Campo 4: De lo Humano y lo Comunitario</h3>
+        <p style="font-size:.82rem;opacity:.65;margin-top:2px;">Identidad personal y pertenencia comunitaria</p>
+      </div>
+      <span class="caret">▼</span>
+    </div>
+    <div class="campo-body">
+      <div class="campo-body-inner">
+        <div style="margin-bottom:12px;">
+          <span class="badge" style="background:#F3EFFE;color:var(--morado)">🎯 Objeto</span>
+          <span style="font-size:.9rem;opacity:.75;">Identidad personal y pertenencia comunitaria.</span>
+        </div>
+        <div style="margin-bottom:18px;">
+          <span class="badge" style="background:#F3EFFE;color:var(--morado)">🔍 Enfoque</span>
+          <span style="font-size:.9rem;opacity:.75;">Emociones, habilidades motrices, vida saludable y colaboración.</span>
+        </div>
+        <div class="campo-pillars">
+          <div class="pillar" style="border-left-color:var(--morado)">
+            <h4>🪪 Construcción de Identidad</h4>
+            <p>Desarrollo del sentido de pertenencia a partir del origen étnico, cultural y lingüístico, reconociendo similitudes y diferencias con sus pares.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--morado)">
+            <h4>🧠 Inteligencia Emocional</h4>
+            <p>Capacidad para percibir, nombrar y regular emociones, desarrollando empatía, resiliencia y conductas prosociales (ayudar a otros).</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--morado)">
+            <h4>🏃 Cuerpo y Salud</h4>
+            <p>Integración de habilidades motrices, higiene personal, y una vida saludable preventiva mediante la interacción colectiva pacífica.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ PROGRAMA ANALÍTICO -->
+<section id="programa">
+  <div class="sec-band" style="background:linear-gradient(135deg,#FFF8E8,#FFFBF0);">
+    <div class="band-icon">🗺️</div>
+    <div>
+      <h2 style="color:var(--naranja);">El Programa Analítico</h2>
+      <p>El puente entre el Programa Sintético Nacional y la práctica situada en tu escuela.</p>
+    </div>
+  </div>
+
+  <div class="highlight yellow">
+    <div class="hi-icon">📌</div>
+    <div class="hi-text">
+      <h4>¿Qué es el Programa Analítico?</h4>
+      <p>No es un formato burocrático. Es un <strong>documento de trabajo colectivo</strong> donde
+      los docentes sitúan los procesos de aprendizaje de las niñas y niños a partir de las
+      problemáticas de su propia comunidad.</p>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="font-size:1.4rem;margin:28px 0 12px;">
+    Arquitectura del Diseño Curricular
+  </h2>
+
+  <div class="arch-flow">
+    <div class="arch-box" style="border-top:4px solid #62b5e5;">
+      <div class="arch-icon">📄</div>
+      <h4>Programa de Estudio</h4>
+      <p>Contenidos nacionales (autoridad federal)</p>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="border-top:4px solid var(--verde);">
+      <div class="arch-icon">🔗</div>
+      <h4>Proceso de Apropiación</h4>
+      <p>Contextualización + Codiseño colectivo docente</p>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="border-top:4px solid var(--rojo);">
+      <div class="arch-icon">📋</div>
+      <h4>Programa Analítico</h4>
+      <p>Currículo contextualizado y situado localmente</p>
+    </div>
+  </div>
+
+  <div class="highlight blue">
+    <div class="hi-icon">👩‍🏫</div>
+    <div class="hi-text">
+      <h4>Autonomía Docente</h4>
+      <p>La autoridad federal determina el Programa Nacional.
+      Los <strong>maestros tienen el poder</strong> sobre la Contextualización,
+      el Codiseño y la Planeación Didáctica.</p>
+    </div>
+  </div>
+
+  <h2 class="section-title" style="font-size:1.4rem;margin:28px 0 12px;">
+    Los 3 Escalones del Programa Analítico
+  </h2>
+
+  <div class="spiral-steps">
+    <div class="spiral-step">
+      <div class="dot" style="background:var(--rojo)">1</div>
+      <div class="step-content">
+        <h4>Lectura de la Realidad (Diagnóstico)</h4>
+        <p>Análisis de las características de las niñas y niños, sus familias, y los retos de la comunidad.
+        <br>→ <em>¿Qué lenguas hablan? ¿Qué expectativas tienen? ¿Cuáles son las condiciones de la escuela?</em></p>
+      </div>
+    </div>
+    <div class="spiral-step">
+      <div class="dot" style="background:var(--azul)">2</div>
+      <div class="step-content">
+        <h4>Contextualización</h4>
+        <p>Toma de decisiones sobre qué contenidos del Programa Sintético se incorporan y
+        cómo se vinculan a los problemas y saberes específicos de la comunidad local.</p>
+      </div>
+    </div>
+    <div class="spiral-step" style="padding-bottom:0;">
+      <div class="dot" style="background:var(--morado)">3</div>
+      <div class="step-content">
+        <h4>Formulación y Codiseño</h4>
+        <p>Incluye tres componentes:</p>
+        <div class="campo-pillars" style="margin-top:10px;">
+          <div class="pillar" style="border-left-color:var(--morado)">
+            <h4>➕ Integración de Contenidos Nuevos</h4>
+            <p>Posibilidad de agregar aprendizajes locales que no están en el programa nacional.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--morado)">
+            <h4>📅 Secuenciación y Temporalidad</h4>
+            <p>Definir el orden y distribución del tiempo a lo largo del ciclo escolar anual. El programa oficial no tiene un orden obligatorio.</p>
+          </div>
+          <div class="pillar" style="border-left-color:var(--morado)">
+            <h4>🎓 Metodologías</h4>
+            <p>Decidir las orientaciones didácticas (ej. Aprendizaje Basado en Problemas) sin llegar aún a la planeación diaria específica.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ QUIZ -->
+<section id="quiz">
+  <div class="sec-band" style="background:linear-gradient(135deg,#E8F7F0,#F0FDF4);">
+    <div class="band-icon">✏️</div>
+    <div>
+      <h2 style="color:var(--verde);">Repaso y Autoevaluación</h2>
+      <p>Pon a prueba lo que aprendiste con estas 10 preguntas de opción múltiple.</p>
+    </div>
+  </div>
+
+  <div class="quiz-wrap">
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" id="qProgress" style="width:10%"></div>
+    </div>
+
+    <div id="quizContent">
+      <!-- preguntas generadas por JS -->
+    </div>
+
+    <div class="quiz-score-card" id="scoreCard">
+      <div class="big-score" id="scoreBig">0/10</div>
+      <h3 id="scoreMsg">¡Resultado!</h3>
+      <p id="scoreDetail">Revisaste los conceptos clave del Programa Sintético Fase 2.</p>
+      <button class="btn-restart" onclick="initQuiz()">🔄 Intentar de nuevo</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ RESUMEN -->
+<section id="resumen">
+  <div class="sec-band" style="background:linear-gradient(135deg,#FEF0F1,#F3EFFE);">
+    <div class="band-icon">📋</div>
+    <div>
+      <h2>Resumen Final</h2>
+      <p>Guía de estudio en un vistazo — todo lo que necesitas recordar.</p>
+    </div>
+  </div>
+
+  <div class="highlight yellow">
+    <div class="hi-icon">⭐</div>
+    <div class="hi-text">
+      <h4>Idea fundamental</h4>
+      <p>La Fase 2 de preescolar integra el aprendizaje alrededor de la <strong>comunidad</strong>,
+      reemplazando asignaturas aisladas por <strong>4 campos formativos interconectados</strong>,
+      con el docente como codiseñador del currículo situado.</p>
+    </div>
+  </div>
+
+  <h3 style="font-weight:800;margin:24px 0 14px;font-size:1.1rem;">🗝️ Conceptos imprescindibles</h3>
+  <div class="resumen-grid">
+    <div class="res-chip" style="background:#FEF0F1;">
+      <div class="res-icon">🧩</div>
+      <h4>Campos Formativos</h4>
+      <p>Reemplazan asignaturas. Integran disciplinas para abordar problemas reales.</p>
+    </div>
+    <div class="res-chip" style="background:#EBF4FF;">
+      <div class="res-icon">🌀</div>
+      <h4>PDA (Espiral)</h4>
+      <p>Aprendizaje en espiral. No lineal, se complejiza por grado integrando lo previo.</p>
+    </div>
+    <div class="res-chip" style="background:#E8F7F0;">
+      <div class="res-icon">🗺️</div>
+      <h4>Programa Analítico</h4>
+      <p>Segundo nivel de concreción. Documento colectivo contextualizado localmente.</p>
+    </div>
+    <div class="res-chip" style="background:#F3EFFE;">
+      <div class="res-icon">👩‍🏫</div>
+      <h4>Autonomía Docente</h4>
+      <p>El maestro codiseña: contextualiza, secuencia y elige metodologías.</p>
+    </div>
+    <div class="res-chip" style="background:#FFF8E8;">
+      <div class="res-icon">🏘️</div>
+      <h4>Comunidad al Centro</h4>
+      <p>La comunidad es el núcleo integrador de todo el aprendizaje de la Fase 2.</p>
+    </div>
+    <div class="res-chip" style="background:#F0FDF4;">
+      <div class="res-icon">🌈</div>
+      <h4>Diversidad e Inclusión</h4>
+      <p>Infancias plurales, lenguas indígenas, LSM y personas con discapacidad.</p>
+    </div>
+  </div>
+
+  <h3 style="font-weight:800;margin:24px 0 14px;font-size:1.1rem;">🧩 Los 4 Campos – Síntesis rápida</h3>
+  <div style="overflow-x:auto;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Campo</th>
+          <th>Objeto de estudio</th>
+          <th>Enfoque clave</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--rojo)">🗣️ Lenguajes</strong></td>
+          <td>Construcciones cognitivas, sociales y dinámicas</td>
+          <td>Oral, escrita, artística, LSM, indígenas</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--azul)">🔬 Saberes Científicos</strong></td>
+          <td>Exploración del entorno y fenómenos naturales</td>
+          <td>Indagación, matemáticas, clasificación</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--verde)">🌿 Ética y Naturaleza</strong></td>
+          <td>Relación e interacción sustentable y pacífica</td>
+          <td>Derechos humanos, cuidado ambiental</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--morado)">💜 Humano y Comunitario</strong></td>
+          <td>Identidad personal y pertenencia comunitaria</td>
+          <td>Emociones, motricidad, vida saludable</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-weight:800;margin:28px 0 14px;font-size:1.1rem;">📐 Ruta del Programa Analítico</h3>
+  <div class="arch-flow">
+    <div class="arch-box" style="border-top:4px solid var(--naranja);">
+      <div class="arch-icon">🔍</div>
+      <h4>1. Lectura<br>de la Realidad</h4>
+      <p>Diagnóstico de niños, familias y comunidad</p>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="border-top:4px solid var(--azul);">
+      <div class="arch-icon">🗺️</div>
+      <h4>2. Contextualización</h4>
+      <p>Vincular contenidos nacionales a saberes locales</p>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="border-top:4px solid var(--morado);">
+      <div class="arch-icon">🛠️</div>
+      <h4>3. Codiseño</h4>
+      <p>Secuenciar, agregar contenidos locales y elegir metodologías</p>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box" style="border-top:4px solid var(--verde);">
+      <div class="arch-icon">📅</div>
+      <h4>4. Planeación Didáctica</h4>
+      <p>Del programa al aula: práctica diaria situada</p>
+    </div>
+  </div>
+
+  <div class="highlight green" style="margin-top:28px;">
+    <div class="hi-icon">🌟</div>
+    <div class="hi-text">
+      <h4>Mensaje final</h4>
+      <p><em>"El currículo vivo se construye en tus manos."</em> La Fase 2 no es un programa
+      que se entrega terminado: es un punto de partida que el colectivo escolar transforma
+      en una experiencia significativa, situada y comunitaria para cada niña y niño.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <p>📚 <strong>Material educativo elaborado por Prof. Francisco De Jesús Luna Benitez</strong></p>
+  <p style="font-size:.78rem;opacity:.6;margin-top:4px;">
+    Guía de Estudio Interactiva · Programa Sintético Fase 2 · Educación Preescolar · Nueva Escuela Mexicana
+  </p>
+</footer>
+
+<script>
+// ── NAVEGACIÓN ───────────────────────────────────────────
+function showSection(id, btn){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('active'));
+  const sec = document.getElementById(id);
+  if(sec){ sec.classList.add('visible'); window.scrollTo({top:0,behavior:'smooth'}); }
+  if(btn) btn.classList.add('active');
+}
+
+// ── ACORDEÓN CAMPOS ───────────────────────────────────────
+function toggleCampo(header){
+  const body = header.nextElementSibling;
+  const caret = header.querySelector('.caret');
+  const isOpen = body.classList.contains('open');
+  // cerrar todos
+  document.querySelectorAll('.campo-body').forEach(b=>{
+    b.classList.remove('open');
+    b.previousElementSibling.querySelector('.caret').style.transform='rotate(0deg)';
+  });
+  if(!isOpen){
+    body.classList.add('open');
+    caret.style.transform='rotate(180deg)';
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────
+function openTab(id, btn){
+  const wrap = btn.closest('.tabs-wrap');
+  wrap.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  wrap.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── QUIZ ──────────────────────────────────────────────────
+const questions=[
+  {
+    q:"¿Cuál es el núcleo integrador del aprendizaje en la Nueva Escuela Mexicana?",
+    opts:["Las asignaturas","La comunidad","El libro de texto","La evaluación estandarizada"],
+    correct:1,
+    fb:"✅ Correcto. La comunidad es el núcleo integrador que reemplaza la visión fragmentada de asignaturas aisladas."
+  },
+  {
+    q:"¿Cómo se llaman los recorridos posibles que describen cómo los niños se apropian del aprendizaje?",
+    opts:["Aprendizajes Esperados","Campos Formativos","Procesos de Desarrollo de Aprendizaje (PDA)","Indicadores de Logro"],
+    correct:2,
+    fb:"✅ Correcto. Los PDA son los recorridos posibles, no lineales, que dan cuenta de cómo los niños aprenden."
+  },
+  {
+    q:"¿Cuántos Campos Formativos tiene la Fase 2 del Programa Sintético?",
+    opts:["3","5","6","4"],
+    correct:3,
+    fb:"✅ Correcto. Los 4 campos son: Lenguajes, Saberes y Pensamiento Científico, Ética/Naturaleza/Sociedades, y De lo Humano y lo Comunitario."
+  },
+  {
+    q:"¿Qué incluye el Campo de Lenguajes más allá del español hablado y escrito?",
+    opts:["Solo la lectura de cuentos","Únicamente la escritura formal","Lenguajes artísticos, LSM, lenguas indígenas e inglés","Solamente las matemáticas básicas"],
+    correct:2,
+    fb:"✅ Correcto. El Campo de Lenguajes abarca expresión oral, escrita, artística (cantar, bailar, pintar), LSM y lenguas indígenas."
+  },
+  {
+    q:"¿Qué es el Programa Analítico?",
+    opts:["El libro de texto oficial nacional","Un formato burocrático de planeación individual","El segundo nivel de concreción del currículo, contextualizado y situado localmente","Una lista de actividades predeterminadas"],
+    correct:2,
+    fb:"✅ Correcto. El Programa Analítico es un documento de trabajo colectivo, segundo nivel de concreción, contextualizado localmente."
+  },
+  {
+    q:"¿Qué diferencia al aprendizaje 'en espiral' del aprendizaje lineal?",
+    opts:["Se repite exactamente lo mismo cada año","No tiene progresión entre grados","Se complejiza integrando lo previo, sin estar atado rígidamente a la edad","Cada grado estudia temas completamente distintos"],
+    correct:2,
+    fb:"✅ Correcto. El aprendizaje en espiral se complejiza integrando lo previo; cada grado profundiza lo que ya se exploró."
+  },
+  {
+    q:"¿Sobre qué tienen poder de decisión los maestros en el Programa Analítico?",
+    opts:["Solo sobre la decoración del aula","Sobre la contextualización, el codiseño y la planeación didáctica","Únicamente sobre la evaluación final","Sobre el calendario oficial federal"],
+    correct:1,
+    fb:"✅ Correcto. Los docentes tienen autonomía profesional sobre la contextualización, el codiseño y la planeación didáctica."
+  },
+  {
+    q:"¿A qué campo formativo pertenecen la indagación natural y las herramientas matemáticas?",
+    opts:["Lenguajes","De lo Humano y lo Comunitario","Ética, Naturaleza y Sociedades","Saberes y Pensamiento Científico"],
+    correct:3,
+    fb:"✅ Correcto. El Campo 2 (Saberes y Pensamiento Científico) se enfoca en indagación, matemáticas, clasificación y modelado."
+  },
+  {
+    q:"¿Qué primer escalón debe completar el colectivo docente para construir el Programa Analítico?",
+    opts:["Elegir el libro de texto","Lectura de la Realidad (diagnóstico)","Diseñar el examen final","Organizar la graduación"],
+    correct:1,
+    fb:"✅ Correcto. El Escalón 1 es la Lectura de la Realidad: analizar las características de niños, familias y comunidad."
+  },
+  {
+    q:"¿Cómo promueve el Campo de Ética, Naturaleza y Sociedades la cultura de paz?",
+    opts:["Prohibiendo el juego libre","Ignorando las diferencias culturales","Reconociendo que familias y comunidades tienen distintas costumbres, promoviendo inclusión y respeto mutuo","Solo mediante reglas estrictas en el aula"],
+    correct:2,
+    fb:"✅ Correcto. Este campo reconoce la diversidad de costumbres y formas de vida, promoviendo la inclusión y el respeto mutuo."
+  }
+];
+
+let current=0, score=0, answered=false;
+
+function initQuiz(){
+  current=0; score=0; answered=false;
+  document.getElementById('scoreCard').classList.remove('show');
+  document.getElementById('quizContent').style.display='block';
+  renderQuestion();
+}
+
+function renderQuestion(){
+  answered=false;
+  updateProgress();
+  const q=questions[current];
+  const html=`
+    <div class="quiz-question-block">
+      <h3>${current+1}. ${q.q}</h3>
+      <div class="quiz-options">
+        ${q.opts.map((o,i)=>`
+          <button class="quiz-opt" onclick="selectAnswer(this,${i})">${o}</button>
+        `).join('')}
+      </div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+      <div class="quiz-nav">
+        <span class="quiz-counter">Pregunta ${current+1} de ${questions.length}</span>
+        <button class="btn-quiz btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">
+          ${current===questions.length-1?'Ver Resultados ':'Siguiente '}→
+        </button>
+      </div>
+    </div>`;
+  document.getElementById('quizContent').innerHTML=html;
+}
+
+function selectAnswer(btn, idx){
+  if(answered) return;
+  answered=true;
+  const q=questions[current];
+  const allBtns=document.querySelectorAll('.quiz-opt');
+  allBtns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById('qFeedback');
+  if(idx===q.correct){
+    btn.classList.add('correct');
+    fb.textContent=q.fb;
+    fb.className='quiz-feedback ok show';
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.correct].classList.add('correct');
+    fb.textContent='❌ Incorrecto. '+q.fb;
+    fb.className='quiz-feedback bad show';
+  }
+  document.getElementById('nextBtn').style.display='inline-block';
+}
+
+function nextQuestion(){
+  current++;
+  if(current>=questions.length){
+    showScore();
+  } else {
+    renderQuestion();
+  }
+}
+
+function updateProgress(){
+  const pct=((current+1)/questions.length)*100;
+  document.getElementById('qProgress').style.width=pct+'%';
+}
+
+function showScore(){
+  document.getElementById('quizContent').style.display='none';
+  const card=document.getElementById('scoreCard');
+  card.classList.add('show');
+  document.getElementById('qProgress').style.width='100%';
+  const pct=Math.round((score/questions.length)*100);
+  document.getElementById('scoreBig').textContent=score+'/'+questions.length;
+  let msg,detail;
+  if(pct>=90){
+    msg='¡Excelente dominio! 🌟';
+    detail='Tienes un sólido conocimiento del Programa Sintético Fase 2.';
+  } else if(pct>=70){
+    msg='¡Muy bien! 👏';
+    detail='Conoces la mayoría de los conceptos. Repasa los temas donde tuviste dudas.';
+  } else if(pct>=50){
+    msg='Vas por buen camino 💪';
+    detail='Te recomendamos revisar las secciones de Campos Formativos y Programa Analítico.';
+  } else {
+    msg='Sigue estudiando 📚';
+    detail='Revisa la guía completa y vuelve a intentarlo. ¡Tú puedes!';
+  }
+  document.getElementById('scoreMsg').textContent=msg;
+  document.getElementById('scoreDetail').textContent=detail;
+}
+
+// ── INIT ──────────────────────────────────────────────────
+initQuiz();
+showSection('portada', document.querySelectorAll('.navbtn')[0]);
+</script>
+</body>
+</html>

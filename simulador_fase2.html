@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- =====================================================
+       META Y CONFIGURACIÓN BÁSICA
+       ===================================================== -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador – Programa Sintético Fase 2</title>
+
+  <!-- Google Fonts: Nunito (cuerpo) + Raleway (títulos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Raleway:wght@700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =====================================================
+       VARIABLES DE COLOR Y FUENTES
+       ===================================================== */
+    :root {
+      --azul-oscuro:  #0d3b66;
+      --azul-medio:   #1565c0;
+      --azul-claro:   #42a5f5;
+      --azul-palido:  #e3f2fd;
+      --acento:       #ff8f00;
+      --verde-ok:     #2e7d32;
+      --rojo-err:     #c62828;
+      --blanco:       #ffffff;
+      --gris-fondo:   #f0f4f9;
+      --gris-texto:   #37474f;
+      --sombra:       0 4px 18px rgba(13,59,102,.15);
+      --radio:        14px;
+      --font-body:    'Nunito', sans-serif;
+      --font-title:   'Raleway', sans-serif;
+    }
+
+    /* =====================================================
+       RESET BÁSICO
+       ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--gris-fondo);
+      color: var(--gris-texto);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* =====================================================
+       ENCABEZADO
+       ===================================================== */
+    header {
+      background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul-medio) 100%);
+      color: var(--blanco);
+      padding: 1.2rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 3px 12px rgba(0,0,0,.3);
+    }
+    header .docente {
+      font-size: clamp(.7rem, 2vw, .85rem);
+      letter-spacing: .08em;
+      opacity: .85;
+      margin-bottom: .25rem;
+    }
+    header h1 {
+      font-family: var(--font-title);
+      font-size: clamp(1rem, 3.5vw, 1.5rem);
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    header .subtitulo {
+      font-size: clamp(.7rem, 2vw, .85rem);
+      opacity: .8;
+      margin-top: .2rem;
+    }
+
+    /* =====================================================
+       BARRA DE PROGRESO + CRONÓMETRO
+       ===================================================== */
+    .barra-info {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: .5rem;
+      background: var(--azul-oscuro);
+      color: var(--blanco);
+      padding: .6rem 1rem;
+    }
+    .cronometro {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .cronometro .icono { font-size: 1.2rem; }
+    #tiempo {
+      font-family: monospace;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,.15);
+      padding: .1rem .5rem;
+      border-radius: 6px;
+    }
+    #tiempo.urgente { color: var(--acento); animation: parpadeo .8s infinite; }
+    @keyframes parpadeo { 50% { opacity: .3; } }
+
+    .progreso-wrap { flex: 1; min-width: 180px; }
+    .progreso-label {
+      font-size: .78rem;
+      margin-bottom: .25rem;
+      opacity: .85;
+    }
+    .barra-progreso {
+      height: 8px;
+      background: rgba(255,255,255,.2);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    #barraFill {
+      height: 100%;
+      background: var(--azul-claro);
+      border-radius: 20px;
+      width: 0%;
+      transition: width .4s ease;
+    }
+
+    /* =====================================================
+       CONTENEDOR PRINCIPAL
+       ===================================================== */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 3rem;
+    }
+
+    /* =====================================================
+       PANTALLA BIENVENIDA
+       ===================================================== */
+    #pantallaBienvenida {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 2rem 1.5rem;
+      box-shadow: var(--sombra);
+      text-align: center;
+    }
+    #pantallaBienvenida .emoji { font-size: 3.5rem; margin-bottom: .8rem; }
+    #pantallaBienvenida h2 {
+      font-family: var(--font-title);
+      font-size: clamp(1.2rem, 4vw, 1.7rem);
+      color: var(--azul-oscuro);
+      margin-bottom: .8rem;
+    }
+    #pantallaBienvenida p { font-size: .95rem; color: #546e7a; margin-bottom: .5rem; }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .info-card {
+      background: var(--azul-palido);
+      border-radius: 10px;
+      padding: .9rem .7rem;
+      font-size: .85rem;
+      color: var(--azul-oscuro);
+      font-weight: 700;
+    }
+    .info-card span { display: block; font-size: 1.6rem; margin-bottom: .3rem; }
+
+    /* =====================================================
+       TARJETA DE PREGUNTA
+       ===================================================== -->
+    */
+    #pantallaPreguntas { display: none; }
+
+    .num-pregunta {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--azul-claro);
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: .4rem;
+    }
+    .tipo-badge {
+      display: inline-block;
+      background: var(--azul-palido);
+      color: var(--azul-oscuro);
+      font-size: .7rem;
+      font-weight: 800;
+      padding: .2rem .6rem;
+      border-radius: 20px;
+      margin-bottom: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    .tarjeta {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 1.5rem 1.3rem;
+      box-shadow: var(--sombra);
+      margin-bottom: 1rem;
+      animation: entrar .3s ease;
+    }
+    @keyframes entrar {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .pregunta-texto {
+      font-size: clamp(.9rem, 2.5vw, 1.05rem);
+      font-weight: 700;
+      color: var(--azul-oscuro);
+      margin-bottom: 1.2rem;
+      line-height: 1.5;
+    }
+
+    /* Opciones */
+    .opciones { display: flex; flex-direction: column; gap: .65rem; }
+    .opcion-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: .7rem;
+      background: var(--gris-fondo);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: clamp(.82rem, 2.2vw, .95rem);
+      color: var(--gris-texto);
+      text-align: left;
+      transition: border-color .2s, background .2s, transform .1s;
+      width: 100%;
+    }
+    .opcion-btn:hover:not(:disabled) {
+      border-color: var(--azul-claro);
+      background: #e8f4fe;
+      transform: translateX(3px);
+    }
+    .opcion-btn .letra {
+      min-width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--azul-medio);
+      color: var(--blanco);
+      font-weight: 800;
+      font-size: .8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: .05rem;
+    }
+    .opcion-btn.correcta {
+      background: #e8f5e9;
+      border-color: var(--verde-ok);
+    }
+    .opcion-btn.correcta .letra { background: var(--verde-ok); }
+    .opcion-btn.incorrecta {
+      background: #ffebee;
+      border-color: var(--rojo-err);
+    }
+    .opcion-btn.incorrecta .letra { background: var(--rojo-err); }
+    .opcion-btn:disabled { cursor: not-allowed; }
+
+    /* Retroalimentación */
+    .retroalimentacion {
+      margin-top: 1rem;
+      padding: .9rem 1rem;
+      border-radius: 10px;
+      font-size: .88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .retroalimentacion.mostrar { display: block; }
+    .retroalimentacion.ok {
+      background: #e8f5e9;
+      border-left: 4px solid var(--verde-ok);
+      color: #1b5e20;
+    }
+    .retroalimentacion.mal {
+      background: #ffebee;
+      border-left: 4px solid var(--rojo-err);
+      color: #b71c1c;
+    }
+
+    /* =====================================================
+       BOTONES DE NAVEGACIÓN
+       ===================================================== */
+    .nav-btns {
+      display: flex;
+      gap: .8rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+    .btn {
+      padding: .7rem 1.5rem;
+      border: none;
+      border-radius: 30px;
+      font-family: var(--font-body);
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      letter-spacing: .03em;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,.18); }
+    .btn:active { transform: translateY(0); }
+    .btn-primario { background: var(--azul-medio); color: var(--blanco); }
+    .btn-secundario { background: var(--azul-palido); color: var(--azul-oscuro); }
+    .btn-acento { background: var(--acento); color: var(--blanco); }
+    .btn-inicio { background: var(--azul-oscuro); color: var(--blanco); width: 100%; max-width: 260px; margin: 1.2rem auto 0; display: block; font-size: 1rem; padding: .85rem; }
+
+    /* =====================================================
+       PANTALLA RESULTADOS
+       ===================================================== */
+    #pantallaResultados { display: none; }
+    .resultado-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      padding: 2rem 1.5rem;
+      box-shadow: var(--sombra);
+      text-align: center;
+    }
+    .circulo-puntaje {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 8px solid var(--azul-medio);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1rem auto;
+      background: var(--azul-palido);
+    }
+    .circulo-puntaje .num { font-family: var(--font-title); font-size: 2.4rem; font-weight: 900; color: var(--azul-oscuro); line-height: 1; }
+    .circulo-puntaje .den { font-size: .85rem; color: #78909c; }
+    .mensaje-final {
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      font-weight: 800;
+      color: var(--azul-oscuro);
+      margin: .8rem 0 .4rem;
+    }
+    .desc-final { font-size: .9rem; color: #546e7a; }
+
+    /* Tabla de revisión */
+    .revision-wrap { margin-top: 1.5rem; text-align: left; }
+    .revision-titulo { font-weight: 800; color: var(--azul-oscuro); margin-bottom: .8rem; font-size: .95rem; }
+    .rev-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .7rem;
+      padding: .6rem .8rem;
+      border-radius: 8px;
+      margin-bottom: .5rem;
+      font-size: .83rem;
+    }
+    .rev-item.ok  { background: #e8f5e9; }
+    .rev-item.mal { background: #ffebee; }
+    .rev-icon { font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+    .rev-texto strong { display: block; font-weight: 700; margin-bottom: .1rem; }
+
+    /* =====================================================
+       RESPONSIVE — ajustes finales para móvil
+       ===================================================== */
+    @media (max-width: 480px) {
+      header { padding: .9rem .8rem; }
+      .tarjeta { padding: 1.1rem 1rem; }
+      .nav-btns { justify-content: stretch; }
+      .btn { flex: 1; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- =====================================================
+     ENCABEZADO FIJO
+     ===================================================== -->
+<header>
+  <div class="docente">📚 Prof. Francisco De Jesus Luna Benitez</div>
+  <h1>Simulador de Conocimientos</h1>
+  <div class="subtitulo">Programa Sintético de la Fase 2 — Educación Preescolar</div>
+</header>
+
+<!-- Barra de progreso + cronómetro -->
+<div class="barra-info" id="barraInfo" style="display:none;">
+  <div class="cronometro">
+    <span class="icono">⏱</span>
+    <span id="tiempo">60:00</span>
+  </div>
+  <div class="progreso-wrap">
+    <div class="progreso-label" id="progresoLabel">Pregunta 1 de 35</div>
+    <div class="barra-progreso"><div id="barraFill"></div></div>
+  </div>
+</div>
+
+<!-- =====================================================
+     CONTENIDO PRINCIPAL
+     ===================================================== -->
+<main>
+
+  <!-- ── PANTALLA BIENVENIDA ── -->
+  <section id="pantallaBienvenida">
+    <div class="emoji">🏫</div>
+    <h2>Evaluación: Programa Sintético Fase 2</h2>
+    <p>Este simulador evalúa tus conocimientos sobre el <strong>Programa de Estudio para la Educación Preescolar</strong> mediante 35 reactivos de opción múltiple.</p>
+    <div class="info-grid">
+      <div class="info-card"><span>📝</span>35 preguntas</div>
+      <div class="info-card"><span>⏱</span>60 minutos</div>
+      <div class="info-card"><span>🎯</span>4 tipos de reactivo</div>
+      <div class="info-card"><span>✅</span>Retroalimentación inmediata</div>
+    </div>
+    <p style="font-size:.85rem;color:#78909c;">Tipos de reactivo: Cuestionamiento directo · Completamiento · Ordenamiento · Relación de elementos</p>
+    <button class="btn btn-primario btn-inicio" onclick="iniciarSimulador()">▶ Comenzar Simulador</button>
+  </section>
+
+  <!-- ── PANTALLA PREGUNTAS ── -->
+  <section id="pantallaPreguntas">
+    <div class="tarjeta" id="tarjetaPregunta">
+      <div class="num-pregunta" id="numPregunta">Pregunta 1 de 35</div>
+      <span class="tipo-badge" id="tipoBadge">Cuestionamiento directo</span>
+      <div class="pregunta-texto" id="textoPregunta"></div>
+      <div class="opciones" id="contenedorOpciones"></div>
+      <div class="retroalimentacion" id="retro"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-secundario" id="btnAnterior" onclick="irPregunta(-1)" style="display:none;">← Anterior</button>
+      <button class="btn btn-primario"   id="btnSiguiente" onclick="irPregunta(1)"  style="display:none;">Siguiente →</button>
+      <button class="btn btn-acento"     id="btnFinalizar" onclick="mostrarResultados()" style="display:none;">Ver resultados 🏆</button>
+    </div>
+  </section>
+
+  <!-- ── PANTALLA RESULTADOS ── -->
+  <section id="pantallaResultados">
+    <div class="resultado-card">
+      <h2 style="font-family:var(--font-title);color:var(--azul-oscuro);font-size:clamp(1.1rem,3.5vw,1.5rem);">🏆 Resultados del Simulador</h2>
+      <div class="circulo-puntaje">
+        <span class="num" id="puntajeNum">0</span>
+        <span class="den">de 35</span>
+      </div>
+      <div class="mensaje-final" id="mensajeFinal"></div>
+      <div class="desc-final" id="descFinal"></div>
+
+      <div class="revision-wrap">
+        <div class="revision-titulo">📋 Revisión de respuestas:</div>
+        <div id="listaRevision"></div>
+      </div>
+
+      <div class="nav-btns" style="justify-content:center;margin-top:1.5rem;">
+        <button class="btn btn-primario" onclick="reiniciar()">🔄 Reintentar</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- =====================================================
+     JAVASCRIPT — BANCO DE 35 PREGUNTAS
+     ===================================================== -->
+<script>
+// -------------------------------------------------------
+// BANCO DE PREGUNTAS
+// Tipos: "directo" | "completamiento" | "ordenamiento" | "relacion"
+// -------------------------------------------------------
+const preguntas = [
+  /* 1 */ {
+    tipo: "directo",
+    texto: "¿Qué representa el Programa Sintético de la Fase 2 dentro del proceso de diseño y desarrollo curricular continuo?",
+    opciones: [
+      "El tercer nivel de concreción curricular donde se evalúan aprendizajes.",
+      "El primer nivel de concreción curricular, que presenta los elementos centrales para el trabajo docente.",
+      "El único documento vinculante que los docentes deben seguir sin modificaciones."
+    ],
+    correcta: 1,
+    retro: "El Programa Sintético representa el primer nivel de concreción curricular, en el que se presentan los elementos centrales para el trabajo docente."
+  },
+  /* 2 */ {
+    tipo: "directo",
+    texto: "¿Cuáles son los cuatro Campos formativos que integran el Programa Sintético de la Fase 2?",
+    opciones: [
+      "Matemáticas; Ciencias Naturales; Español; Historia.",
+      "Lenguajes; Saberes y Pensamiento Científico; Ética, Naturaleza y Sociedades; De lo Humano y lo Comunitario.",
+      "Lenguajes; Tecnología; Valores; Expresión Artística."
+    ],
+    correcta: 1,
+    retro: "Los cuatro Campos formativos son: Lenguajes; Saberes y Pensamiento Científico; Ética, Naturaleza y Sociedades; y De lo Humano y lo Comunitario."
+  },
+  /* 3 */ {
+    tipo: "directo",
+    texto: "¿Qué representan los Procesos de desarrollo de aprendizaje en el Programa Sintético?",
+    opciones: [
+      "Exámenes estandarizados aplicados al finalizar cada ciclo escolar.",
+      "Recorridos o rutas posibles que dan cuenta de las formas en que niñas, niños y adolescentes se apropian de aprendizajes.",
+      "Planes de clase elaborados exclusivamente por la autoridad educativa central."
+    ],
+    correcta: 1,
+    retro: "Los Procesos de desarrollo de aprendizaje representan recorridos o rutas posibles que dan cuenta de las formas en que niñas, niños y adolescentes se apropian de aprendizajes que les permiten comprender el mundo."
+  },
+  /* 4 */ {
+    tipo: "completamiento",
+    texto: "El Programa Sintético es considerado un documento inacabado porque…",
+    opciones: [
+      "…fue elaborado sin consultar a los docentes ni a las familias.",
+      "…cada uno de los Contenidos que se presentan deberá someterse al proceso de contextualización por parte del colectivo docente.",
+      "…está en revisión permanente por parte del Congreso de la Unión."
+    ],
+    correcta: 1,
+    retro: "El documento se considera inacabado en tanto que cada uno de los Contenidos que se presentan deberá someterse al proceso de contextualización por parte del colectivo docente."
+  },
+  /* 5 */ {
+    tipo: "directo",
+    texto: "En la Fase 2 (Educación Preescolar), ¿en qué ámbitos se espera que niñas y niños desarrollen y amplíen sus posibilidades para usar diversos lenguajes?",
+    opciones: [
+      "Exclusivamente en el ámbito escolar formal, durante actividades dirigidas.",
+      "En distintos contextos y situaciones cotidianas, para comunicarse, interactuar y compartir su forma de percibir el mundo.",
+      "Solo en actividades artísticas y de expresión oral frente a la comunidad."
+    ],
+    correcta: 1,
+    retro: "En la Fase 2 se espera que niñas y niños desarrollen y amplíen sus posibilidades para usar diversos lenguajes en distintos contextos y situaciones cotidianas."
+  },
+  /* 6 */ {
+    tipo: "directo",
+    texto: "¿Qué implica el Campo formativo De lo Humano y lo Comunitario en cuanto a la convivencia escolar?",
+    opciones: [
+      "Que los docentes establecen reglas inamovibles de disciplina para regular la convivencia.",
+      "Promover la participación libre en distintos espacios, para que se escuche la voz de todas y todos en igualdad de condiciones, creando ambientes socioculturales diversos y respetuosos.",
+      "Que los alumnos deben memorizar los derechos humanos antes de convivir con sus pares."
+    ],
+    correcta: 1,
+    retro: "El campo De lo Humano y lo Comunitario promueve la participación libre e igualitaria en los distintos espacios sociales, creando ambientes socioculturales diversos, respetuosos y abiertos."
+  },
+  /* 7 */ {
+    tipo: "relacion",
+    texto: "Relacione cada Campo formativo con su enfoque principal según el Programa Sintético de la Fase 2.\n\nCampos: 1. Lenguajes · 2. Saberes y Pensamiento Científico · 3. Ética, Naturaleza y Sociedades · 4. De lo Humano y lo Comunitario\n\nEnfoques: a) Exploración del entorno, formulación de preguntas y resolución de problemas · b) Ciudadanía activa, convivencia y comunidad · c) Comunicación, expresión y comprensión en múltiples códigos · d) Valores éticos, relación con la naturaleza y la sociedad",
+    opciones: [
+      "1c, 2a, 3d, 4b",
+      "1a, 2c, 3b, 4d",
+      "1c, 2d, 3a, 4b"
+    ],
+    correcta: 0,
+    retro: "Lenguajes → comunicación y expresión (c); Saberes y Pensamiento Científico → exploración y preguntas (a); Ética, Naturaleza y Sociedades → valores y naturaleza (d); De lo Humano y lo Comunitario → ciudadanía y comunidad (b)."
+  },
+  /* 8 */ {
+    tipo: "directo",
+    texto: "¿Qué papel cumplen las familias y otros miembros de la comunidad en el Campo de Saberes y Pensamiento Científico?",
+    opciones: [
+      "Sustituyen al docente en la enseñanza de contenidos científicos formales.",
+      "Cumplen un papel fundamental al compartir saberes y el legado histórico que heredaron, relevantes en distintos ámbitos de la vida cotidiana.",
+      "Aportan únicamente recursos económicos para los materiales del aula."
+    ],
+    correcta: 1,
+    retro: "Las familias y personas de la comunidad cumplen un papel fundamental en la formación de niñas y niños al compartir los saberes y el legado histórico que heredaron."
+  },
+  /* 9 */ {
+    tipo: "completamiento",
+    texto: "En la Fase 2 es fundamental que niñas y niños se involucren emocionalmente con las actividades que llevan a cabo; por ello…",
+    opciones: [
+      "…se les asignan tareas con calificación numérica desde el primer día.",
+      "…es necesario partir de sus intereses sobre fenómenos o situaciones relevantes que ocurran en su entorno.",
+      "…el docente diseña el programa anual sin considerar el contexto de los alumnos."
+    ],
+    correcta: 1,
+    retro: "Dado que el involucramiento emocional es clave en la Fase 2, las actividades deben partir de los intereses de niñas y niños sobre fenómenos o situaciones relevantes de su entorno."
+  },
+  /* 10 */ {
+    tipo: "directo",
+    texto: "¿Qué tipo de herramientas se proponen en el Programa Sintético para diversificar el aprendizaje en Saberes y Pensamiento Científico?",
+    opciones: [
+      "Libros de texto convencionales y exámenes escritos mensuales.",
+      "Fichas, balanzas, calendarios, recipientes, tangram, dados, componentes de la naturaleza como piedras y semillas.",
+      "Dispositivos electrónicos de última generación para cada estudiante."
+    ],
+    correcta: 1,
+    retro: "El programa propone herramientas variadas como fichas, balanzas, calendarios, recipientes, material de construcción y de arte, geoplanos, tangram, dados, piedras, arena y semillas."
+  },
+  /* 11 */ {
+    tipo: "ordenamiento",
+    texto: "Ordene los planos del Programa Analítico del Programa Sintético de la Fase 2, del primero al último:\n\n1. Diagnóstico y reconocimiento del contexto escolar\n2. Contextualización de los Contenidos curriculares\n3. Formulación final del Programa Analítico\n4. Codiseño de nuevos contenidos pertinentes",
+    opciones: [
+      "2, 4, 1, 3",
+      "1, 2, 4, 3",
+      "1, 4, 2, 3"
+    ],
+    correcta: 1,
+    retro: "El Programa Analítico se construye en el siguiente orden: Primer plano – Diagnóstico del contexto; Segundo plano – Contextualización; Tercer plano – Codiseño; y finalmente la Formulación del Programa Analítico."
+  },
+  /* 12 */ {
+    tipo: "directo",
+    texto: "¿Qué permite el Segundo Plano (Contextualización) del Programa Analítico al colectivo escolar?",
+    opciones: [
+      "Reproducir los contenidos nacionales sin modificación alguna para garantizar uniformidad.",
+      "Interpretar y resignificar los Contenidos curriculares del Programa Sintético desde sus propios términos y referencias, promoviendo un aprendizaje situacional.",
+      "Sustituir completamente el currículo nacional por uno elaborado exclusivamente por la escuela."
+    ],
+    correcta: 1,
+    retro: "La contextualización permite al colectivo escolar interpretar y resignificar los Contenidos curriculares desde sus propios términos y referencias para promover un aprendizaje situacional."
+  },
+  /* 13 */ {
+    tipo: "completamiento",
+    texto: "Los 'Contenidos contextualizados', dentro del proceso de diseño del Programa Analítico, son aquellos que…",
+    opciones: [
+      "…no aparecen en el Programa Sintético y surgen exclusivamente de la realidad local.",
+      "…mantienen su esencia pero requieren ser contextualizados de manera más pertinente a las condiciones particulares de los estudiantes y el contexto.",
+      "…se incorporan al Programa Analítico tal como aparecen en el Programa Sintético, sin ajuste alguno."
+    ],
+    correcta: 1,
+    retro: "Los Contenidos contextualizados son aquellos que, manteniendo su esencia, requieren ser adaptados de manera más pertinente a las condiciones particulares de los estudiantes y del contexto escolar."
+  },
+  /* 14 */ {
+    tipo: "directo",
+    texto: "¿Cuál es la diferencia entre 'Contenidos sin ajustes' y 'Contenidos nuevos' en el diseño del Programa Analítico?",
+    opciones: [
+      "Los sin ajustes son locales; los nuevos son nacionales.",
+      "Los sin ajustes se incorporan tal como aparecen en el Programa Sintético; los nuevos no están presentes en él y corresponden a contenidos locales o regionales.",
+      "No existe diferencia; ambos términos son sinónimos dentro del Programa Sintético."
+    ],
+    correcta: 1,
+    retro: "Contenidos sin ajustes se incorporan tal como están en el Programa Sintético; Contenidos nuevos son aquellos no previstos en él y que responden a necesidades locales o regionales."
+  },
+  /* 15 */ {
+    tipo: "directo",
+    texto: "¿Qué característica define a la evaluación formativa según el Plan de estudio 2022?",
+    opciones: [
+      "Se aplica únicamente al finalizar el ciclo escolar en un examen escrito.",
+      "Forma parte del proceso formativo, se ubica en la relación pedagógica profesor-estudiante y en el marco de un currículo que integra conocimientos alrededor de la realidad de los estudiantes.",
+      "Es responsabilidad exclusiva de la supervisión escolar y no del docente de aula."
+    ],
+    correcta: 1,
+    retro: "Según el Plan de estudio 2022, la evaluación formativa forma parte del proceso formativo y se encuentra en la relación pedagógica profesor-estudiante dentro de un currículo integrador."
+  },
+  /* 16 */ {
+    tipo: "directo",
+    texto: "¿Qué establece la UNESCO (2021) sobre la evaluación formativa?",
+    opciones: [
+      "Que debe basarse en exámenes estandarizados internacionales para comparar resultados.",
+      "Que es una serie de actividades integradas al quehacer pedagógico que enfatizan el acompañamiento y la retroalimentación continua basada en el diálogo.",
+      "Que la evaluación formativa es innecesaria cuando existe evaluación sumativa sólida."
+    ],
+    correcta: 1,
+    retro: "La UNESCO (2021) define la evaluación formativa como actividades integradas al quehacer pedagógico que enfatizan el proceso de acompañamiento y la retroalimentación continua basada en el diálogo."
+  },
+  /* 17 */ {
+    tipo: "directo",
+    texto: "¿Por qué el Programa Analítico de la escuela debe tener mayor integración curricular que la suma de programas analíticos por grado?",
+    opciones: [
+      "Porque cada grado elabora su propio programa sin coordinación con los demás.",
+      "Porque se construye por ciclo escolar de manera anual para cada grado e incorpora los cuatro Campos formativos, promoviendo coherencia vertical.",
+      "Porque la integración curricular es obligatoria por ley solo en educación secundaria."
+    ],
+    correcta: 1,
+    retro: "El Programa Analítico se construye por ciclo escolar anual para cada grado e incorpora los cuatro Campos formativos, lo que favorece una integración curricular real y no la simple suma de programas."
+  },
+  /* 18 */ {
+    tipo: "relacion",
+    texto: "Relacione cada consideración de evaluación con su descripción correcta.\n\nConsideraciones: 1. Avance progresivo · 2. Formas de razonamiento · 3. Contenidos como referentes · 4. Registros flexibles\n\nDescripciones: a) Los productos no son la única evidencia de participación · b) Las y los docentes podrán observarlos a lo largo de toda la Educación Preescolar · c) Son el punto de partida para organizar el trabajo y valorar avances · d) Responden a lo que saben, interpretan y entienden, por lo que no pueden forzarse",
+    opciones: [
+      "1b, 2d, 3c, 4a",
+      "1a, 2c, 3d, 4b",
+      "1c, 2b, 3a, 4d"
+    ],
+    correcta: 0,
+    retro: "Avance progresivo → observable a lo largo de Preescolar (b); Formas de razonamiento → no pueden forzarse (d); Contenidos como referentes → para organizar y valorar (c); Registros flexibles → los productos no son la única evidencia (a)."
+  },
+  /* 19 */ {
+    tipo: "completamiento",
+    texto: "En el Campo formativo Lenguajes de la Fase 2, es necesario que niñas y niños se expresen en su lengua materna —ya sea español, alguna lengua indígena, de señas o extranjera— para que…",
+    opciones: [
+      "…obtengan una calificación aprobatoria en lenguaje y comunicación.",
+      "…al interactuar entre sí, conozcan la diversidad lingüística, étnica y cultural, favoreciendo el aprecio de su propia lengua.",
+      "…el docente pueda homogenizar la comunicación dentro del salón de clases."
+    ],
+    correcta: 1,
+    retro: "La expresión en la lengua materna busca que niñas y niños conozcan la diversidad lingüística, étnica y cultural al interactuar con sus pares, promoviendo el aprecio de su propia lengua."
+  },
+  /* 20 */ {
+    tipo: "directo",
+    texto: "¿Qué papel juega el Consejo Técnico Escolar (CTE) en relación con el Programa Analítico?",
+    opciones: [
+      "Elaborar los exámenes finales de ciclo para todos los grados.",
+      "Revisar periódicamente el Programa Analítico para hacer reorientaciones, adaptaciones y ajustes que la realidad le devuelva a la estrategia de Contextualización.",
+      "Administrar los recursos económicos de la escuela sin relación con el currículo."
+    ],
+    correcta: 1,
+    retro: "El CTE revisa periódicamente el Programa Analítico para hacer reorientaciones, adaptaciones y ajustes que la realidad le devuelva a la estrategia de Contextualización, manteniendo el documento como instrumento dinámico."
+  },
+  /* 21 */ {
+    tipo: "directo",
+    texto: "¿Qué autonomía profesional promueve la organización de los elementos curriculares del Programa Sintético?",
+    opciones: [
+      "Los docentes pueden modificar libremente el currículo sin acuerdo con el colectivo.",
+      "Fomenta el diseño de propuestas contextualizadas en las que se problematice la realidad y se atienda a las características, necesidades e intereses de niñas, niños y adolescentes.",
+      "Limita al docente a seguir el libro de texto oficial sin adaptaciones."
+    ],
+    correcta: 1,
+    retro: "La organización de los elementos curriculares impulsa mayor autonomía profesional para diseñar propuestas contextualizadas que problematicen la realidad y atiendan las necesidades de los estudiantes."
+  },
+  /* 22 */ {
+    tipo: "directo",
+    texto: "¿Qué incluye el enfoque formativo de evaluación según el Programa Sintético de la Fase 2?",
+    opciones: [
+      "Documentar sistemáticamente información sobre el desenvolvimiento de niñas y niños en las actividades promovidas desde la escuela, para tomar decisiones sobre el proceso educativo.",
+      "Asignar calificaciones numéricas a cada actividad realizada por los alumnos.",
+      "Comparar el desempeño de los alumnos con estándares nacionales e internacionales."
+    ],
+    correcta: 0,
+    retro: "El enfoque formativo de evaluación implica documentar sistemáticamente información sobre el desenvolvimiento de niñas y niños para tomar decisiones en relación con el proceso educativo."
+  },
+  /* 23 */ {
+    tipo: "completamiento",
+    texto: "Los objetos y artefactos tecnológicos en el Campo de Saberes y Pensamiento Científico son abordados porque…",
+    opciones: [
+      "…deben ser memorizados por los alumnos como parte del vocabulario técnico.",
+      "…mejoran y facilitan la vida familiar y de la comunidad, y los niños los usan cotidianamente en su hogar y escuela.",
+      "…son indispensables para acceder a la tecnología de punta desde preescolar."
+    ],
+    correcta: 1,
+    retro: "El contenido de objetos y artefactos tecnológicos se aborda porque mejoran y facilitan la vida familiar y de la comunidad, y los niños ya los usan en su vida cotidiana."
+  },
+  /* 24 */ {
+    tipo: "directo",
+    texto: "¿Qué significa que el Programa Sintético entiende 'lo nacional como espacio de lo común desde la diversidad'?",
+    opciones: [
+      "Que todos los alumnos del país deben tener exactamente los mismos contenidos y actividades sin variación.",
+      "Que los contenidos nacionales son un punto de partida y no contenidos universales acabados o aplicables a cualquier contexto; se enriquecen con la diversidad local.",
+      "Que cada estado diseña su propio currículo de manera completamente independiente."
+    ],
+    correcta: 1,
+    retro: "Lo nacional se entiende como espacio de lo común desde la diversidad; los contenidos son un punto de partida y no contenidos universales acabados, pues cada contexto los enriquece."
+  },
+  /* 25 */ {
+    tipo: "relacion",
+    texto: "Relacione cada elemento curricular con su descripción.\n\nElementos: 1. Campos formativos · 2. Contenidos · 3. Procesos de desarrollo de aprendizaje\n\nDescripciones: a) Rutas posibles de apropiación de aprendizajes · b) Saberes, habilidades y actitudes organizados por grandes áreas · c) Unidades de conocimiento que el colectivo docente contextualiza",
+    opciones: [
+      "1b, 2c, 3a",
+      "1c, 2a, 3b",
+      "1a, 2b, 3c"
+    ],
+    correcta: 0,
+    retro: "Campos formativos → grandes áreas del saber (b); Contenidos → unidades de conocimiento a contextualizar (c); Procesos de desarrollo de aprendizaje → rutas posibles de apropiación (a)."
+  },
+  /* 26 */ {
+    tipo: "directo",
+    texto: "¿Qué papel tienen los proyectos comunitarios, los círculos de diálogo y las situaciones problemáticas en la Fase 2?",
+    opciones: [
+      "Son actividades optativas que el docente aplica solo cuando sobra tiempo en la planeación.",
+      "Son estrategias para que los aprendizajes tengan pertinencia y sentido, poniendo en marcha aprendizajes de manera integral en contextos reales.",
+      "Sustituyen completamente la instrucción directa del docente en el aula."
+    ],
+    correcta: 1,
+    retro: "Proyectos comunitarios, círculos de diálogo y situaciones problemáticas se ponen en marcha para que los aprendizajes tengan pertinencia y sentido de manera integral."
+  },
+  /* 27 */ {
+    tipo: "completamiento",
+    texto: "La expresión creativa con los distintos elementos de los lenguajes artísticos en la Fase 2 busca que los niños, en el primer proceso de desarrollo de aprendizaje…",
+    opciones: [
+      "…presenten sus producciones artísticas en festivales escolares ante los padres de familia.",
+      "…experimenten con los diversos elementos de los lenguajes artísticos y descubran sus posibilidades de creación y expresión.",
+      "…aprendan técnicas formales de dibujo, pintura y escultura bajo la guía del docente."
+    ],
+    correcta: 1,
+    retro: "En el primer proceso de desarrollo de aprendizaje, los niños experimentan con los elementos de los lenguajes artísticos y descubren sus posibilidades de creación y expresión."
+  },
+  /* 28 */ {
+    tipo: "ordenamiento",
+    texto: "Ordene los pasos del proceso de contextualización del Programa Analítico, del primero al último:\n\n1. Determinar los Contenidos que integrarán el Programa Analítico\n2. Identificar las necesidades, intereses y características de los grupos\n3. Establecer vinculaciones y metodologías a aplicar\n4. Revisar el Plan de estudio 2022 y los Programas Sintéticos",
+    opciones: [
+      "4, 2, 1, 3",
+      "2, 4, 1, 3",
+      "1, 2, 4, 3"
+    ],
+    correcta: 0,
+    retro: "Primero se revisa el Plan de estudio y los Programas Sintéticos (4), luego se identifican necesidades del grupo (2), se determinan los Contenidos (1) y finalmente se establecen vinculaciones y metodologías (3)."
+  },
+  /* 29 */ {
+    tipo: "directo",
+    texto: "¿Cómo describe el Programa Sintético la relación entre la escuela y la comunidad en el Campo De lo Humano y lo Comunitario?",
+    opciones: [
+      "La escuela es una institución aislada de la comunidad para proteger su autonomía pedagógica.",
+      "La escuela está viva y es parte de la comunidad, cambia y se transforma de acuerdo con lo que ocurre en ella, por lo que cada escuela deberá considerar su historia, contexto y condiciones actuales.",
+      "La comunidad debe adaptarse a los lineamientos escolares sin intervenir en el currículo."
+    ],
+    correcta: 1,
+    retro: "El programa concibe la escuela como parte viva de la comunidad que cambia y se transforma con ella; por eso cada escuela debe considerar su historia, contexto y condiciones actuales."
+  },
+  /* 30 */ {
+    tipo: "directo",
+    texto: "¿En qué consiste la retroalimentación dialógica dentro de la evaluación formativa según el Programa Sintético?",
+    opciones: [
+      "El docente comunica a los padres de familia las calificaciones obtenidas cada bimestre.",
+      "Procura que los estudiantes reflexionen sobre su proceso de aprendizaje mediante un vínculo permanente entre estudiantes y docentes, basado en la participación y la observación contextualizada.",
+      "Consiste en publicar los resultados de los exámenes en el periódico mural del salón."
+    ],
+    correcta: 1,
+    retro: "La retroalimentación dialógica procura que los estudiantes reflexionen sobre su proceso de aprendizaje, sosteniendo un vínculo permanente con los docentes a través de la participación y la observación contextualizada."
+  },
+  /* 31 */ {
+    tipo: "completamiento",
+    texto: "En el Campo Ética, Naturaleza y Sociedades, relacionarse con espacios naturales fomenta que niñas y niños…",
+    opciones: [
+      "…desarrollen competencias laborales orientadas al trabajo en el campo y la agricultura.",
+      "…se sientan parte de la naturaleza, tengan vivencias en entornos naturales y participen colaborativamente en su cuidado, preservación y aprovechamiento sustentable.",
+      "…realicen experimentos de laboratorio para comprender los ecosistemas."
+    ],
+    correcta: 1,
+    retro: "Relacionarse con espacios naturales busca que niñas y niños se sientan parte de la naturaleza, tengan vivencias en entornos naturales y participen en su cuidado y aprovechamiento sustentable."
+  },
+  /* 32 */ {
+    tipo: "directo",
+    texto: "¿Cómo se construye el Programa Analítico de la escuela en cuanto a su temporalidad?",
+    opciones: [
+      "Se elabora una sola vez al inicio del ciclo escolar y no se modifica durante el año.",
+      "Se construye por ciclo escolar de manera anual, para cada grado, e incorpora los cuatro Campos formativos; además, es revisado periódicamente en las sesiones de CTE.",
+      "Es elaborado por la supervisión escolar y entregado a los docentes antes del inicio del ciclo."
+    ],
+    correcta: 1,
+    retro: "El Programa Analítico se construye por ciclo escolar de manera anual para cada grado, incorpora los cuatro Campos formativos y es revisado periódicamente en el CTE para actualizarlo."
+  },
+  /* 33 */ {
+    tipo: "relacion",
+    texto: "Relacione cada proceso de desarrollo de aprendizaje del Campo Lenguajes (producción de expresiones creativas) con su descripción.\n\nProcesos: 1.° · 2.° · 3.°\n\nDescripciones: a) Enriquece sus producciones incluyendo o retomando elementos de manifestaciones artísticas y culturales, y aprecia las creaciones de sus pares · b) Experimenta con los elementos de los lenguajes artísticos y produce expresiones creativas para representar su mundo · c) Combina elementos artísticos como formas, colores, texturas y música en producciones creativas, y aprecia con empatía las expresiones de otras personas",
+    opciones: [
+      "1b, 2c, 3a",
+      "1c, 2b, 3a",
+      "1a, 2c, 3b"
+    ],
+    correcta: 0,
+    retro: "Proceso 1.° → experimenta y produce (b); Proceso 2.° → combina elementos y aprecia con empatía (c); Proceso 3.° → enriquece con manifestaciones culturales y aprecia a sus pares (a)."
+  },
+  /* 34 */ {
+    tipo: "ordenamiento",
+    texto: "Ordene las etapas que forman parte del panorama de la Fase 2 tal como se organiza el Programa Sintético:\n\n1. Presentación de los Campos formativos con sus especificidades\n2. El Programa Analítico: Contextualización y Codiseño\n3. Panorama de los Contenidos de la Fase 2\n4. Reflexiones sobre la evaluación formativa",
+    opciones: [
+      "3, 1, 2, 4",
+      "1, 3, 2, 4",
+      "2, 1, 3, 4"
+    ],
+    correcta: 0,
+    retro: "La organización del Programa Sintético es: Panorama de Contenidos de la Fase 2 (3) → Campos formativos con especificidades (1) → Programa Analítico: Contextualización y Codiseño (2) → Reflexiones sobre evaluación formativa (4)."
+  },
+  /* 35 */ {
+    tipo: "directo",
+    texto: "Según el Programa Sintético de la Fase 2, ¿qué implica la diversidad en el contexto escolar?",
+    opciones: [
+      "Que todos los alumnos deben recibir exactamente el mismo trato y las mismas actividades para garantizar equidad.",
+      "Entablar relaciones basadas en el respeto, la aceptación, la cooperación y la conciencia social, donde las experiencias y emociones de niñas y niños sean tomadas en cuenta y valoradas.",
+      "Que el docente debe separar a los alumnos en grupos homogéneos para facilitar la enseñanza."
+    ],
+    correcta: 1,
+    retro: "La diversidad implica entablar relaciones basadas en el respeto, la aceptación, la cooperación y la conciencia social, donde las experiencias y emociones de todos sean tomadas en cuenta y valoradas."
+  }
+];
+
+// -------------------------------------------------------
+// ESTADO DEL SIMULADOR
+// -------------------------------------------------------
+let indice = 0;            // pregunta actual (0-based)
+let respuestas = [];       // índice de opción elegida por el usuario (-1 = no respondida)
+let respondida = false;    // si la pregunta actual ya fue contestada
+let intervalo = null;      // setInterval del cronómetro
+let segundosRestantes = 3600; // 60 minutos
+
+// Inicializar arreglo de respuestas
+function initRespuestas() {
+  respuestas = new Array(preguntas.length).fill(-1);
+}
+
+// -------------------------------------------------------
+// INICIAR SIMULADOR
+// -------------------------------------------------------
+function iniciarSimulador() {
+  initRespuestas();
+  indice = 0;
+  document.getElementById('pantallaBienvenida').style.display = 'none';
+  document.getElementById('pantallaPreguntas').style.display  = 'block';
+  document.getElementById('barraInfo').style.display          = 'flex';
+  iniciarCronometro();
+  mostrarPregunta();
+}
+
+// -------------------------------------------------------
+// CRONÓMETRO
+// -------------------------------------------------------
+function iniciarCronometro() {
+  segundosRestantes = 3600;
+  actualizarReloj();
+  intervalo = setInterval(() => {
+    segundosRestantes--;
+    actualizarReloj();
+    if (segundosRestantes <= 0) {
+      clearInterval(intervalo);
+      alert('⏱ ¡Tiempo agotado! Se mostrarán tus resultados.');
+      mostrarResultados();
+    }
+  }, 1000);
+}
+
+function actualizarReloj() {
+  const min = Math.floor(segundosRestantes / 60).toString().padStart(2, '0');
+  const seg = (segundosRestantes % 60).toString().padStart(2, '0');
+  const el = document.getElementById('tiempo');
+  el.textContent = `${min}:${seg}`;
+  // Urgencia cuando quedan menos de 5 minutos
+  el.classList.toggle('urgente', segundosRestantes < 300);
+}
+
+// -------------------------------------------------------
+// MOSTRAR PREGUNTA
+// -------------------------------------------------------
+const tiposLabel = {
+  directo:       'Cuestionamiento directo',
+  completamiento:'Completamiento',
+  ordenamiento:  'Ordenamiento',
+  relacion:      'Relación de elementos'
+};
+
+function mostrarPregunta() {
+  const p = preguntas[indice];
+  respondida = (respuestas[indice] !== -1);
+
+  // Actualizar encabezados
+  document.getElementById('numPregunta').textContent   = `Pregunta ${indice + 1} de ${preguntas.length}`;
+  document.getElementById('tipoBadge').textContent     = tiposLabel[p.tipo] || p.tipo;
+  document.getElementById('textoPregunta').textContent = p.texto;
+  document.getElementById('progresoLabel').textContent = `Pregunta ${indice + 1} de ${preguntas.length}`;
+
+  // Barra de progreso
+  const porcentaje = ((indice + 1) / preguntas.length) * 100;
+  document.getElementById('barraFill').style.width = porcentaje + '%';
+
+  // Opciones
+  const cont = document.getElementById('contenedorOpciones');
+  cont.innerHTML = '';
+  const letras = ['A', 'B', 'C', 'D'];
+  p.opciones.forEach((op, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opcion-btn';
+    btn.innerHTML = `<span class="letra">${letras[i]}</span><span>${op}</span>`;
+    btn.onclick = () => seleccionarOpcion(i);
+    if (respondida) {
+      btn.disabled = true;
+      if (i === p.correcta)             btn.classList.add('correcta');
+      if (i === respuestas[indice] && i !== p.correcta) btn.classList.add('incorrecta');
+    }
+    cont.appendChild(btn);
+  });
+
+  // Retroalimentación
+  const retro = document.getElementById('retro');
+  if (respondida) {
+    const esCorrecta = respuestas[indice] === p.correcta;
+    retro.className = 'retroalimentacion mostrar ' + (esCorrecta ? 'ok' : 'mal');
+    retro.innerHTML = (esCorrecta ? '✅ <strong>¡Correcto!</strong> ' : '❌ <strong>Incorrecto.</strong> La respuesta correcta es la opción <strong>' + letras[p.correcta] + '</strong>. ') + p.retro;
+  } else {
+    retro.className = 'retroalimentacion';
+    retro.innerHTML = '';
+  }
+
+  // Botones de navegación
+  document.getElementById('btnAnterior').style.display  = indice > 0 ? 'inline-block' : 'none';
+  document.getElementById('btnSiguiente').style.display = (respondida && indice < preguntas.length - 1) ? 'inline-block' : 'none';
+  document.getElementById('btnFinalizar').style.display = (respondida && indice === preguntas.length - 1) ? 'inline-block' : 'none';
+}
+
+// -------------------------------------------------------
+// SELECCIONAR OPCIÓN
+// -------------------------------------------------------
+function seleccionarOpcion(i) {
+  if (respondida) return;
+  respuestas[indice] = i;
+  mostrarPregunta();
+}
+
+// -------------------------------------------------------
+// NAVEGACIÓN
+// -------------------------------------------------------
+function irPregunta(dir) {
+  const nuevo = indice + dir;
+  if (nuevo >= 0 && nuevo < preguntas.length) {
+    indice = nuevo;
+    mostrarPregunta();
+  }
+}
+
+// -------------------------------------------------------
+// RESULTADOS
+// -------------------------------------------------------
+function mostrarResultados() {
+  clearInterval(intervalo);
+  const correctas = respuestas.filter((r, i) => r === preguntas[i].correcta).length;
+
+  document.getElementById('pantallaPreguntas').style.display  = 'none';
+  document.getElementById('pantallaResultados').style.display = 'block';
+
+  document.getElementById('puntajeNum').textContent = correctas;
+
+  // Mensaje según puntaje
+  const pct = (correctas / preguntas.length) * 100;
+  let msg, desc;
+  if (pct >= 90)      { msg = '🌟 ¡Excelente dominio!';     desc = 'Tienes un conocimiento sobresaliente del Programa Sintético Fase 2.'; }
+  else if (pct >= 70) { msg = '👍 ¡Buen desempeño!';        desc = 'Conoces bien el programa; refuerza los temas con menor puntaje.'; }
+  else if (pct >= 50) { msg = '📖 En proceso';              desc = 'Revisa los contenidos del Programa Sintético Fase 2 y vuelve a intentarlo.'; }
+  else                { msg = '💪 Sigue estudiando';        desc = 'Te recomendamos repasar el documento completo antes de volver a intentarlo.'; }
+
+  document.getElementById('mensajeFinal').textContent = msg;
+  document.getElementById('descFinal').textContent    = desc;
+
+  // Lista de revisión
+  const lista = document.getElementById('listaRevision');
+  lista.innerHTML = '';
+  preguntas.forEach((p, i) => {
+    const correcta = respuestas[i] === p.correcta;
+    const letras   = ['A', 'B', 'C', 'D'];
+    const item = document.createElement('div');
+    item.className = `rev-item ${correcta ? 'ok' : 'mal'}`;
+    item.innerHTML = `
+      <span class="rev-icon">${correcta ? '✅' : '❌'}</span>
+      <div class="rev-texto">
+        <strong>Pregunta ${i + 1} · ${tiposLabel[p.tipo]}</strong>
+        ${!correcta ? `Tu respuesta: ${respuestas[i] >= 0 ? letras[respuestas[i]] : 'Sin responder'} — Correcta: ${letras[p.correcta]}` : 'Respondida correctamente'}
+      </div>`;
+    lista.appendChild(item);
+  });
+}
+
+// -------------------------------------------------------
+// REINICIAR
+// -------------------------------------------------------
+function reiniciar() {
+  document.getElementById('pantallaResultados').style.display = 'none';
+  document.getElementById('pantallaPreguntas').style.display  = 'none';
+  document.getElementById('barraInfo').style.display          = 'none';
+  document.getElementById('pantallaBienvenida').style.display = 'block';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simulador Admisión Preescolar 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Merriweather:wght@700&display=swap');
+
+  :root {
+    --azul: #1a56a0;
+    --azul-claro: #2d7dd2;
+    --azul-pale: #e8f2fc;
+    --verde: #1a8c5e;
+    --verde-claro: #e8f7f0;
+    --rojo: #c0392b;
+    --rojo-claro: #fdecea;
+    --dorado: #e6a817;
+    --gris: #6b7a8d;
+    --gris-claro: #f4f6f9;
+    --blanco: #ffffff;
+    --sombra: 0 4px 20px rgba(26,86,160,.13);
+    --sombra-fuerte: 0 8px 32px rgba(26,86,160,.2);
+    --radio: 14px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #0d3b7a 0%, #1a56a0 40%, #1e6fbf 100%);
+    overflow: hidden;
+  }
+
+  /* ═══════════════════ PANTALLA INICIO ═══════════════════ */
+  #pantalla-inicio {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0d3b7a 0%, #1a56a0 60%, #2d7dd2 100%);
+    z-index: 100;
+    padding: 16px;
+  }
+
+  .inicio-card {
+    background: var(--blanco);
+    border-radius: 24px;
+    padding: 40px 44px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    text-align: center;
+  }
+
+  .inicio-escudo {
+    font-size: 56px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+
+  .inicio-titulo {
+    font-family: 'Merriweather', serif;
+    font-size: 1.55rem;
+    color: var(--azul);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .inicio-autor {
+    font-size: .82rem;
+    color: var(--gris);
+    letter-spacing: .06em;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .inicio-info {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .inicio-badge {
+    background: var(--azul-pale);
+    color: var(--azul);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: .8rem;
+    font-weight: 700;
+  }
+
+  .inicio-label {
+    display: block;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--gris);
+    text-align: left;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .inicio-input {
+    width: 100%;
+    border: 2px solid #dce3ec;
+    border-radius: var(--radio);
+    padding: 13px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: #2c3e50;
+    outline: none;
+    transition: border-color .2s;
+    margin-bottom: 20px;
+  }
+  .inicio-input:focus { border-color: var(--azul-claro); }
+
+  .inicio-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-claro) 100%);
+    color: var(--blanco);
+    border: none;
+    border-radius: var(--radio);
+    padding: 15px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    letter-spacing: .03em;
+  }
+  .inicio-btn:hover { transform: translateY(-2px); box-shadow: var(--sombra-fuerte); }
+  .inicio-btn:active { transform: translateY(0); }
+
+  .inicio-firma {
+    margin-top: 18px;
+    font-size: .75rem;
+    color: #aab5c4;
+  }
+
+  /* ═══════════════════ SIMULADOR PRINCIPAL ═══════════════════ */
+  #simulador {
+    display: none;
+    position: fixed; inset: 0;
+    flex-direction: column;
+    background: var(--gris-claro);
+  }
+  #simulador.activo { display: flex; }
+
+  /* ——— HEADER ——— */
+  .header {
+    background: linear-gradient(135deg, #0d3b7a 0%, #1a56a0 100%);
+    color: var(--blanco);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+    height: 58px;
+  }
+
+  .header-titulo {
+    font-family: 'Merriweather', serif;
+    font-size: .88rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-sub {
+    font-size: .65rem;
+    opacity: .75;
+    font-weight: 400;
+    font-family: 'Nunito', sans-serif;
+    display: block;
+  }
+
+  .header-centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .progreso-texto {
+    font-size: .7rem;
+    opacity: .8;
+    white-space: nowrap;
+  }
+
+  .progreso-barra {
+    width: 120px;
+    height: 5px;
+    background: rgba(255,255,255,.25);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progreso-fill {
+    height: 100%;
+    background: #7de8b8;
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+
+  /* TIMER */
+  .timer {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,.12);
+    border-radius: 10px;
+    padding: 6px 12px;
+    flex-shrink: 0;
+  }
+  .timer-icon { font-size: 1rem; }
+  .timer-display {
+    font-size: .95rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .timer.urgente { background: rgba(192,57,43,.5); animation: parpadeo 1s infinite; }
+  @keyframes parpadeo { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+  /* ——— BANDA TEMÁTICA ——— */
+  .banda-tema {
+    background: var(--azul-pale);
+    border-bottom: 2px solid #c8ddf5;
+    padding: 5px 20px;
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--azul);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    flex-shrink: 0;
+  }
+
+  /* ——— ÁREA PRINCIPAL ——— */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 14px 16px 10px;
+    gap: 12px;
+  }
+
+  /* ——— TARJETA PREGUNTA ——— */
+  .pregunta-card {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    padding: 18px 22px 14px;
+    box-shadow: var(--sombra);
+    flex-shrink: 0;
+  }
+
+  .pregunta-num {
+    font-size: .7rem;
+    font-weight: 800;
+    color: var(--azul-claro);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 6px;
+  }
+
+  .pregunta-texto {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #1c2b3a;
+    line-height: 1.45;
+  }
+
+  /* ——— OPCIONES ——— */
+  .opciones-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .opciones-wrap::-webkit-scrollbar { width: 5px; }
+  .opciones-wrap::-webkit-scrollbar-thumb { background: #ccd6e4; border-radius: 99px; }
+
+  .opcion {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--blanco);
+    border: 2px solid #dce3ec;
+    border-radius: 12px;
+    padding: 11px 15px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .1s;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  }
+  .opcion:hover:not(.bloqueada) {
+    border-color: var(--azul-claro);
+    background: var(--azul-pale);
+    transform: translateY(-1px);
+  }
+  .opcion.seleccionada { border-color: var(--azul); background: var(--azul-pale); }
+  .opcion.correcta { border-color: var(--verde); background: var(--verde-claro); }
+  .opcion.incorrecta { border-color: var(--rojo); background: var(--rojo-claro); }
+  .opcion.bloqueada { cursor: default; }
+
+  .opcion-letra {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--azul-pale);
+    color: var(--azul);
+    font-weight: 800;
+    font-size: .82rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .opcion.seleccionada .opcion-letra { background: var(--azul); color: var(--blanco); }
+  .opcion.correcta .opcion-letra { background: var(--verde); color: var(--blanco); }
+  .opcion.incorrecta .opcion-letra { background: var(--rojo); color: var(--blanco); }
+
+  .opcion-texto {
+    font-size: .875rem;
+    color: #2c3e50;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  /* ——— RETROALIMENTACIÓN ——— */
+  .retro {
+    border-radius: 12px;
+    padding: 11px 15px;
+    font-size: .8rem;
+    line-height: 1.5;
+    flex-shrink: 0;
+    display: none;
+  }
+  .retro.visible { display: block; }
+  .retro.correcta {
+    background: var(--verde-claro);
+    border-left: 4px solid var(--verde);
+    color: #1a5c40;
+  }
+  .retro.incorrecta {
+    background: var(--rojo-claro);
+    border-left: 4px solid var(--rojo);
+    color: #7b1a14;
+  }
+  .retro-titulo { font-weight: 800; margin-bottom: 3px; }
+
+  /* ——— CONTROLES ——— */
+  .controles {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    padding-bottom: 2px;
+  }
+
+  .btn {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: .9rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s, opacity .2s;
+    letter-spacing: .02em;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .btn-anterior {
+    background: var(--blanco);
+    color: var(--azul);
+    border: 2px solid #c8ddf5;
+    flex: 0 0 auto;
+    padding: 12px 18px;
+  }
+  .btn-anterior:hover:not(:disabled) { border-color: var(--azul); }
+
+  .btn-siguiente {
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-claro) 100%);
+    color: var(--blanco);
+    box-shadow: 0 4px 12px rgba(26,86,160,.3);
+  }
+  .btn-siguiente:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(26,86,160,.4); transform: translateY(-1px); }
+
+  .btn-finalizar {
+    background: linear-gradient(135deg, var(--verde) 0%, #25b47a 100%);
+    color: var(--blanco);
+    box-shadow: 0 4px 12px rgba(26,140,94,.3);
+  }
+  .btn-finalizar:hover { box-shadow: 0 6px 18px rgba(26,140,94,.4); transform: translateY(-1px); }
+
+  /* ═══════════════════ PANTALLA RESULTADOS ═══════════════════ */
+  #pantalla-resultados {
+    display: none;
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, #0d3b7a 0%, #1a56a0 60%, #2d7dd2 100%);
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  #pantalla-resultados.activo { display: flex; }
+
+  .resultados-card {
+    background: var(--blanco);
+    border-radius: 24px;
+    padding: 36px 40px;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+    text-align: center;
+  }
+
+  .res-emoji { font-size: 56px; line-height: 1; margin-bottom: 10px; }
+  .res-titulo {
+    font-family: 'Merriweather', serif;
+    font-size: 1.4rem;
+    color: var(--azul);
+    margin-bottom: 6px;
+  }
+  .res-nombre {
+    font-size: 1.05rem;
+    color: var(--gris);
+    margin-bottom: 22px;
+  }
+
+  .res-circulo {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.15);
+  }
+  .res-pct {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--blanco);
+    line-height: 1;
+  }
+  .res-pct-lbl {
+    font-size: .75rem;
+    color: rgba(255,255,255,.85);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  .res-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .res-stat {
+    background: var(--gris-claro);
+    border-radius: 14px;
+    padding: 14px 10px;
+  }
+  .res-stat-n {
+    font-size: 1.6rem;
+    font-weight: 900;
+    display: block;
+    line-height: 1;
+  }
+  .res-stat-l {
+    font-size: .7rem;
+    color: var(--gris);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .stat-correctas .res-stat-n { color: var(--verde); }
+  .stat-incorrectas .res-stat-n { color: var(--rojo); }
+  .stat-total .res-stat-n { color: var(--azul); }
+
+  .res-mensaje {
+    background: var(--azul-pale);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: .88rem;
+    color: var(--azul);
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 22px;
+  }
+
+  .btn-reiniciar {
+    width: 100%;
+    background: linear-gradient(135deg, var(--azul) 0%, var(--azul-claro) 100%);
+    color: var(--blanco);
+    border: none;
+    border-radius: var(--radio);
+    padding: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    margin-bottom: 12px;
+  }
+  .btn-reiniciar:hover { transform: translateY(-2px); box-shadow: var(--sombra-fuerte); }
+
+  .res-firma {
+    font-size: .72rem;
+    color: #aab5c4;
+    margin-top: 8px;
+  }
+
+  /* ═══════════════════ RESPONSIVE AJUSTES ═══════════════════ */
+  @media (max-width: 480px) {
+    .inicio-card { padding: 28px 20px; }
+    .inicio-titulo { font-size: 1.2rem; }
+    .header-titulo { font-size: .8rem; }
+    .pregunta-card { padding: 14px 14px 10px; }
+    .pregunta-texto { font-size: .87rem; }
+    .opcion-texto { font-size: .82rem; }
+    .resultados-card { padding: 24px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════════════════ PANTALLA INICIO ═════════════════════ -->
+<div id="pantalla-inicio">
+  <div class="inicio-card">
+    <div class="inicio-escudo">🎓</div>
+    <h1 class="inicio-titulo">Simulador Admisión Preescolar 2026</h1>
+    <p class="inicio-autor">Prof. Francisco De Jesus Luna Benitez</p>
+
+    <div class="inicio-info">
+      <span class="inicio-badge">📝 120 reactivos</span>
+      <span class="inicio-badge">⏱ 120 minutos</span>
+      <span class="inicio-badge">🎯 4 tipos de reactivo</span>
+    </div>
+
+    <label class="inicio-label" for="nombre-input">Nombre del estudiante</label>
+    <input id="nombre-input" class="inicio-input" type="text"
+           placeholder="Escribe tu nombre completo" maxlength="80" autocomplete="name"/>
+
+    <button class="inicio-btn" onclick="iniciarSimulador()">▶ Comenzar Examen</button>
+
+    <p class="inicio-firma">Prof. Francisco De Jesus Luna Benitez · 2026</p>
+  </div>
+</div>
+
+<!-- ═════════════════════ SIMULADOR ═════════════════════ -->
+<div id="simulador">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div>
+      <div class="header-titulo">Simulador Preescolar 2026
+        <span class="header-sub">Prof. F. De Jesus Luna Benitez</span>
+      </div>
+    </div>
+    <div class="header-centro">
+      <div class="progreso-texto" id="progreso-texto">Reactivo 1 de 120</div>
+      <div class="progreso-barra">
+        <div class="progreso-fill" id="progreso-fill" style="width:0.83%"></div>
+      </div>
+    </div>
+    <div class="timer" id="timer">
+      <span class="timer-icon">⏱</span>
+      <span class="timer-display" id="timer-display">120:00</span>
+    </div>
+  </header>
+
+  <!-- BANDA TEMA -->
+  <div class="banda-tema" id="banda-tema">Tema 1</div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- Pregunta -->
+    <div class="pregunta-card">
+      <div class="pregunta-num" id="pregunta-num">Reactivo 1 de 120</div>
+      <div class="pregunta-texto" id="pregunta-texto"></div>
+    </div>
+
+    <!-- Opciones (scrollables) -->
+    <div class="opciones-wrap" id="opciones-wrap"></div>
+
+    <!-- Retroalimentación -->
+    <div class="retro" id="retro">
+      <div class="retro-titulo" id="retro-titulo"></div>
+      <div id="retro-cuerpo"></div>
+    </div>
+
+    <!-- Controles -->
+    <div class="controles">
+      <button class="btn btn-anterior" id="btn-anterior" onclick="navegarAnterior()" disabled>← Anterior</button>
+      <button class="btn btn-siguiente" id="btn-siguiente" onclick="navegarSiguiente()">Siguiente →</button>
+      <button class="btn btn-finalizar" id="btn-finalizar" onclick="mostrarResultados()" style="display:none">✅ Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════ RESULTADOS ═════════════════════ -->
+<div id="pantalla-resultados">
+  <div class="resultados-card">
+    <div class="res-emoji" id="res-emoji">🏆</div>
+    <h2 class="res-titulo">¡Simulador Finalizado!</h2>
+    <p class="res-nombre" id="res-nombre">Estudiante</p>
+
+    <div class="res-circulo" id="res-circulo">
+      <span class="res-pct" id="res-pct">0%</span>
+      <span class="res-pct-lbl">Aciertos</span>
+    </div>
+
+    <div class="res-stats">
+      <div class="res-stat stat-correctas">
+        <span class="res-stat-n" id="res-correctas">0</span>
+        <span class="res-stat-l">✅ Correctas</span>
+      </div>
+      <div class="res-stat stat-incorrectas">
+        <span class="res-stat-n" id="res-incorrectas">0</span>
+        <span class="res-stat-l">❌ Incorrectas</span>
+      </div>
+      <div class="res-stat stat-total">
+        <span class="res-stat-n" id="res-total">120</span>
+        <span class="res-stat-l">📝 Total</span>
+      </div>
+    </div>
+
+    <div class="res-mensaje" id="res-mensaje"></div>
+
+    <button class="btn-reiniciar" onclick="reiniciar()">🔄 Volver a Intentarlo</button>
+    <p class="res-firma">Prof. Francisco De Jesus Luna Benitez · Simulador Admisión Preescolar 2026</p>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   BANCO DE 120 REACTIVOS
+   Distribuidos en 6 temas:
+   ① Acoso Escolar (20)  ② Conflictos Escolares (20)
+   ③ Fase 2 Preescolar (25)  ④ Programa Analítico (20)
+   ⑤ LGDNNA (20)  ⑥ LGE (15)
+══════════════════════════════════════════════════════════════ */
+const BANCO = [
+
+  // ══════════════════════════════════════════
+  // TEMA 1: PROTOCOLO DE ERRADICACIÓN DEL ACOSO ESCOLAR
+  // ══════════════════════════════════════════
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Cuál es el elemento que distingue al acoso escolar de una pelea aislada o riña común?", ops:["Que ocurra únicamente dentro de las instalaciones del plantel escolar.","Que combine poder desigual, intención, repetición y duración sostenida.","Que involucre necesariamente a más de dos estudiantes al mismo tiempo."], ok:1, retro:"El Protocolo establece que el acoso escolar se define por cuatro elementos simultáneos: poder desigual, intención de dañar, repetición de la conducta y duración sostenida en el tiempo. La ausencia de alguno de estos elementos lo convierte en un conflicto ordinario." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Qué tipo de acoso escolar se caracteriza por el uso de plataformas digitales para amenazar, difundir rumores o compartir imágenes sin consentimiento?", ops:["Acoso físico, ya que afecta la integridad corporal del estudiante.","Acoso socioemocional, porque daña las relaciones interpersonales.","Ciberacoso, cuyo alcance es virtual y trasciende el espacio escolar."], ok:2, retro:"El ciberacoso utiliza plataformas digitales para amenazar, difundir rumores, humillar o compartir imágenes sin consentimiento. Su característica principal es el alcance virtual, que extiende el daño más allá del entorno escolar." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Cuál es el propósito principal del Protocolo de Erradicación del Acoso Escolar según el Acuerdo 14/12/23?", ops:["Establecer acciones claras de prevención, atención y no repetición, sin limitarse a sancionar.","Expulsar de forma definitiva a los estudiantes que cometan actos de violencia.","Centralizar todas las decisiones disciplinarias en la supervisión de zona escolar."], ok:0, retro:"El Protocolo busca ir más allá de la sanción: establece acciones de prevención, atención oportuna y medidas de no repetición, garantizando a niñas, niños y adolescentes el derecho a una educación libre de violencia." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Quiénes son los espectadores pasivos en una situación de acoso escolar?", ops:["Docentes que no se encuentran presentes en el momento del incidente.","Educandos que no participan directamente, pero actúan de manera pasiva o incitadora.","Padres de familia que no asisten a las reuniones convocadas por la escuela."], ok:1, retro:"Los espectadores pasivos son los educandos que presencian el acoso sin participar directamente, pero cuyo silencio o indiferencia lo alimenta. Intervenirlos es clave para erradicar el fenómeno." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Cuál de las siguientes situaciones es un ejemplo claro de acoso socioemocional?", ops:["Golpear repetidamente a un compañero durante el recreo.","Insultar a un alumno con sobrenombres ofensivos frente al grupo.","Aislar, marginar e ignorar a un estudiante de manera sistemática y deliberada."], ok:2, retro:"El acoso socioemocional se manifiesta en comportamientos que lesionan las relaciones interpersonales: aislar, marginar, ignorar o avergonzar en público. Su daño es relacional y afecta profundamente el bienestar emocional del estudiante." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Qué fase del Protocolo corresponde a la 'observación activa y reconocimiento' de comportamientos de vulnerabilidad en víctimas, agresores y espectadores?", ops:["Fase 2: Notificación a autoridades y familias.","Fase 1: Detección a través de la observación activa.","Fase 4: Seguimiento para la sanación continua."], ok:1, retro:"La Fase 1 de Detección es el Radar del protocolo. Su objetivo es reconocer comportamientos de vulnerabilidad sin prejuzgar la veracidad de los hechos, usando guías de observación e indicadores de riesgo." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Cuál es el principio rector que busca proteger la identidad y los datos personales de todos los involucrados en un caso de acoso escolar?", ops:["Acción sin daño: intervenciones que sanen en lugar de castigar destructivamente.","Perspectiva de género: eliminar causas de opresión y desigualdad.","Confidencialidad: proteger la identidad y los datos de los involucrados."], ok:2, retro:"La Confidencialidad es un principio rector que garantiza la protección de la identidad y los datos de todas las personas involucradas durante todo el proceso de atención al caso." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"Al confirmarse un caso de acoso escolar, ¿a quiénes debe informarse de manera inmediata en la Fase 2 del Protocolo?", ops:["Únicamente al agresor y a su familia para responsabilizarlos del hecho.","A los medios de comunicación locales para visibilizar la problemática.","A las madres, padres o tutores de todos los involucrados, bajo estricta confidencialidad."], ok:2, retro:"La acción inmediata de la Fase 2 es informar a las madres, padres o tutores de todos los involucrados —víctima y agresor—, garantizando la confidencialidad y la no revictimización en todo momento." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Cuál es la meta final del Protocolo de Erradicación del Acoso Escolar, más allá de resolver el caso presente?", ops:["Documentar estadísticamente los casos para elaborar informes anuales.","Evitar que se repitan actos de acoso escolar en el futuro (no repetición).","Transferir al agresor a otra institución educativa para proteger a la víctima."], ok:1, retro:"El objetivo definitivo del Protocolo no es solo resolver el caso, sino garantizar la no repetición mediante acciones diseñadas a la medida del entorno escolar específico, sin estigmatizar a ninguna de las personas involucradas." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Qué tipo de acoso escolar implica agresiones físicas repetidas como golpes, empujones, zancadillas, encierros o el robo de pertenencias personales?", ops:["Acoso verbal, ya que busca humillar con palabras y acciones directas.","Acoso físico, caracterizado por agresiones corporales y materiales directas.","Acoso socioemocional, porque genera miedo y aislamiento en la víctima."], ok:1, retro:"El acoso físico se caracteriza por agresiones repetidas y directas al cuerpo o pertenencias del estudiante: golpes, empujones, zancadillas, encierros, robo y destrucción de objetos personales." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"El acoso escolar generalmente ocurre en _______, lejos de la mirada de los adultos, lo que lo distingue de las riñas o conflictos ordinarios.", ops:["…el salón de clases durante el desarrollo de las actividades académicas.","…privado, en espacios sin supervisión adulta.","…presencia de otros docentes que fungen como testigos del incidente."], ok:1, retro:"Una nota diagnóstica clave del Protocolo señala que el acoso ocurre generalmente en privado, lejos de la mirada de los adultos, lo que dificulta su detección y justifica la importancia de la observación activa." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"En la Fase 3 de Intervención, la Ruta Administrativa incluye la firma de Cartas de compromisos donde el educando agresor y su familia se responsabilizan de…", ops:["…cubrir una compensación económica a favor de la institución escolar.","…cumplir los acuerdos establecidos para restaurar la convivencia.","…solicitar el cambio de institución educativa en un plazo no mayor a 30 días."], ok:1, retro:"Las Cartas de compromisos son instrumentos de la Ruta Administrativa donde el educando agresor y su familia se responsabilizan de cumplir los acuerdos pactados, garantizando la restauración del entorno escolar." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"La Ruta Formativa en la Fase de Intervención se enfoca en implementar prácticas restaurativas para subsanar los daños, en lugar de…", ops:["…documentar minuciosamente el caso en las bitácoras escolares.","…notificar de inmediato a las autoridades educativas de zona.","…infligir castigos que no contribuyen a la restauración del vínculo."], ok:2, retro:"La Ruta Formativa apuesta por prácticas restaurativas —sanar el daño y recomponer las relaciones— en lugar de aplicar castigos que, según el Protocolo, no contribuyen a la convivencia pacífica ni a la no repetición." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"El principio de 'Acción sin daño' establece que las intervenciones durante el proceso deben sanar, no…", ops:["…documentar los hechos en el expediente del estudiante involucrado.","…castigar destructivamente ni generar más daño del existente.","…notificar inmediatamente a las familias de los involucrados."], ok:1, retro:"El principio de Acción sin daño garantiza que todas las intervenciones institucionales busquen la sanación y restauración, evitando castigos destructivos que agraven la situación de cualquiera de las partes." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"Ordene los 4 momentos de atención del Protocolo de Erradicación del Acoso Escolar en la secuencia correcta de aplicación:", ops:["Detección → Notificación → Intervención → Seguimiento","Notificación → Detección → Seguimiento → Intervención","Detección → Intervención → Notificación → Seguimiento"], ok:0, retro:"El mapa de acción del Protocolo sigue este orden lógico: 1) Detección (identificar), 2) Notificación (informar), 3) Intervención (actuar), 4) Seguimiento (acompañar). Cada momento prepara el siguiente." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"Seleccione la opción que relacione correctamente cada Fase del Protocolo con su descripción funcional: 1. Detección / 2. Notificación / 3. Intervención / 4. Seguimiento — a) La Brújula / b) El Radar / c) La Red de Alerta / d) La Acción", ops:["1b, 2c, 3d, 4a","1c, 2b, 3a, 4d","1d, 2a, 3c, 4b"], ok:0, retro:"La correspondencia correcta es: Detección = El Radar (1b), Notificación = La Red de Alerta (2c), Intervención = La Acción (3d), Seguimiento = La Brújula (4a). Cada nombre metafórico describe el rol de la fase." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"Seleccione la opción que relacione correctamente cada tipo de acoso escolar con su descripción: 1. Físico / 2. Verbal / 3. Socioemocional / 4. Ciberacoso — a) Uso de plataformas digitales / b) Comportamientos de aislamiento o marginación / c) Agresiones físicas repetidas / d) Expresiones agresivas con palabras", ops:["1c, 2d, 3b, 4a","1d, 2c, 3a, 4b","1b, 2a, 3d, 4c"], ok:0, retro:"La relación correcta es: Físico = agresiones directas (1c), Verbal = palabras agresivas (2d), Socioemocional = daño relacional (3b), Ciberacoso = alcance virtual (4a)." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"Seleccione la opción que relacione correctamente cada Principio Rector del Protocolo con su descripción: 1. No revictimización / 2. Confidencialidad / 3. Inclusión y No Discriminación / 4. Perspectiva de Género — a) Proteger datos / b) Eliminar opresión / c) Evitar más daño / d) Eliminar barreras", ops:["1c, 2a, 3d, 4b","1a, 2c, 3b, 4d","1d, 2b, 3c, 4a"], ok:0, retro:"La relación correcta: No revictimización = evitar más daño (1c), Confidencialidad = proteger datos (2a), Inclusión y No Discriminación = eliminar barreras (3d), Perspectiva de Género = combatir desigualdad (4b)." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"Seleccione la opción que relacione correctamente los pasos de la Fase 4 (Seguimiento) con su descripción: 1. Acompañamiento / 2. Documentación / 3. Verificación / 4. Comunicación abierta — a) Confirmar cumplimiento de acuerdos / b) Registrar con bitácoras / c) Red periódica escuela-familia-instituciones / d) Apoyo pedagógico y socioemocional", ops:["1d, 2b, 3a, 4c","1b, 2d, 3c, 4a","1c, 2a, 3d, 4b"], ok:0, retro:"Los pasos del Seguimiento: Acompañamiento = apoyo pedagógico-socioemocional (1d), Documentación = bitácoras (2b), Verificación = cumplimiento de acuerdos (3a), Comunicación abierta = red continua de contacto (4c)." },
+  { tema:"📋 Acoso Escolar · Acuerdo 14/12/23", texto:"¿Cuál es el Receptor Central en la Fase de Notificación del Protocolo de Erradicación del Acoso Escolar?", ops:["Las familias de las víctimas como representantes de la comunidad.","El Cuerpo Colegiado y las Autoridades Escolares del plantel educativo.","Las instancias externas de Derechos Humanos o protección civil."], ok:1, retro:"El Receptor Central es la instancia escolar que recibe y canaliza las quejas, denuncias y solicitudes de atención. Está conformado por el Cuerpo Colegiado y las Autoridades Escolares del plantel." },
+
+  // ══════════════════════════════════════════
+  // TEMA 2: RESOLUCIÓN DE CONFLICTOS ESCOLARES
+  // ══════════════════════════════════════════
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Cuál es la perspectiva pedagógica correcta sobre los conflictos escolares según la guía de estudio?", ops:["Son interrupciones negativas que deben eliminarse para mantener el orden en el aula.","Son oportunidades educativas que preparan a los estudiantes para hacer valer sus derechos de manera no violenta.","Son señales de que el docente no maneja bien su grupo y debe reforzar las normas de disciplina."], ok:1, retro:"El conflicto escolar no es una interrupción sino una oportunidad educativa. Aprender a resolverlos prepara a los alumnos para la vida, enseñándoles a defender sus derechos de forma no violenta." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Cuál de los siguientes describe correctamente el estilo de afrontamiento 'Cooperación/Negociación' dentro de la Matriz de Diagnóstico?", ops:["Renunciar a las propias necesidades y evitar el problema para preservar la armonía del grupo (Pierdo/Pierdes).","Imponer los propios intereses sobre los demás sin considerar el valor de la relación (Gano/Pierdes).","Ceder en lo flexible para proteger tanto el objetivo fundamental como la relación con el otro (Gano/Ganas)."], ok:2, retro:"La Cooperación/Negociación se ubica en el cuadrante Gano/Ganas: ambas partes ceden en lo secundario para proteger lo fundamental y la relación. Exige asertividad y empatía simultáneamente." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Cuál es la diferencia principal entre la Negociación y la Mediación como estrategias de intervención en conflictos escolares?", ops:["En la negociación interviene un tercero neutral que guía el proceso; en la mediación las partes lo resuelven solas.","En la negociación las partes resuelven directamente con disposición al diálogo; en la mediación un facilitador neutro guía el proceso sin imponer soluciones.","La mediación se aplica cuando aún existe disposición y capacidad para el diálogo directo entre las partes."], ok:1, retro:"La Negociación ocurre cuando las partes aún pueden dialogar directamente. La Mediación requiere un facilitador neutral e imparcial cuando el diálogo directo se ha roto, aunque NUNCA impone la solución." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Qué técnica del Botiquín de Regulación Emocional consiste en cambiar pensamientos irracionales (como 'Me odia') por pensamientos racionales (como 'Tuvo un mal día')?", ops:["Tiempo Fuera: distanciamiento temporal para calmar la emoción antes de dialogar.","Distracción Conductual: enfocar la atención en una actividad con movimiento.","Reestructuración Cognitiva: cambiar la interpretación irracional por una racional y objetiva."], ok:2, retro:"La Reestructuración Cognitiva es la tercera herramienta del botiquín. Consiste en identificar pensamientos distorsionados sobre el conflicto y reemplazarlos por interpretaciones más realistas y menos hostiles." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Cuál es el rol correcto del mediador escolar durante un proceso de mediación entre estudiantes?", ops:["Actuar como juez e imponer la solución más justa considerando la versión de ambas partes.","Ser un facilitador neutral e imparcial que guía el proceso comunicativo, pero que NUNCA impone la solución.","Ser el docente de mayor autoridad y experiencia que decide el resultado definitivo del conflicto."], ok:1, retro:"El mediador es un facilitador neutral e imparcial. Su función es crear condiciones para que las partes lleguen a su propio acuerdo. Imponer una solución invalidaría el proceso de mediación." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Según la 'Radiografía de un Conflicto', ¿cuál combinación de señales indica que se está ante un conflicto real que requiere intervención docente?", ops:["Únicamente cuando hay una confrontación física visible entre dos o más estudiantes dentro del salón de clases.","Cuando las necesidades de dos partes se contraponen, existe tensión que distorsiona la percepción y hay emociones latentes como enojo, tristeza o frustración.","Cuando el docente recibe una queja formal por escrito firmada por los alumnos involucrados en el problema."], ok:1, retro:"Un conflicto puede identificarse antes de que escale físicamente. Las señales clave son: necesidades contrapuestas, tensión que distorsiona la percepción, incomodidad ante la conducta del otro y emociones latentes como enojo o resentimiento." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"En el Ciclo de la Escucha Activa, ¿qué acción corresponde al Paso 2: Parafrasear?", ops:["Hacer preguntas abiertas para clarificar la situación, como '¿Cómo te sientes ahora?'.","Repetir con palabras propias lo que la otra persona dijo para confirmar que se entendió correctamente.","Reconocer los sentimientos del otro, por ejemplo preguntando si se sintió avergonzado."], ok:1, retro:"Parafrasear es el acto de repetir el mensaje recibido con palabras propias para verificar la comprensión. Esto genera confianza y evita malentendidos." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Qué estilo de afrontamiento describe el cuadrante 'Evasión' en la Matriz de Diagnóstico?", ops:["Gano/Ganas: ceder en lo flexible para proteger el objetivo fundamental y la relación.","Pierdo/Pierdes: renunciar a las propias necesidades y evitar el problema por completo.","Gano/Pierdes: imponer los intereses propios sin importar el daño a la relación con el otro."], ok:1, retro:"La Evasión es el cuadrante Pierdo/Pierdes: la persona renuncia a sus necesidades y evita confrontar el conflicto. Esto no resuelve el problema subyacente y puede generar resentimiento acumulado." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Según el Flujo de Resolución del Educador (El Acordeón), ¿cuál es la primera acción que debe realizar el docente cuando surge un conflicto?", ops:["Aplicar inmediatamente la Negociación o la Mediación según la gravedad del conflicto observado.","Identificar el estilo de afrontamiento de las partes: Competición, Evasión o Acomodación.","Realizar de inmediato el Análisis 3P (Persona, Proceso, Problema) para conocer la raíz del conflicto."], ok:1, retro:"La primera acción del acordeón es identificar el estilo de afrontamiento de las partes involucradas. Conocer si dominan la competición, evasión o acomodación permite elegir la estrategia de intervención adecuada." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"¿Cuál es el enfoque correcto del Modelo de las 3 P para el análisis integral de un conflicto escolar?", ops:["Analizar únicamente el Problema para encontrar la solución más rápida y eficiente posible.","Centrarse solo en el Proceso comunicativo sin considerar las emociones de las personas involucradas.","Analizar de manera simultánea las Personas (emociones e involucrados), el Proceso (factores desencadenantes) y el Problema (intereses ocultos)."], ok:2, retro:"El Modelo 3P es integral: analiza simultáneamente las Personas (¿quiénes? ¿qué emociones?), el Proceso (¿qué lo desencadenó?) y el Problema (¿cuáles son los intereses ocultos?). Solo integrando las tres dimensiones se puede llegar a una resolución duradera." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"El estilo de afrontamiento más deseable en la resolución de conflictos escolares es la Cooperación/Negociación, porque…", ops:["…una parte debe sacrificar todos sus intereses para que el conflicto termine sin mayor tensión.","…ambas partes ganan en lo fundamental, y el proceso exige asertividad para defender lo propio y empatía para ceder en lo secundario.","…el docente toma la decisión final para ahorrar tiempo y restablecer el orden rápidamente."], ok:1, retro:"La Cooperación es el estilo Gano/Ganas: exige el equilibrio entre asertividad (defender lo fundamental) y empatía (ceder en lo secundario). Así ambas partes salen fortalecidas y la relación se preserva." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"En el Ciclo de la Escucha Activa, el Paso 3: Reflejar consiste en…", ops:["…hacer preguntas abiertas como '¿Cómo te sientes ahora?' para clarificar la situación inicial.","…reconocer los sentimientos del otro, por ejemplo preguntando '¿Tú te sentiste avergonzado por lo que te dijo?'","…hacer una síntesis breve del problema general para cerrar el ciclo de comunicación."], ok:1, retro:"Reflejar es el paso en que se nombran y validan los sentimientos del interlocutor. Reconocer las emociones del otro genera empatía y abre la disposición al diálogo." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Ordene los 4 pasos del Ciclo de la Escucha Activa en la secuencia correcta. 1.Parafrasear 2.Resumir 3.Clarificar 4.Reflejar", ops:["3, 1, 4, 2  (Clarificar → Parafrasear → Reflejar → Resumir)","1, 3, 2, 4  (Parafrasear → Clarificar → Resumir → Reflejar)","3, 4, 1, 2  (Clarificar → Reflejar → Parafrasear → Resumir)"], ok:0, retro:"El ciclo correcto es: Paso 1 Clarificar (preguntas abiertas) → Paso 2 Parafrasear (confirmar entendimiento) → Paso 3 Reflejar (reconocer sentimientos) → Paso 4 Resumir (síntesis del problema)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Ordene correctamente las tres fases del Embudo de la Mediación: 1.Descripción del Conflicto 2.Inicio 3.Obtención de Acuerdos", ops:["2, 1, 3  (Inicio → Descripción del Conflicto → Obtención de Acuerdos)","1, 2, 3  (Descripción del Conflicto → Inicio → Obtención de Acuerdos)","3, 1, 2  (Obtención de Acuerdos → Descripción del Conflicto → Inicio)"], ok:0, retro:"El Embudo de la Mediación sigue: Inicio (restablecer comunicación y reglas) → Descripción del Conflicto (escuchar ambas versiones) → Obtención de Acuerdos (compromisos concretos y firma)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Seleccione la opción que relacione correctamente cada estilo de afrontamiento con su característica: 1.Competición 2.Evasión 3.Acomodación 4.Cooperación — a)Gano/Ganas b)Gano/Pierdes c)Pierdo/Ganas d)Pierdo/Pierdes", ops:["1b, 2d, 3c, 4a","1d, 2b, 3a, 4c","1c, 2a, 3d, 4b"], ok:0, retro:"Competición = Gano/Pierdes (imponer); Evasión = Pierdo/Pierdes (evitar); Acomodación = Pierdo/Ganas (ceder totalmente); Cooperación = Gano/Ganas (ceder en lo flexible)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Seleccione la opción que relacione correctamente cada paso del Ciclo de la Escucha Activa con su descripción: 1.Clarificar 2.Parafrasear 3.Reflejar 4.Resumir — a)Síntesis breve del problema b)Repetir para confirmar c)Reconocer sentimientos d)Hacer preguntas abiertas", ops:["1d, 2b, 3c, 4a","1b, 2a, 3d, 4c","1c, 2d, 3a, 4b"], ok:0, retro:"Clarificar = preguntas abiertas (d); Parafrasear = confirmar entendimiento (b); Reflejar = reconocer sentimientos (c); Resumir = síntesis del problema (a)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Seleccione la opción que relacione correctamente cada fase del Embudo de la Mediación con su actividad principal: 1.Inicio 2.Descripción del Conflicto 3.Obtención de Acuerdos — a)Compromisos concretos y firma b)Restablecer comunicación y definir reglas c)Escuchar ambas versiones sin interrupciones", ops:["1b, 2c, 3a","1c, 2a, 3b","1a, 2b, 3c"], ok:0, retro:"Inicio = restablecer comunicación y definir reglas (b); Descripción del Conflicto = escuchar ambas versiones (c); Obtención de Acuerdos = compromisos concretos y firma (a)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Seleccione la opción que relacione correctamente cada 'P' del Modelo de las 3 P con su pregunta diagnóstica: 1.Personas 2.Proceso 3.Problema — a)¿Intereses ocultos? b)¿Quiénes, qué emociones? c)¿Qué desencadenó el conflicto?", ops:["1b, 2c, 3a","1a, 2b, 3c","1c, 2a, 3b"], ok:0, retro:"Personas = quiénes y qué sienten (b); Proceso = qué lo desencadenó y cómo fluye la comunicación (c); Problema = intereses ocultos y disposición a ceder (a)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Seleccione la opción que relacione correctamente cada pilar de la Alianza Escuela-Familia con su descripción: 1.Fomentar Autoestima 2.Búsqueda de Consenso 3.Escuchar con Empatía 4.Colaboración — a)Ayuda mutua en tareas b)Evitar comparaciones c)Diálogo seguro en el hogar d)Decisiones familiares conjuntas", ops:["1b, 2d, 3c, 4a","1a, 2b, 3d, 4c","1c, 2a, 3b, 4d"], ok:0, retro:"Fomentar Autoestima = evitar comparaciones (1b); Consenso = decisiones en familia (2d); Escuchar con Empatía = diálogo seguro en casa (3c); Colaboración = ayuda mutua en tareas (4a)." },
+  { tema:"⚖️ Resolución de Conflictos Escolares", texto:"Según la guía de estudio, la resolución de conflictos debe ser una práctica habitual en la escuela porque…", ops:["…reduce el número de llamadas de atención que el docente debe hacer durante la clase.","…es un esfuerzo sostenido para convertir la escuela en un espacio de justicia, solidaridad e igualdad, más allá del horario lectivo.","…permite al director evaluar el desempeño del docente en el manejo de situaciones difíciles."], ok:1, retro:"La resolución de conflictos no es una actividad puntual; es un compromiso pedagógico continuo para transformar la cultura escolar en un entorno de justicia, solidaridad e igualdad, fuera y dentro del horario lectivo." },
+
+  // ══════════════════════════════════════════
+  // TEMA 3: PROGRAMA SINTÉTICO FASE 2 (PREESCOLAR)
+  // ══════════════════════════════════════════
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué representa el Programa Sintético de la Fase 2 dentro del proceso de diseño y desarrollo curricular continuo?", ops:["El tercer nivel de concreción curricular donde se evalúan aprendizajes.","El primer nivel de concreción curricular, que presenta los elementos centrales para el trabajo docente.","El único documento vinculante que los docentes deben seguir sin modificaciones."], ok:1, retro:"El Programa Sintético representa el primer nivel de concreción curricular, en el que se presentan los elementos centrales para el trabajo docente." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Cuáles son los cuatro Campos formativos que integran el Programa Sintético de la Fase 2?", ops:["Matemáticas; Ciencias Naturales; Español; Historia.","Lenguajes; Saberes y Pensamiento Científico; Ética, Naturaleza y Sociedades; De lo Humano y lo Comunitario.","Lenguajes; Tecnología; Valores; Expresión Artística."], ok:1, retro:"Los cuatro Campos formativos son: Lenguajes; Saberes y Pensamiento Científico; Ética, Naturaleza y Sociedades; y De lo Humano y lo Comunitario." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué representan los Procesos de desarrollo de aprendizaje en el Programa Sintético?", ops:["Exámenes estandarizados aplicados al finalizar cada ciclo escolar.","Recorridos o rutas posibles que dan cuenta de las formas en que niñas, niños y adolescentes se apropian de aprendizajes.","Planes de clase elaborados exclusivamente por la autoridad educativa central."], ok:1, retro:"Los Procesos de desarrollo de aprendizaje representan recorridos o rutas posibles que dan cuenta de las formas en que niñas, niños y adolescentes se apropian de aprendizajes que les permiten comprender el mundo." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"El Programa Sintético es considerado un documento inacabado porque…", ops:["…fue elaborado sin consultar a los docentes ni a las familias.","…cada uno de los Contenidos que se presentan deberá someterse al proceso de contextualización por parte del colectivo docente.","…está en revisión permanente por parte del Congreso de la Unión."], ok:1, retro:"El documento se considera inacabado en tanto que cada uno de los Contenidos que se presentan deberá someterse al proceso de contextualización por parte del colectivo docente." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué implica el Campo formativo De lo Humano y lo Comunitario en cuanto a la convivencia escolar?", ops:["Que los docentes establecen reglas inamovibles de disciplina para regular la convivencia.","Promover la participación libre en distintos espacios, para que se escuche la voz de todas y todos en igualdad de condiciones, creando ambientes socioculturales diversos y respetuosos.","Que los alumnos deben memorizar los derechos humanos antes de convivir con sus pares."], ok:1, retro:"El campo De lo Humano y lo Comunitario promueve la participación libre e igualitaria en los distintos espacios sociales, creando ambientes socioculturales diversos, respetuosos y abiertos." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"Relacione cada Campo formativo con su enfoque principal: 1.Lenguajes 2.Saberes y Pensamiento Científico 3.Ética, Naturaleza y Sociedades 4.De lo Humano y lo Comunitario — a)Exploración del entorno b)Ciudadanía y comunidad c)Comunicación y expresión d)Valores éticos y naturaleza", ops:["1c, 2a, 3d, 4b","1a, 2c, 3b, 4d","1c, 2d, 3a, 4b"], ok:0, retro:"Lenguajes → comunicación y expresión (c); Saberes y Pensamiento Científico → exploración y preguntas (a); Ética, Naturaleza y Sociedades → valores y naturaleza (d); De lo Humano y lo Comunitario → ciudadanía y comunidad (b)." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué papel cumplen las familias y otros miembros de la comunidad en el Campo de Saberes y Pensamiento Científico?", ops:["Sustituyen al docente en la enseñanza de contenidos científicos formales.","Cumplen un papel fundamental al compartir saberes y el legado histórico que heredaron, relevantes en distintos ámbitos de la vida cotidiana.","Aportan únicamente recursos económicos para los materiales del aula."], ok:1, retro:"Las familias y personas de la comunidad cumplen un papel fundamental en la formación de niñas y niños al compartir los saberes y el legado histórico que heredaron." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"En la Fase 2 es fundamental que niñas y niños se involucren emocionalmente con las actividades; por ello…", ops:["…se les asignan tareas con calificación numérica desde el primer día.","…es necesario partir de sus intereses sobre fenómenos o situaciones relevantes que ocurran en su entorno.","…el docente diseña el programa anual sin considerar el contexto de los alumnos."], ok:1, retro:"Dado que el involucramiento emocional es clave en la Fase 2, las actividades deben partir de los intereses de niñas y niños sobre fenómenos o situaciones relevantes de su entorno." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué tipo de herramientas se proponen en el Programa Sintético para diversificar el aprendizaje en Saberes y Pensamiento Científico?", ops:["Libros de texto convencionales y exámenes escritos mensuales.","Fichas, balanzas, calendarios, recipientes, tangram, dados, componentes de la naturaleza como piedras y semillas.","Dispositivos electrónicos de última generación para cada estudiante."], ok:1, retro:"El programa propone herramientas variadas como fichas, balanzas, calendarios, recipientes, material de construcción y de arte, geoplanos, tangram, dados, piedras, arena y semillas." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"Ordene los planos del Programa Analítico del Programa Sintético de la Fase 2, del primero al último: 1.Diagnóstico y reconocimiento del contexto 2.Contextualización 3.Formulación final 4.Codiseño de nuevos contenidos", ops:["2, 4, 1, 3","1, 2, 4, 3","1, 4, 2, 3"], ok:1, retro:"El Programa Analítico se construye: Primer plano – Diagnóstico del contexto; Segundo plano – Contextualización; Tercer plano – Codiseño; y finalmente la Formulación del Programa Analítico." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué permite el Segundo Plano (Contextualización) del Programa Analítico al colectivo escolar?", ops:["Reproducir los contenidos nacionales sin modificación alguna para garantizar uniformidad.","Interpretar y resignificar los Contenidos curriculares del Programa Sintético desde sus propios términos y referencias, promoviendo un aprendizaje situacional.","Sustituir completamente el currículo nacional por uno elaborado exclusivamente por la escuela."], ok:1, retro:"La contextualización permite al colectivo escolar interpretar y resignificar los Contenidos curriculares desde sus propios términos y referencias para promover un aprendizaje situacional." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Cuál es la diferencia entre 'Contenidos sin ajustes' y 'Contenidos nuevos' en el diseño del Programa Analítico?", ops:["Los sin ajustes son locales; los nuevos son nacionales.","Los sin ajustes se incorporan tal como aparecen en el Programa Sintético; los nuevos no están presentes en él y corresponden a contenidos locales o regionales.","No existe diferencia; ambos términos son sinónimos dentro del Programa Sintético."], ok:1, retro:"Contenidos sin ajustes se incorporan tal como están en el Programa Sintético; Contenidos nuevos son aquellos no previstos en él y que responden a necesidades locales o regionales." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué característica define a la evaluación formativa según el Plan de estudio 2022?", ops:["Se aplica únicamente al finalizar el ciclo escolar en un examen escrito.","Forma parte del proceso formativo, se ubica en la relación pedagógica profesor-estudiante y en el marco de un currículo que integra conocimientos alrededor de la realidad de los estudiantes.","Es responsabilidad exclusiva de la supervisión escolar y no del docente de aula."], ok:1, retro:"Según el Plan de estudio 2022, la evaluación formativa forma parte del proceso formativo y se encuentra en la relación pedagógica profesor-estudiante dentro de un currículo integrador." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"Relacione cada consideración de evaluación con su descripción: 1.Avance progresivo 2.Formas de razonamiento 3.Contenidos como referentes 4.Registros flexibles — a)Los productos no son la única evidencia b)Observable a lo largo de Preescolar c)Punto de partida para organizar y valorar d)No pueden forzarse", ops:["1b, 2d, 3c, 4a","1a, 2c, 3d, 4b","1c, 2b, 3a, 4d"], ok:0, retro:"Avance progresivo → observable a lo largo de Preescolar (b); Formas de razonamiento → no pueden forzarse (d); Contenidos como referentes → para organizar y valorar (c); Registros flexibles → los productos no son la única evidencia (a)." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué papel juega el Consejo Técnico Escolar (CTE) en relación con el Programa Analítico?", ops:["Elaborar los exámenes finales de ciclo para todos los grados.","Revisar periódicamente el Programa Analítico para hacer reorientaciones, adaptaciones y ajustes que la realidad le devuelva a la estrategia de Contextualización.","Administrar los recursos económicos de la escuela sin relación con el currículo."], ok:1, retro:"El CTE revisa periódicamente el Programa Analítico para hacer reorientaciones, adaptaciones y ajustes que la realidad le devuelva a la estrategia de Contextualización, manteniendo el documento como instrumento dinámico." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué incluye el enfoque formativo de evaluación según el Programa Sintético de la Fase 2?", ops:["Documentar sistemáticamente información sobre el desenvolvimiento de niñas y niños en las actividades promovidas desde la escuela, para tomar decisiones sobre el proceso educativo.","Asignar calificaciones numéricas a cada actividad realizada por los alumnos.","Comparar el desempeño de los alumnos con estándares nacionales e internacionales."], ok:0, retro:"El enfoque formativo de evaluación implica documentar sistemáticamente información sobre el desenvolvimiento de niñas y niños para tomar decisiones en relación con el proceso educativo." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué papel tienen los proyectos comunitarios, los círculos de diálogo y las situaciones problemáticas en la Fase 2?", ops:["Son actividades optativas que el docente aplica solo cuando sobra tiempo en la planeación.","Son estrategias para que los aprendizajes tengan pertinencia y sentido, poniendo en marcha aprendizajes de manera integral en contextos reales.","Sustituyen completamente la instrucción directa del docente en el aula."], ok:1, retro:"Proyectos comunitarios, círculos de diálogo y situaciones problemáticas se ponen en marcha para que los aprendizajes tengan pertinencia y sentido de manera integral." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"Ordene los pasos del proceso de contextualización del Programa Analítico, del primero al último: 1.Determinar Contenidos 2.Identificar necesidades del grupo 3.Establecer vinculaciones y metodologías 4.Revisar Plan de estudio 2022", ops:["4, 2, 1, 3","2, 4, 1, 3","1, 2, 4, 3"], ok:0, retro:"Primero se revisa el Plan de estudio y los Programas Sintéticos (4), luego se identifican necesidades del grupo (2), se determinan los Contenidos (1) y finalmente se establecen vinculaciones y metodologías (3)." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Cómo se construye el Programa Analítico de la escuela en cuanto a su temporalidad?", ops:["Se elabora una sola vez al inicio del ciclo escolar y no se modifica durante el año.","Se construye por ciclo escolar de manera anual, para cada grado, e incorpora los cuatro Campos formativos; además, es revisado periódicamente en las sesiones de CTE.","Es elaborado por la supervisión escolar y entregado a los docentes antes del inicio del ciclo."], ok:1, retro:"El Programa Analítico se construye por ciclo escolar de manera anual para cada grado, incorpora los cuatro Campos formativos y es revisado periódicamente en el CTE para actualizarlo." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Qué significa que el Programa Sintético entiende 'lo nacional como espacio de lo común desde la diversidad'?", ops:["Que todos los alumnos del país deben tener exactamente los mismos contenidos y actividades sin variación.","Que los contenidos nacionales son un punto de partida y no contenidos universales acabados o aplicables a cualquier contexto; se enriquecen con la diversidad local.","Que cada estado diseña su propio currículo de manera completamente independiente."], ok:1, retro:"Lo nacional se entiende como espacio de lo común desde la diversidad; los contenidos son un punto de partida y no contenidos universales acabados, pues cada contexto los enriquece." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"Relacione cada elemento curricular con su descripción: 1.Campos formativos 2.Contenidos 3.Procesos de desarrollo de aprendizaje — a)Rutas posibles de apropiación b)Saberes organizados por grandes áreas c)Unidades de conocimiento que el colectivo docente contextualiza", ops:["1b, 2c, 3a","1c, 2a, 3b","1a, 2b, 3c"], ok:0, retro:"Campos formativos → grandes áreas del saber (b); Contenidos → unidades de conocimiento a contextualizar (c); Procesos de desarrollo de aprendizaje → rutas posibles de apropiación (a)." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿Cómo describe el Programa Sintético la relación entre la escuela y la comunidad en el Campo De lo Humano y lo Comunitario?", ops:["La escuela es una institución aislada de la comunidad para proteger su autonomía pedagógica.","La escuela está viva y es parte de la comunidad, cambia y se transforma de acuerdo con lo que ocurre en ella, por lo que cada escuela deberá considerar su historia, contexto y condiciones actuales.","La comunidad debe adaptarse a los lineamientos escolares sin intervenir en el currículo."], ok:1, retro:"El programa concibe la escuela como parte viva de la comunidad que cambia y se transforma con ella; por eso cada escuela debe considerar su historia, contexto y condiciones actuales." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"En el Campo Ética, Naturaleza y Sociedades, relacionarse con espacios naturales fomenta que niñas y niños…", ops:["…desarrollen competencias laborales orientadas al trabajo en el campo y la agricultura.","…se sientan parte de la naturaleza, tengan vivencias en entornos naturales y participen colaborativamente en su cuidado, preservación y aprovechamiento sustentable.","…realicen experimentos de laboratorio para comprender los ecosistemas."], ok:1, retro:"Relacionarse con espacios naturales busca que niñas y niños se sientan parte de la naturaleza, tengan vivencias en entornos naturales y participen en su cuidado y aprovechamiento sustentable." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"¿En qué consiste la retroalimentación dialógica dentro de la evaluación formativa según el Programa Sintético?", ops:["El docente comunica a los padres de familia las calificaciones obtenidas cada bimestre.","Procura que los estudiantes reflexionen sobre su proceso de aprendizaje mediante un vínculo permanente entre estudiantes y docentes, basado en la participación y la observación contextualizada.","Consiste en publicar los resultados de los exámenes en el periódico mural del salón."], ok:1, retro:"La retroalimentación dialógica procura que los estudiantes reflexionen sobre su proceso de aprendizaje, sosteniendo un vínculo permanente con los docentes a través de la participación y la observación contextualizada." },
+  { tema:"📚 Programa Sintético Fase 2 · Preescolar", texto:"Según el Programa Sintético de la Fase 2, ¿qué implica la diversidad en el contexto escolar?", ops:["Que todos los alumnos deben recibir exactamente el mismo trato y las mismas actividades para garantizar equidad.","Entablar relaciones basadas en el respeto, la aceptación, la cooperación y la conciencia social, donde las experiencias y emociones de niñas y niños sean tomadas en cuenta y valoradas.","Que el docente debe separar a los alumnos en grupos homogéneos para facilitar la enseñanza."], ok:1, retro:"La diversidad implica entablar relaciones basadas en el respeto, la aceptación, la cooperación y la conciencia social, donde las experiencias y emociones de todos sean tomadas en cuenta y valoradas." },
+
+  // ══════════════════════════════════════════
+  // TEMA 4: PROGRAMA ANALÍTICO · TRES PLANOS
+  // ══════════════════════════════════════════
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se identifica el primer plano de construcción del programa analítico: Contextualización curricular, cuando el colectivo docente…", ops:["…analiza las condiciones socioeconómicas, culturales y lingüísticas de la comunidad para adaptar los contenidos del Plan de Estudios a su realidad local.","…diseña secuencias didácticas innovadoras para trabajar los contenidos de manera interdisciplinaria.","…elabora materiales educativos específicos para atender a estudiantes con necesidades educativas especiales."], ok:0, retro:"El primer plano, Contextualización curricular, consiste en analizar las características del contexto local (socioeconómicas, culturales, lingüísticas) para adaptar el currículo nacional a las particularidades de la comunidad educativa." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Una situación que ejemplifica el segundo plano: Metodológico, en la construcción del programa analítico es cuando los docentes…", ops:["…investigan las problemáticas ambientales de su región para integrarlas como ejes transversales.","…definen las estrategias de enseñanza, los recursos didácticos y las formas de evaluación más pertinentes para abordar los contenidos con sus estudiantes.","…consensan la distribución de contenidos por grado escolar considerando la progresión de aprendizajes."], ok:1, retro:"El segundo plano, Metodológico, se enfoca en definir el cómo enseñar: las estrategias didácticas, recursos, materiales y formas de evaluación que se utilizarán para desarrollar los contenidos curriculares." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se refleja el trabajo del tercer plano: Codiseño de contenidos, cuando en la escuela…", ops:["…los docentes revisan los libros de texto gratuitos para identificar qué contenidos son prioritarios según su contexto.","…se organiza un proyecto comunitario donde estudiantes, docentes y familias co-crean contenidos sobre la historia local para integrarlos al currículo.","…el director establece los criterios de evaluación que todos los docentes deben aplicar."], ok:1, retro:"El Codiseño de contenidos implica la participación activa y colaborativa de diversos actores educativos (docentes, estudiantes, familias) en la creación de contenidos situados y pertinentes a su realidad, como en este proyecto comunitario." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Una acción que corresponde al primer plano: Contextualización curricular, es cuando el Consejo Técnico Escolar…", ops:["…realiza un diagnóstico de las lenguas indígenas presentes en la comunidad escolar para incorporarlas en el programa analítico.","…define las técnicas de trabajo colaborativo que se implementarán durante el ciclo escolar.","…elabora rúbricas de evaluación específicas para cada campo formativo."], ok:0, retro:"La Contextualización curricular requiere identificar las características específicas del contexto, como las lenguas indígenas presentes, para adaptar el currículo a la realidad sociocultural de la comunidad." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se ejemplifica el segundo plano: Metodológico, cuando los docentes de una escuela…", ops:["…analizan los índices de marginación de la localidad para priorizar ciertos contenidos.","…acuerdan implementar el aprendizaje basado en proyectos como estrategia principal para desarrollar los contenidos de todos los campos formativos.","…diseñan nuevas unidades temáticas basadas en las festividades tradicionales de la región."], ok:1, retro:"El plano Metodológico define las estrategias y métodos de enseñanza. Acordar implementar el aprendizaje basado en proyectos como estrategia didáctica es una decisión metodológica sobre el cómo enseñar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Una situación que refleja el tercer plano: Codiseño de contenidos, es cuando…", ops:["…los estudiantes investigan problemáticas de su comunidad y, junto con sus docentes, crean materiales educativos que se integran al programa de estudios.","…el colectivo docente revisa las estadísticas educativas de la zona para identificar áreas de oportunidad.","…se establecen horarios flexibles para atender la diversidad de ritmos de aprendizaje."], ok:0, retro:"El Codiseño implica la creación colaborativa de contenidos. La participación activa de estudiantes y docentes en la investigación y creación de materiales situados es un claro ejemplo de codiseño." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Corresponde al primer plano: Contextualización curricular, cuando en el programa analítico…", ops:["…se incluyen las actividades productivas de la región (agricultura, pesca, artesanías) como contextos para el aprendizaje de las matemáticas.","…se definen los instrumentos de evaluación que se utilizarán durante el ciclo escolar.","…se establecen acuerdos sobre cómo organizar el trabajo por proyectos integradores."], ok:0, retro:"La Contextualización curricular adapta los contenidos a la realidad local. Incorporar las actividades productivas regionales como contextos de aprendizaje es contextualizar el currículo a la realidad socioeconómica de la comunidad." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se identifica el segundo plano: Metodológico, cuando el colectivo docente…", ops:["…identifica que en la comunidad existe alta migración y decide incorporar esta realidad en los contenidos.","…determina que utilizarán principalmente el trabajo cooperativo y la resolución de problemas como metodologías de enseñanza.","…crea nuevos contenidos sobre tradiciones orales de la comunidad en coordinación con adultos mayores."], ok:1, retro:"El plano Metodológico se centra en definir las estrategias y métodos de enseñanza. Determinar que se utilizarán el trabajo cooperativo y la resolución de problemas son decisiones metodológicas sobre el cómo enseñar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Una acción del tercer plano: Codiseño de contenidos, se observa cuando…", ops:["…el supervisor escolar solicita reportes sobre el avance programático de cada grupo.","…docentes, estudiantes y miembros de la comunidad colaboran en la elaboración de un herbario local que se integra como contenido del programa de ciencias naturales.","…se revisan los resultados de las evaluaciones estandarizadas para ajustar las metas educativas."], ok:1, retro:"El Codiseño de contenidos implica la creación colaborativa entre diversos actores. La elaboración conjunta de un herbario local como contenido curricular es un claro ejemplo de codiseño participativo." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se ejemplifica el primer plano: Contextualización curricular, cuando…", ops:["…se analizan las características del territorio (urbano, rural, indígena) para ajustar los tiempos y espacios de aprendizaje.","…se acuerdan las estrategias de retroalimentación formativa que se implementarán.","…se diseñan situaciones didácticas específicas para el aprendizaje de la lectoescritura."], ok:0, retro:"La Contextualización curricular implica analizar las características territoriales, sociales y culturales para adaptar el currículo. Analizar el tipo de territorio para ajustar tiempos y espacios es contextualizar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Una situación del segundo plano: Metodológico, es cuando los docentes…", ops:["…investigan las problemáticas de salud más frecuentes en la comunidad para integrarlas como contenidos.","…acuerdan implementar el portafolio de evidencias como principal instrumento de evaluación formativa en todos los grados.","…invitan a artesanos locales para co-diseñar contenidos sobre técnicas tradicionales de producción."], ok:1, retro:"El plano Metodológico define las formas de evaluación y las estrategias didácticas. Acordar implementar el portafolio de evidencias como instrumento de evaluación es una decisión metodológica sobre el cómo evaluar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Corresponde al tercer plano: Codiseño de contenidos, cuando…", ops:["…el colectivo docente identifica que el 60% de las familias trabaja en el sector informal y adapta horarios.","…se decide trabajar con metodologías activas y participativas en lugar de clases expositivas.","…estudiantes, docentes y familias crean conjuntamente un recetario tradicional de la región que se usa como material didáctico en diversos campos formativos."], ok:2, retro:"El Codiseño de contenidos implica la creación colaborativa de materiales y contenidos situados. La elaboración conjunta de un recetario tradicional como material didáctico es codiseño participativo." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se identifica el primer plano: Contextualización curricular, cuando en el Consejo Técnico Escolar…", ops:["…se analizan las festividades y celebraciones tradicionales de la comunidad para incorporarlas como ejes articuladores del programa analítico.","…se establecen los criterios para la conformación de equipos de trabajo en el aula.","…se definen las ponderaciones de cada tipo de evaluación (diagnóstica, formativa, sumativa)."], ok:0, retro:"La Contextualización curricular adapta el currículo al contexto sociocultural. Incorporar las festividades tradicionales locales como ejes articuladores es contextualizar el programa a la realidad cultural de la comunidad." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Una acción del segundo plano: Metodológico, se refleja cuando…", ops:["…se identifican las necesidades educativas específicas de estudiantes con discapacidad para diseñar contenidos accesibles.","…los docentes definen que utilizarán principalmente el aprendizaje situado y el método de casos como estrategias didácticas.","…se elaboran materiales didácticos bilingües en español y lengua indígena en colaboración con hablantes nativos."], ok:1, retro:"El plano Metodológico define las estrategias de enseñanza. Determinar que se utilizarán el aprendizaje situado y el método de casos son decisiones metodológicas sobre el cómo enseñar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Se ejemplifica el tercer plano: Codiseño de contenidos, cuando…", ops:["…se revisan los índices de reprobación y deserción para establecer acciones de mejora.","…docentes y estudiantes investigan juntos sobre plantas medicinales tradicionales y crean un manual ilustrado que se integra como contenido de ciencias y prácticas sociales.","…se analizan los resultados del diagnóstico inicial para conocer los conocimientos previos del alumnado."], ok:1, retro:"El Codiseño de contenidos implica la creación colaborativa de materiales situados. La investigación conjunta y creación de un manual sobre plantas medicinales tradicionales es un claro ejemplo de codiseño." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Corresponde al primer plano: Contextualización curricular, cuando…", ops:["…se identifican las problemáticas ambientales locales (contaminación del río, deforestación) para integrarlas como contenidos relevantes en el programa analítico.","…se acuerdan las técnicas de evaluación entre pares que se implementarán en todos los grupos.","…se diseña una planeación interdisciplinaria que vincula matemáticas con artes."], ok:0, retro:"La Contextualización curricular identifica las características y problemáticas del contexto local para adaptar los contenidos. Incorporar problemáticas ambientales específicas de la región es contextualizar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"La comunidad educativa organiza brigadas de limpieza del río local y documentan el proceso para crear materiales educativos sobre cuidado ambiental que se integran al currículo. ¿A qué plano del Programa Analítico corresponde?", ops:["Primer plano: Contextualización curricular.","Segundo plano: Metodológico.","Tercer plano: Codiseño de contenidos."], ok:2, retro:"El Codiseño de contenidos implica la creación colaborativa de materiales situados desde la práctica comunitaria. Documentar brigadas ambientales para crear materiales educativos es codiseño participativo." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Los docentes identifican variantes lingüísticas en la comunidad (náhuatl, mixteco, español) para diseñar estrategias de educación plurilingüe. ¿A qué plano corresponde esta acción?", ops:["Primer plano: Contextualización curricular.","Segundo plano: Metodológico.","Tercer plano: Codiseño de contenidos."], ok:0, retro:"La Contextualización curricular identifica las características lingüísticas del contexto. Identificar las variantes lingüísticas presentes para diseñar estrategias de educación plurilingüe es contextualizar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Los docentes acuerdan implementar el método socrático y la mayéutica como estrategias principales para desarrollar el pensamiento crítico. ¿A qué plano corresponde?", ops:["Primer plano: Contextualización curricular.","Segundo plano: Metodológico.","Tercer plano: Codiseño de contenidos."], ok:1, retro:"El plano Metodológico define las estrategias didácticas. Acordar implementar el método socrático y la mayéutica como estrategias de enseñanza es una decisión metodológica sobre el cómo enseñar." },
+  { tema:"🗂️ Programa Analítico · Tres Planos de Construcción", texto:"Estudiantes, docentes, familias y productores locales colaboran en la creación de un huerto escolar que se documenta y convierte en material didáctico interdisciplinario. ¿A qué plano corresponde?", ops:["Primer plano: Contextualización curricular.","Segundo plano: Metodológico.","Tercer plano: Codiseño de contenidos."], ok:2, retro:"El Codiseño de contenidos implica la creación colaborativa de recursos y contenidos situados. La creación comunitaria de un huerto escolar como material didáctico es codiseño participativo." },
+
+  // ══════════════════════════════════════════
+  // TEMA 5: LGDNNA — LEY GENERAL DE DERECHOS DE NNA
+  // ══════════════════════════════════════════
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Cuántos derechos fundamentales enuncia el Artículo 13 de la LGDNNA?", ops:["15 derechos","20 derechos","25 derechos"], ok:1, retro:"El Artículo 13 enuncia 20 derechos fundamentales que la guía agrupa en 5 pilares estratégicos." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Qué principio establece que siempre se elegirá la interpretación legal que mayor beneficio otorgue a la niñez cuando existan distintas interpretaciones?", ops:["Igualdad Sustantiva","Interés Superior de la Niñez","No Discriminación"], ok:1, retro:"El Interés Superior de la Niñez (Art. 2 y 3) es la consideración primordial en la toma de decisiones y guía la interpretación legal en favor de los menores." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Cuál es la transformación central que realiza la LGDNNA respecto a niñas, niños y adolescentes en el ámbito jurídico?", ops:["De sujetos de derechos a objetos de protección institucional","De objetos de protección a titulares plenos de derechos","De beneficiarios de programas sociales a sujetos tutelados"], ok:1, retro:"La LGDNNA transforma la visión jurídica: los menores dejan de ser objetos de protección para convertirse en titulares plenos de derechos." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Cuáles son las tres obligaciones concretas que impone el Derecho de Prioridad (Art. 17) a la sociedad y al Estado?", ops:["Protección y socorro; registro de nacimiento; diseño de políticas","Protección y socorro; atención preferente en servicios; diseño de políticas públicas","Atención en servicios; educación gratuita; acceso a la justicia"], ok:1, retro:"El Art. 17 obliga a: 1) brindar auxilio prioritario en emergencias, 2) atender a menores antes que adultos en los servicios, y 3) considerarlos eje central en políticas públicas." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Bajo qué condición el Principio de No Separación (Art. 23) permite que un niño sea separado de quien ejerce la patria potestad?", ops:["Nunca puede ocurrir bajo ninguna circunstancia","Solo por orden de autoridad competente, mediante debido proceso y como último recurso para preservar su Interés Superior","Solo cuando los padres lo soliciten voluntariamente a las autoridades"], ok:1, retro:"El Art. 23 establece que la separación únicamente es posible mediante orden de autoridad competente, con debido proceso y como último recurso." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Cuál es la diferencia fundamental entre Igualdad Formal e Igualdad Sustantiva en el marco de la LGDNNA?", ops:["La igualdad formal garantiza todos los derechos; la sustantiva es solo aspiracional","La igualdad formal trata a todos igual; la sustantiva obliga al Estado a adoptar Acciones Afirmativas para eliminar barreras estructurales","La igualdad formal aplica a adultos; la sustantiva aplica exclusivamente a menores"], ok:1, retro:"La Igualdad Sustantiva (Art. 36 y 37) reconoce que no basta tratar a todos igual; el Estado debe adoptar medidas especiales temporales (Acciones Afirmativas) para nivelar las condiciones." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Qué establece el Art. 60 de la LGDNNA sobre el juego y la recreación en la vida de los menores?", ops:["Son actividades complementarias no esenciales que pueden limitarse","Son factores primordiales del desarrollo; imponer regímenes desproporcionados que los menoscaben es ilegal","Solo aplican en el ámbito escolar y deben ser supervisados"], ok:1, retro:"El Art. 60 reconoce el juego y la recreación como factores primordiales del desarrollo, siendo ilegal imponer regímenes que limiten este derecho." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Qué concepto describe el proceso por el cual el menor va adquiriendo gradualmente mayor capacidad de decidir conforme avanza en edad y madurez?", ops:["Interés Superior de la Niñez","Igualdad Sustantiva","Autonomía Progresiva"], ok:2, retro:"La Autonomía Progresiva (Art. 2) establece que se debe considerar la opinión del menor según su edad, desarrollo evolutivo, cognoscitivo y madurez." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"El Art. 53 establece que negar los ajustes razonables a niñas, niños y adolescentes con discapacidad constituye legalmente…", ops:["…una falta administrativa menor que no requiere sanción.","…un acto de discriminación.","…una violación al reglamento escolar únicamente."], ok:1, retro:"Según el Art. 53, negar los ajustes razonables es un acto de discriminación; el Diseño Universal es obligatorio para garantizar la inclusión." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Según el Art. 44, quienes ejercen la patria potestad tienen la obligación de adoptar prácticas de crianza positiva que incluyen…", ops:["…límites estrictos basados en la autoridad parental sin importar la edad.","…formación basada en el respeto, enfoque de derechos humanos, límites acordes a la edad y entorno afectivo.","…disciplina rigurosa para formar carácter y responsabilidad mediante el esfuerzo."], ok:1, retro:"La Crianza Positiva (Art. 44) exige: respeto, enfoque de derechos humanos, límites acordes a la edad y un entorno afectivo que fomente el bienestar." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Ordene los 5 pilares estratégicos de la LGDNNA tal como aparecen en la guía de estudio (del primero al último): 1.Voz y Privacidad 2.Los Cimientos 3.Fronteras y Justicia 4.Supervivencia y Familia 5.Desarrollo Integral", ops:["2, 4, 5, 1, 3","1, 2, 3, 4, 5","4, 2, 1, 5, 3"], ok:0, retro:"Los 5 pilares en orden son: 1-Los Cimientos, 2-Supervivencia y Familia, 3-Desarrollo Integral, 4-Voz y Privacidad, 5-Fronteras y Justicia." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Ordene las tres capas del 'Ecosistema de la LGDNNA' de adentro (centro) hacia afuera: 1.Entorno Inmediato (familia) 2.El Sujeto de Derechos (el niño al centro) 3.Obligación Estatal", ops:["3, 1, 2","2, 1, 3","1, 3, 2"], ok:1, retro:"El modelo concéntrico coloca al niño (sujeto de derechos) en el centro, rodeado por el Entorno Inmediato (familia) y finalmente la Obligación Estatal en el exterior." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Relacione cada artículo con el derecho o principio que establece: 1.Art.19 2.Art.44 3.Art.60 4.Art.87 — a)Derecho al descanso y esparcimiento b)Exención de responsabilidad penal para menores de 12 años c)Derecho a la identidad d)Crianza positiva", ops:["1c, 2d, 3a, 4b","1d, 2c, 3b, 4a","1a, 2b, 3c, 4d"], ok:0, retro:"Art.19=Identidad (c), Art.44=Crianza positiva (d), Art.60=Descanso y esparcimiento (a), Art.87=Exención penal menores de 12 (b)." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Relacione cada pilar estratégico de la LGDNNA con los derechos que lo conforman: 1.Los Cimientos 2.Supervivencia y Familia 3.Desarrollo Integral 4.Voz y Privacidad — a)Salud, Educación, Juego b)Vida, Identidad, Crianza c)Participación, Intimidad d)Principios y Equidad", ops:["1d, 2b, 3a, 4c","1a, 2d, 3c, 4b","1c, 2a, 3d, 4b"], ok:0, retro:"Los Cimientos=Principios y Equidad(d), Supervivencia y Familia=Vida/Identidad/Crianza(b), Desarrollo Integral=Salud/Educación/Juego(a), Voz y Privacidad=Participación/Intimidad(c)." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Relacione cada concepto clave de la LGDNNA con su definición: 1.Ajustes Razonables 2.Diseño Universal 3.Acciones Afirmativas 4.Interés Superior — a)Medidas especiales temporales b)Modificaciones en casos particulares c)Consideración primordial en toda toma de decisiones d)Entornos utilizables por todas las personas sin adaptación", ops:["1b, 2d, 3a, 4c","1a, 2c, 3d, 4b","1d, 2b, 3c, 4a"], ok:0, retro:"Ajustes Razonables=adaptaciones individuales(b), Diseño Universal=entornos para todos(d), Acciones Afirmativas=medidas temporales(a), Interés Superior=consideración primordial(c)." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Relacione cada tipo de igualdad con su descripción en la LGDNNA: 1.Igualdad Formal 2.Igualdad Sustantiva 3.No Discriminación — a)Prohibición de restringir derechos por origen étnico o género b)Trato igual ante la ley c)Acciones Afirmativas para eliminar barreras", ops:["1b, 2c, 3a","1a, 2b, 3c","1c, 2a, 3b"], ok:0, retro:"Igualdad Formal=trato igual ante la ley(b), Igualdad Sustantiva=acciones afirmativas para eliminar barreras(c), No Discriminación=prohibición de restricciones por características personales(a)." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿Cuál es el principio jurídico que establece que el sistema de justicia para adolescentes debe buscar la reinserción social con la menor intervención posible del Estado, evitando que la víctima sea sometida a procesos traumáticos repetitivos?", ops:["Principio de Igualdad Sustantiva y Acciones Afirmativas","Principio de Mínima Intervención y No Revictimización","Principio de Autonomía Progresiva y Garantía Presupuestal"], ok:1, retro:"El Art. 82 y 87 establecen la seguridad jurídica bajo el principio de Mínima Intervención y No Revictimización, protegiendo tanto al adolescente como a la víctima dentro del proceso judicial." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Según el Art. 89, los adolescentes de 12 a 17 años que cometen conductas tipificadas como delito están sujetos a…", ops:["…el mismo sistema penal que los adultos con medidas especiales de consideración.","…la Ley Nacional del Sistema Integral de Justicia Penal para Adolescentes, con garantía de asistencia especializada.","…únicamente medidas de asistencia social sin ninguna consecuencia legal."], ok:1, retro:"El Art. 89 establece un Sistema Especializado para adolescentes de 12 a 17 años, con asistencia legal, acompañamiento familiar y protección de identidad." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"¿En cuántos pilares estratégicos se agrupan los 20 derechos del Art. 13 en la guía de estudio de los Pilares de la LGDNNA?", ops:["3 pilares","4 pilares","5 pilares"], ok:2, retro:"Los 20 derechos del Art. 13 se organizan en 5 pilares: Los Cimientos, Supervivencia y Familia, Desarrollo Integral, Voz y Privacidad, y Fronteras y Justicia." },
+  { tema:"⚡ LGDNNA · Derechos de Niñas, Niños y Adolescentes", texto:"Relacione cada grupo de artículos con su contenido y el pilar al que pertenecen: 1.Art.14-17 2.Art.19-23 3.Art.62-65 4.Art.101Bis-101Bis2 — a)Identidad y Familia b)Frontera Digital c)Libertad de Expresión d)Vida, Supervivencia y Derecho de Prioridad", ops:["1d, 2a, 3c, 4b","1a, 2d, 3b, 4c","1c, 2b, 3d, 4a"], ok:0, retro:"Art.14-17=Vida/Prioridad/Supervivencia(d), Art.19-23=Identidad y Familia(a), Art.62-65=Libertad de Expresión(c), Art.101Bis=Frontera Digital(b)." },
+
+  // ══════════════════════════════════════════
+  // TEMA 6: LEY GENERAL DE EDUCACIÓN (LGE)
+  // ══════════════════════════════════════════
+  { tema:"📖 Ley General de Educación · NEM", texto:"¿Cuál es la característica de la educación que, según el Artículo 7 de la LGE, prohíbe que la prestación del servicio educativo se condicione a cualquier contraprestación o pago?", ops:["Laica: la educación se mantiene completamente ajena a cualquier doctrina religiosa en los planteles.","Gratuita: está prohibido condicionar la prestación del servicio educativo a cualquier contraprestación o pago.","Pública: la educación es impartida y administrada directamente por el Estado con fines de orden público."], ok:1, retro:"El Art. 7 de la LGE define cinco características irrenunciables de la educación: Universal, Inclusiva, Pública, Gratuita y Laica. La gratuidad implica específicamente que está prohibido condicionar la prestación del servicio a cualquier contraprestación o pago." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"¿Cuál es el centro de la acción pública que coloca la Nueva Escuela Mexicana, según el Artículo 11 de la LGE?", ops:["La formación de ciudadanos competitivos capaces de responder a los retos del mercado laboral global.","El máximo logro de aprendizaje de niñas, niños, adolescentes y jóvenes.","La estandarización curricular nacional para garantizar resultados uniformes en todas las regiones del país."], ok:1, retro:"El Art. 11 establece que la NEM buscará la equidad, la excelencia y la mejora continua, colocando en el centro de la acción pública el máximo logro de aprendizaje de niñas, niños, adolescentes y jóvenes." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"¿Cuál de las siguientes situaciones ejemplifica el criterio 'inclusiva' de la educación según el Artículo 16 de la LGE?", ops:["Una escuela que promueve la identidad nacional a través del estudio de la historia y los símbolos patrios.","Una escuela que elimina las distintas barreras al aprendizaje y a la participación, realizando ajustes razonables para todos los alumnos.","Una escuela que busca el mejoramiento permanente del pensamiento crítico de sus estudiantes a través de estrategias innovadoras."], ok:1, retro:"El criterio 'inclusiva' del Art. 16 significa tomar en cuenta los ritmos de aprendizaje y eliminar las barreras al aprendizaje y a la participación, incluyendo los ajustes razonables para garantizar el acceso de todos." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"¿Cuál es el papel que reconoce la LGE a los maestros y maestras dentro de la Nueva Escuela Mexicana?", ops:["Son ejecutores de planes y programas diseñados por las autoridades educativas federales.","Son agentes fundamentales del proceso educativo y profesionales de la formación (Art. 13 NEM).","Son administradores del aprendizaje que reportan resultados a los padres de familia periódicamente."], ok:1, retro:"La revalorización docente es uno de los pilares de la NEM (Arts. 11-14). La ley reconoce a maestras y maestros como agentes fundamentales del proceso educativo y como profesionales de la formación." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"¿Cuál es la función del criterio 'humanista' de la educación según el Artículo 16 de la LGE?", ops:["Defender la soberanía nacional y garantizar la continuidad histórica y cultural de México.","Fomentar el aprecio por la dignidad humana y rechazar actitudes que favorezcan los privilegios de grupo.","Desarrollar el pensamiento lógico-matemático y las habilidades tecnológicas del estudiante."], ok:1, retro:"El criterio 'humanista' del Art. 16 apunta al aprecio por la dignidad humana y al rechazo de privilegios de cualquier tipo. Este criterio es diferente del 'nacional' (soberanía) y del 'cognitivo' (habilidades matemáticas/tecnológicas)." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"La característica 'laica' de la educación, establecida en el Artículo 7 de la LGE, significa que la educación…", ops:["…debe impartirse sin ningún costo para las familias, garantizando el acceso universal a los servicios.","…se mantiene por completo ajena a cualquier doctrina religiosa en los planteles educativos.","…se adapta a las necesidades específicas de cada estudiante mediante ajustes curriculares especiales."], ok:1, retro:"La laicidad es una de las cinco características irrenunciables del Art. 7. Significa que la educación impartida por el Estado se mantiene completamente al margen de cualquier doctrina, credo o institución religiosa, garantizando la libertad de conciencia." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"El dominio socioemocional del aprendizaje integral (Art. 18) busca que los estudiantes desarrollen…", ops:["…pensamiento lógico-matemático, literacidad y conocimiento tecnológico para la apropiación científica.","…habilidades motrices, activación física y apreciación artística vinculada con la salud.","…imaginación, creatividad, empatía, resiliencia, trabajo en red y gestión emocional."], ok:2, retro:"El Art. 18 establece cuatro dominios del aprendizaje integral. El Socioemocional incluye: imaginación, creatividad, empatía, resiliencia, trabajo en red y gestión emocional." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"La educación 'equitativa', según el Artículo 16 de la LGE, se caracteriza porque…", ops:["…fomenta la convivencia armónica entre personas de diferentes orígenes culturales y lingüísticos.","…combate las desigualdades y ofrece educación pertinente para todos, considerando sus contextos y necesidades.","…impulsa el mejoramiento permanente del pensamiento crítico y la preparación para la vida democrática."], ok:1, retro:"El criterio 'equitativa' del Art. 16 tiene como propósito combatir las desigualdades socioeducativas y ofrecer una educación pertinente para todos los estudiantes, considerando sus distintos contextos." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"La escuela concebida como un centro de aprendizaje comunitario dentro de la Nueva Escuela Mexicana (Art. 12) significa que…", ops:["…la escuela se convierte en un espacio exclusivo para la instrucción académica formal, separado de la comunidad.","…la escuela debe ser un espacio seguro, libre de violencias, que se vincula activamente con su entorno comunitario.","…la comunidad financia directamente las actividades escolares, eliminando la responsabilidad estatal del presupuesto."], ok:1, retro:"El Art. 12 de la LGE establece que la NEM concibe a la escuela como un centro de aprendizaje comunitario: un espacio seguro, libre de violencias y abierto a la comunidad. Esto implica la conexión activa con el entorno social y cultural de los estudiantes." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"Ordene los cuatro pilares fundamentales de la Ley General de Educación, del más básico al más específico según la metáfora del árbol: 1.Orientación Integral 2.Participación Social 3.Derecho a la Educación 4.Nueva Escuela Mexicana", ops:["1 → 4 → 3 → 2 (Orientación, NEM, Derecho, Participación)","3 → 4 → 1 → 2 (Derecho, NEM, Orientación, Participación)","2 → 3 → 1 → 4 (Participación, Derecho, Orientación, NEM)"], ok:1, retro:"La metáfora del árbol: Raíces = Derecho a la Educación (cimiento), Tronco = Nueva Escuela Mexicana, Ramas = Orientación Integral, Entorno = Participación Social." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"Ordene los cuatro dominios del aprendizaje integral (Art. 18 LGE) de lo más abstracto/cognitivo a lo más físico/expresivo: 1.Físico y Artístico 2.Cognitivo 3.Humanístico y Cívico 4.Socioemocional", ops:["1 → 4 → 3 → 2 (Físico, Socioemocional, Humanístico, Cognitivo)","4 → 2 → 3 → 1 (Socioemocional, Cognitivo, Humanístico, Físico)","2 → 3 → 4 → 1 (Cognitivo, Humanístico, Socioemocional, Físico)"], ok:2, retro:"De lo más abstracto a lo más concreto/expresivo: Dominio Cognitivo → Humanístico y Cívico → Socioemocional → Físico y Artístico." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"Seleccione la opción que relacione correctamente el Pilar de la LGE con su descripción: 1.Derecho a la Educación 2.Nueva Escuela Mexicana 3.Participación Social — a)La filosofía y el vehículo operativo del Estado b)El ecosistema comunitario que nutre el aprendizaje c)El cimiento innegociable y constitucional", ops:["1a, 2b, 3c","1c, 2a, 3b","1b, 2c, 3a"], ok:1, retro:"El Derecho a la Educación es el cimiento constitucional (c). La Nueva Escuela Mexicana es la filosofía y el vehículo del Estado (a). La Participación Social es el ecosistema comunitario (b)." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"Seleccione la opción que relacione correctamente el criterio de educación del Artículo 16 con su definición: 1.Democrática 2.Equitativa 3.Intercultural — a)Combate desigualdades y ofrece educación pertinente b)Promueve convivencia armónica entre comunidades c)Sistema de vida fundado en el mejoramiento constante del pueblo", ops:["1c, 2a, 3b","1a, 2c, 3b","1b, 2a, 3c"], ok:0, retro:"Democrática = sistema de vida de mejoramiento constante (c). Equitativa = combate desigualdades y educación pertinente (a). Intercultural = convivencia armónica entre personas y comunidades (b)." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"Seleccione la opción que relacione correctamente el dominio del aprendizaje integral (Art. 18 LGE) con uno de sus contenidos específicos: 1.Cognitivo 2.Humanístico y Cívico 3.Socioemocional — a)Desarrollo de empatía, resiliencia y gestión emocional b)Pensamiento lógico-matemático y apropiación científica c)Valores para la responsabilidad ciudadana: solidaridad, justicia", ops:["1b, 2c, 3a","1a, 2b, 3c","1c, 2a, 3b"], ok:0, retro:"Cognitivo → pensamiento lógico-matemático y apropiación científica (b). Humanístico y Cívico → valores ciudadanos (c). Socioemocional → empatía, resiliencia y gestión emocional (a)." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"Seleccione la opción que relacione correctamente el fin de la educación (Art. 15 LGE) con su descripción: 1.Dignidad Humana 2.Respeto a la Naturaleza 3.Amor a la Patria — a)Desarrollo sostenible y mitigación del cambio climático b)Formación humanista y respeto irrestricto a los derechos de todos c)Aprecio por la cultura, historia y símbolos patrios", ops:["1b, 2a, 3c","1a, 2c, 3b","1c, 2b, 3a"], ok:0, retro:"Dignidad Humana → formación humanista y respeto a los derechos de todos (b). Respeto a la Naturaleza → desarrollo sostenible y mitigación del cambio climático (a). Amor a la Patria → aprecio por la cultura, historia y símbolos patrios (c)." },
+  { tema:"📖 Ley General de Educación · NEM", texto:"¿Cuál es la obligación irrenunciable de los padres de familia según el Artículo 129 de la LGE?", ops:["Gestionar recursos económicos para apoyar las actividades extracurriculares de la institución educativa.","Revisar constantemente el progreso, desempeño y conducta de sus hijos, y colaborar con la institución educativa.","Elegir libremente la institución educativa que consideren más conveniente para el desarrollo de sus hijos."], ok:1, retro:"El Art. 129 establece las obligaciones de los padres: hacer que sus hijos reciban educación obligatoria, revisar su progreso y conducta, colaborar con la institución, informar sobre cambios de conducta y acudir a los llamados para la revisión del desempeño." }
+
+]; // fin BANCO (120 reactivos)
+
+
+/* ════════════════════════════════════════════
+   VARIABLES DE ESTADO
+════════════════════════════════════════════ */
+let indice        = 0;
+let respuestas    = new Array(BANCO.length).fill(null);
+let respondida    = false;
+let segundos      = 120 * 60;   // 120 minutos
+let intervalo     = null;
+let nombreEstudiante = "";
+
+/* ════════════════════════════════════════════
+   INICIO
+════════════════════════════════════════════ */
+function iniciarSimulador() {
+  const inp = document.getElementById('nombre-input').value.trim();
+  if (!inp) {
+    alert('Por favor, escribe tu nombre para comenzar el examen.');
+    return;
+  }
+  nombreEstudiante = inp;
+  document.getElementById('pantalla-inicio').style.display = 'none';
+  document.getElementById('simulador').classList.add('activo');
+  respuestas = new Array(BANCO.length).fill(null);
+  indice = 0;
+  seconds = 120 * 60;
+  iniciarTimer();
+  mostrarPregunta();
+}
+
+/* ════════════════════════════════════════════
+   TEMPORIZADOR
+════════════════════════════════════════════ */
+function iniciarTimer() {
+  segundos = 120 * 60;
+  actualizarDisplay();
+  intervalo = setInterval(() => {
+    segundos--;
+    actualizarDisplay();
+    if (segundos <= 0) {
+      clearInterval(intervalo);
+      mostrarResultados(true);
+    }
+    if (segundos <= 300) {
+      document.getElementById('timer').classList.add('urgente');
+    }
+  }, 1000);
+}
+
+function actualizarDisplay() {
+  const m = Math.floor(segundos / 60);
+  const s = segundos % 60;
+  document.getElementById('timer-display').textContent =
+    String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+/* ════════════════════════════════════════════
+   MOSTRAR PREGUNTA
+════════════════════════════════════════════ */
+function mostrarPregunta() {
+  const q = BANCO[indice];
+  respondida = respuestas[indice] !== null;
+
+  // Banda
+  document.getElementById('banda-tema').textContent = q.tema;
+
+  // Num y texto
+  document.getElementById('pregunta-num').textContent = `Reactivo ${indice + 1} de ${BANCO.length}`;
+  document.getElementById('pregunta-texto').innerHTML = q.texto;
+
+  // Progreso
+  document.getElementById('progreso-texto').textContent = `Reactivo ${indice + 1} de ${BANCO.length}`;
+  document.getElementById('progreso-fill').style.width = `${((indice + 1) / BANCO.length) * 100}%`;
+
+  // Opciones
+  const wrap = document.getElementById('opciones-wrap');
+  wrap.innerHTML = '';
+  const letras = ['A','B','C'];
+  q.ops.forEach((op, i) => {
+    const div = document.createElement('div');
+    div.className = 'opcion' + (respondida ? ' bloqueada' : '');
+    if (respondida) {
+      if (i === q.ok) div.classList.add('correcta');
+      else if (i === respuestas[indice]) div.classList.add('incorrecta');
+    }
+    div.innerHTML = `<div class="opcion-letra">${letras[i]}</div><div class="opcion-texto">${op}</div>`;
+    if (!respondida) {
+      div.addEventListener('click', () => seleccionarOpcion(i));
+    }
+    wrap.appendChild(div);
+  });
+
+  // Retroalimentación
+  const retro = document.getElementById('retro');
+  const retroTit = document.getElementById('retro-titulo');
+  const retroCuerpo = document.getElementById('retro-cuerpo');
+  if (respondida) {
+    const esCorrecta = respuestas[indice] === q.ok;
+    retro.className = `retro visible ${esCorrecta ? 'correcta' : 'incorrecta'}`;
+    retroTit.textContent = esCorrecta ? '✅ ¡Correcto!' : '❌ Respuesta incorrecta';
+    retroCuerpo.textContent = q.retro;
+  } else {
+    retro.className = 'retro';
+  }
+
+  // Botones
+  document.getElementById('btn-anterior').disabled = indice === 0;
+  const esUltima = indice === BANCO.length - 1;
+  document.getElementById('btn-siguiente').style.display = esUltima ? 'none' : 'flex';
+  document.getElementById('btn-finalizar').style.display = esUltima ? 'flex' : 'none';
+}
+
+/* ════════════════════════════════════════════
+   SELECCIONAR OPCIÓN
+════════════════════════════════════════════ */
+function seleccionarOpcion(i) {
+  if (respondida) return;
+  respuestas[indice] = i;
+  respondida = true;
+  mostrarPregunta();
+}
+
+/* ════════════════════════════════════════════
+   NAVEGACIÓN
+════════════════════════════════════════════ */
+function navegarSiguiente() {
+  if (indice < BANCO.length - 1) { indice++; mostrarPregunta(); }
+}
+
+function navegarAnterior() {
+  if (indice > 0) { indice--; mostrarPregunta(); }
+}
+
+/* ════════════════════════════════════════════
+   RESULTADOS
+════════════════════════════════════════════ */
+function mostrarResultados(porTiempo = false) {
+  clearInterval(intervalo);
+
+  let correctas = 0;
+  respuestas.forEach((r, i) => { if (r === BANCO[i].ok) correctas++; });
+  const incorrectas = BANCO.length - correctas;
+  const pct = Math.round((correctas / BANCO.length) * 100);
+
+  // Llenar datos
+  document.getElementById('res-nombre').textContent = nombreEstudiante;
+  document.getElementById('res-correctas').textContent = correctas;
+  document.getElementById('res-incorrectas').textContent = incorrectas;
+  document.getElementById('res-total').textContent = BANCO.length;
+  document.getElementById('res-pct').textContent = pct + '%';
+
+  // Color círculo
+  const circ = document.getElementById('res-circulo');
+  if (pct >= 80) circ.style.background = 'linear-gradient(135deg, #1a8c5e, #25b47a)';
+  else if (pct >= 60) circ.style.background = 'linear-gradient(135deg, #e67e22, #f39c12)';
+  else circ.style.background = 'linear-gradient(135deg, #c0392b, #e74c3c)';
+
+  // Emoji y mensaje
+  let emoji, msg;
+  if (porTiempo) {
+    emoji = '⏰';
+    msg = `El tiempo se agotó, ${nombreEstudiante}. Lograste responder ${correctas} de ${BANCO.length} reactivos (${pct}%). ¡No te desanimes, inténtalo de nuevo!`;
+  } else if (pct >= 90) {
+    emoji = '🏆';
+    msg = `¡Excelente, ${nombreEstudiante}! Dominas los temas de admisión a preescolar. ¡Eres un referente pedagógico!`;
+  } else if (pct >= 75) {
+    emoji = '🎉';
+    msg = `¡Muy bien, ${nombreEstudiante}! Tienes un sólido manejo del material. Repasa los reactivos que fallaste para consolidarlos.`;
+  } else if (pct >= 60) {
+    emoji = '📚';
+    msg = `Buen esfuerzo, ${nombreEstudiante}. Aprobado. Te recomendamos repasar los temas donde tuviste más errores.`;
+  } else {
+    emoji = '💪';
+    msg = `No te desanimes, ${nombreEstudiante}. Revisa los materiales de estudio con detenimiento y vuelve a intentarlo. ¡Tú puedes!`;
+  }
+
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-mensaje').textContent = msg;
+
+  document.getElementById('simulador').classList.remove('activo');
+  document.getElementById('pantalla-resultados').classList.add('activo');
+}
+
+/* ════════════════════════════════════════════
+   REINICIAR
+════════════════════════════════════════════ */
+function reiniciar() {
+  document.getElementById('pantalla-resultados').classList.remove('activo');
+  document.getElementById('nombre-input').value = '';
+  document.getElementById('timer').classList.remove('urgente');
+  document.getElementById('pantalla-inicio').style.display = 'flex';
+}
+
+/* Tecla Enter en el campo nombre */
+document.getElementById('nombre-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') iniciarSimulador();
+});
+</script>
+</body>
+</html>
