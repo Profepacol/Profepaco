@@ -23,11 +23,12 @@
       --pdf-bg:       #fff8e8;
       --pdf-icon:     #d97706;
       --special-icon: #b5179e;
-      --special-border:#e879d8;
+      --special-brd:  #e879d8;
       --radius:       16px;
       --shadow-sm:    0 2px 12px rgba(30,60,110,0.08);
-      --shadow-md:    0 8px 28px rgba(30,60,110,0.14);
-      --nav-h:        64px;
+      --shadow-md:    0 8px 28px rgba(30,60,110,0.15);
+      --shadow-lg:    0 20px 56px rgba(30,60,110,0.18);
+      --nav-h:        68px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,177 +51,221 @@
       pointer-events: none;
     }
 
-    /* ════════════════════════════════
-       NAV BAR
-    ════════════════════════════════ */
+    /* ══════════════════════════════
+       NAVBAR
+    ══════════════════════════════ */
     .navbar {
-      position: sticky; top: 0; z-index: 200;
+      position: sticky; top: 0; z-index: 500;
+      height: var(--nav-h);
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      box-shadow: 0 2px 16px rgba(30,60,110,0.09);
-      height: var(--nav-h);
+      box-shadow: 0 2px 20px rgba(30,60,110,0.09);
       display: flex; align-items: center;
     }
     .nav-inner {
-      max-width: 1300px; margin: 0 auto; width: 100%;
-      padding: 0 22px;
-      display: flex; align-items: center; gap: 6px;
+      max-width: 1100px; margin: 0 auto; width: 100%;
+      padding: 0 28px;
+      display: flex; align-items: center; gap: 8px;
     }
     .nav-brand {
       font-family: 'Playfair Display', serif;
-      font-size: 1rem; font-weight: 900;
-      color: var(--navy);
-      margin-right: auto;
-      white-space: nowrap;
-      overflow: hidden; text-overflow: ellipsis;
-      max-width: 220px;
+      font-size: .95rem; font-weight: 900; color: var(--navy);
+      margin-right: auto; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; max-width: 240px;
     }
-    .nav-brand span { color: var(--navy-mid); }
+    .nav-brand em { font-style: normal; color: var(--navy-mid); }
 
-    /* nav buttons */
+    /* ── MENU BUTTONS ── */
     .nav-btn {
       position: relative;
-      display: flex; align-items: center; gap: 7px;
-      padding: 9px 16px;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px;
       border-radius: 12px;
       border: 1.5px solid transparent;
-      font-family: inherit; font-size: .85rem; font-weight: 700;
-      cursor: pointer; background: transparent;
-      transition: background .18s, border-color .18s, color .18s;
-      white-space: nowrap;
-      color: var(--muted);
+      font-family: inherit; font-size: .88rem; font-weight: 700;
+      cursor: pointer; background: transparent; color: var(--muted);
+      transition: all .18s ease;
+      white-space: nowrap; user-select: none;
     }
-    .nav-btn:hover, .nav-btn.open {
-      background: var(--bg2);
-      color: var(--navy);
-      border-color: var(--border);
-    }
-    .nav-btn.sim-btn:hover,   .nav-btn.sim-btn.open   { background: var(--sim-bg);   color: var(--sim-icon);   border-color: var(--sim-border,#b3d9f7); }
+    .nav-btn .btn-icon { font-size: 1.1rem; }
+    .nav-btn .caret    { font-size: .65rem; transition: transform .22s ease; }
+    .nav-btn.open .caret { transform: rotate(180deg); }
+
+    .nav-btn.sim-btn:hover,   .nav-btn.sim-btn.open   { background: var(--sim-bg);   color: var(--sim-icon);   border-color: #b3d9f7; }
     .nav-btn.guide-btn:hover, .nav-btn.guide-btn.open { background: var(--guide-bg); color: var(--guide-icon); border-color: #a8e6c8; }
     .nav-btn.pdf-btn:hover,   .nav-btn.pdf-btn.open   { background: var(--pdf-bg);   color: var(--pdf-icon);   border-color: #ffd080; }
 
-    .nav-btn .caret {
-      font-size: .7rem;
-      transition: transform .22s ease;
-      display: inline-block;
-    }
-    .nav-btn.open .caret { transform: rotate(180deg); }
-
-    /* ── DROPDOWN ── */
+    /* ── DROPDOWN PANEL ── */
     .dropdown {
       position: absolute;
-      top: calc(100% + 10px);
+      top: calc(100% + 12px);
       left: 0;
-      min-width: 280px;
+      width: 320px;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: 0 16px 48px rgba(30,60,110,0.16);
-      padding: 10px;
-      z-index: 300;
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
+      padding: 10px 8px;
+      z-index: 600;
       display: none;
-      animation: dropIn .22s cubic-bezier(.34,1.36,.64,1) both;
-      max-height: 70vh;
+      max-height: 72vh;
       overflow-y: auto;
     }
-    .dropdown.open { display: block; }
-
-    /* scrollbar */
+    .dropdown.open {
+      display: block;
+      animation: dropIn .2s cubic-bezier(.34,1.36,.64,1) both;
+    }
     .dropdown::-webkit-scrollbar { width: 5px; }
     .dropdown::-webkit-scrollbar-track { background: transparent; }
     .dropdown::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
-    .drop-item {
-      display: flex; align-items: center; gap: 10px;
+    /* ── DROPDOWN ITEMS ── */
+    .di {
+      display: flex; align-items: center; gap: 11px;
       padding: 10px 12px;
       border-radius: 12px;
       cursor: pointer;
-      font-size: .85rem; font-weight: 600;
-      color: var(--text);
+      font-size: .86rem; font-weight: 600; color: var(--text);
       transition: background .15s, color .15s;
       position: relative;
     }
-    .drop-item:hover { background: var(--bg2); color: var(--navy); }
-    .drop-item .di-emoji { font-size: 1.2rem; flex-shrink: 0; width: 28px; text-align: center; }
-    .drop-item .di-text  { flex: 1; line-height: 1.3; }
-    .drop-item .di-tag   {
+    .di-emoji { font-size: 1.25rem; flex-shrink: 0; width: 30px; text-align: center; }
+    .di-label { flex: 1; line-height: 1.3; }
+    .di-tag {
       font-size: .58rem; font-weight: 800; letter-spacing: .08em;
-      text-transform: uppercase; padding: 2px 7px; border-radius: 99px;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 99px;
       flex-shrink: 0;
     }
 
-    /* sim dropdown items */
-    .sim-drop .drop-item:hover { background: var(--sim-bg); color: var(--sim-icon); }
-    .sim-drop .di-tag  { background: var(--sim-bg); color: var(--sim-icon); }
+    /* sim items */
+    .sim-drop .di:hover { background: var(--sim-bg); color: var(--sim-icon); }
+    .sim-drop .di-tag   { background: var(--sim-bg); color: var(--sim-icon); }
 
-    /* guide dropdown items */
-    .guide-drop .drop-item:hover { background: var(--guide-bg); color: var(--guide-icon); }
-    .guide-drop .di-tag { background: var(--guide-bg); color: var(--guide-icon); }
+    /* guide items */
+    .guide-drop .di:hover { background: var(--guide-bg); color: var(--guide-icon); }
+    .guide-drop .di-tag   { background: var(--guide-bg); color: var(--guide-icon); }
 
-    /* pdf dropdown items */
-    .pdf-drop .drop-item:hover { background: var(--pdf-bg); color: var(--pdf-icon); }
-    .pdf-drop .di-tag { background: var(--pdf-bg); color: var(--pdf-icon); }
+    /* pdf items */
+    .pdf-drop .di:hover { background: var(--pdf-bg); color: var(--pdf-icon); }
+    .pdf-drop .di-tag   { background: var(--pdf-bg); color: var(--pdf-icon); }
 
-    /* ★ SPECIAL item inside dropdown */
-    .drop-item.special-item {
-      background: linear-gradient(135deg, #fff0fb, #fce7ff);
-      border: 1.5px solid var(--special-border);
-      margin-bottom: 4px;
+    /* ── SPECIAL ITEM (Admisión Preescolar 2026) ── */
+    .di.special {
+      background: linear-gradient(130deg, #fff0fb, #fce7ff);
+      border: 1.5px solid var(--special-brd);
+      margin: 0 0 6px 0;
+      padding: 13px 12px;
     }
-    .drop-item.special-item:hover {
-      background: linear-gradient(135deg, #fce7ff, #f5c8ff);
-      border-color: var(--special-icon);
+    .di.special .di-label  { color: #6b0063; font-weight: 800; font-size: .9rem; }
+    .di.special .di-tag    { background: #fce4fb; color: var(--special-icon); border: 1px solid var(--special-brd); }
+    .di.special:hover      { background: linear-gradient(130deg, #fce7ff, #f7c8ff); border-color: var(--special-icon); }
+
+    .di-new-badge {
+      position: absolute; top: -8px; right: 10px;
+      font-size: .58rem; font-weight: 800; letter-spacing: .07em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #b5179e, #7209b7);
+      color: #fff; border-radius: 99px; padding: 3px 10px;
+      box-shadow: 0 2px 10px rgba(114,9,183,.4);
+      animation: pulse 1.8s ease infinite;
     }
-    .drop-item.special-item .di-tag {
-      background: #fce4fb; color: var(--special-icon);
-      border: 1px solid var(--special-border);
-    }
-    .drop-item.special-item .di-text { color: #6b0063; font-weight: 800; }
-    .drop-new-badge {
-      position: absolute; top: -6px; right: 8px;
-      font-size: .56rem; font-weight: 800; letter-spacing: .06em;
-      background: linear-gradient(90deg,#b5179e,#7209b7);
-      color: #fff; border-radius: 99px; padding: 2px 8px;
-      box-shadow: 0 2px 8px rgba(181,23,158,0.35);
-      animation: pulseBadge 1.8s ease infinite;
-    }
-    @keyframes pulseBadge {
-      0%,100% { box-shadow: 0 2px 8px rgba(181,23,158,0.35); }
-      50%      { box-shadow: 0 2px 16px rgba(181,23,158,0.65); }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 2px 10px rgba(114,9,183,.4); }
+      50%      { box-shadow: 0 2px 18px rgba(114,9,183,.7); }
     }
 
-    .drop-divider {
-      height: 1px; background: var(--border);
-      margin: 6px 8px;
-    }
+    .drop-divider { height: 1px; background: var(--border); margin: 6px 8px; }
 
-    /* hamburger for mobile */
-    .nav-toggle {
-      display: none;
-      flex-direction: column; gap: 5px;
-      background: none; border: none; cursor: pointer; padding: 6px;
+    /* ══════════════════════════════
+       VIEWER
+    ══════════════════════════════ */
+    .viewer-wrap {
+      display: none; flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      margin: 28px auto;
+      max-width: 1100px;
     }
-    .nav-toggle span {
-      display: block; width: 22px; height: 2px;
-      background: var(--navy); border-radius: 99px;
-      transition: transform .2s, opacity .2s;
+    .viewer-wrap.active { display: flex; animation: fadeUp .3s ease both; }
+    .viewer-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
     }
+    .viewer-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .viewer-dot.blue  { background: var(--sim-icon);   }
+    .viewer-dot.green { background: var(--guide-icon); }
+    .viewer-title {
+      flex: 1; font-size: .9rem; font-weight: 700; color: var(--navy);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .viewer-close {
+      background: #fff; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 8px; padding: 6px 16px;
+      font-size: .82rem; cursor: pointer; font-family: inherit; font-weight: 700;
+      transition: background .18s, color .18s, border-color .18s;
+    }
+    .viewer-close:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+    .viewer-iframe { width: 100%; height: 78vh; border: none; background: #fff; }
 
-    /* ════════════════════════════════
-       PAGE
-    ════════════════════════════════ */
+    /* ══════════════════════════════
+       MODAL PDF
+    ══════════════════════════════ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 9999;
+      background: rgba(15,28,60,.5);
+      backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; animation: fadeIn .2s ease both; }
+    .modal-box {
+      background: var(--surface); border-radius: 24px;
+      padding: 44px 38px 36px; max-width: 420px; width: 100%;
+      box-shadow: 0 28px 64px rgba(10,20,50,.22);
+      border: 1px solid var(--border); text-align: center;
+      animation: popUp .3s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .modal-big-icon { font-size: 3.4rem; display: block; margin-bottom: 14px; }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900; color: var(--navy);
+      margin-bottom: 12px; line-height: 1.2;
+    }
+    .modal-body  { font-size: .95rem; color: var(--muted); font-weight: 500; line-height: 1.65; margin-bottom: 22px; }
+    .modal-body strong { color: var(--text); font-weight: 700; }
+    .modal-pill {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      background: var(--pdf-bg); border: 1.5px solid #ffd080;
+      border-radius: 14px; padding: 13px 22px;
+      font-size: .93rem; font-weight: 800; color: var(--pdf-icon);
+      width: 100%; margin-bottom: 24px;
+    }
+    .modal-btn {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+      color: #fff; border: none; border-radius: 14px; padding: 13px;
+      font-size: .92rem; font-weight: 800; cursor: pointer; font-family: inherit;
+      transition: opacity .18s, transform .15s;
+    }
+    .modal-btn:hover { opacity: .88; transform: translateY(-2px); }
+
+    /* ══════════════════════════════
+       PAGE / HEADER
+    ══════════════════════════════ */
     .page {
       position: relative; z-index: 1;
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 0 22px 70px;
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 28px 80px;
     }
 
-    /* ── HEADER ── */
     header {
       text-align: center;
-      padding: 52px 20px 40px;
-      margin-bottom: 44px;
+      padding: 60px 20px 50px;
       animation: fadeDown .65s ease both;
     }
     .header-inner {
@@ -228,7 +273,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 36px 48px 30px;
+      padding: 40px 56px 34px;
       box-shadow: var(--shadow-md);
     }
     .header-badge {
@@ -236,13 +281,13 @@
       font-size: .72rem; font-weight: 700; letter-spacing: .14em;
       text-transform: uppercase; color: var(--navy-mid);
       background: #e4ecff; border: 1px solid #c3d4f5;
-      border-radius: 99px; padding: 5px 14px; margin-bottom: 18px;
+      border-radius: 99px; padding: 5px 14px; margin-bottom: 20px;
     }
     header h1 {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      font-size: clamp(2rem, 5vw, 3.2rem);
       font-weight: 900; color: var(--navy);
-      line-height: 1.12; margin-bottom: 10px;
+      line-height: 1.1; margin-bottom: 12px;
     }
     header h1 span {
       background: linear-gradient(130deg, var(--navy-mid), #4a9ede);
@@ -250,14 +295,9 @@
     }
     .subtitle-level {
       display: inline-flex; align-items: center; gap: 8px;
-      font-size: .88rem; font-weight: 700;
-      color: var(--guide-icon);
-      background: var(--guide-bg);
-      border: 1px solid #a8e6c8;
-      border-radius: 99px;
-      padding: 5px 18px;
-      margin-bottom: 16px;
-      letter-spacing: .02em;
+      font-size: .9rem; font-weight: 700; color: var(--guide-icon);
+      background: var(--guide-bg); border: 1px solid #a8e6c8;
+      border-radius: 99px; padding: 5px 18px; margin-bottom: 18px;
     }
     .author-line {
       display: flex; align-items: center; justify-content: center;
@@ -271,383 +311,194 @@
       font-size: 1rem; flex-shrink: 0;
     }
 
-    /* ── SECTION HEADER ── */
-    .section-header {
-      display: flex; align-items: center; gap: 14px;
-      margin-bottom: 20px;
-      animation: fadeUp .5s ease both;
+    /* hint below header */
+    .nav-hint {
+      margin-top: 32px;
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
     }
-    .section-icon {
-      width: 42px; height: 42px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; flex-shrink: 0;
+    .hint-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: .8rem; font-weight: 700;
+      border-radius: 99px; padding: 7px 18px; border: 1.5px solid;
+      animation: fadeUp .6s ease both;
     }
-    .section-icon.sim   { background: var(--sim-bg);  }
-    .section-icon.guide { background: var(--guide-bg); }
-    .section-icon.pdf   { background: var(--pdf-bg);   }
-    .section-info h2 { font-size: 1.1rem; font-weight: 800; color: var(--navy); }
-    .section-info p  { font-size: .78rem; color: var(--muted); font-weight: 500; }
-    .section-line    { flex: 1; height: 1px; background: var(--border); }
-
-    /* ── GRID ── */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 14px;
-      margin-bottom: 50px;
-    }
-
-    /* ── CARDS ── */
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius);
-      padding: 20px 18px 18px;
-      cursor: pointer;
-      transition: transform .2s ease, box-shadow .2s ease;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      animation: fadeUp .5s ease both;
-      border: 1px solid var(--border);
-    }
-    .card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-    .card.sim   { border-top: 3px solid var(--sim-icon);   }
-    .card.guide { border-top: 3px solid var(--guide-icon); }
-
-    /* ★ SPECIAL CARD */
-    .card.special {
-      background: linear-gradient(145deg, #fff0fb, #fce7ff);
-      border: 1.5px solid var(--special-border);
-      border-top: 3px solid var(--special-icon);
-      box-shadow: 0 4px 18px rgba(181,23,158,0.13);
-    }
-    .card.special:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 36px rgba(181,23,158,0.26);
-    }
-    .card.special .card-tag   { background: #fce4fb; color: var(--special-icon); border: 1px solid var(--special-border); }
-    .card.special .card-title { color: #6b0063; }
-    .card.special .card-sub   { color: #c06ab8; }
-    .card.special .card-arrow { color: var(--special-icon); }
-    .card.special::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .card-new-ribbon {
-      position: absolute; top: 10px; left: -28px;
-      background: linear-gradient(90deg, #b5179e, #7209b7);
-      color: #fff; font-size: .6rem; font-weight: 800;
-      letter-spacing: .08em; padding: 4px 36px;
-      transform: rotate(-45deg);
-      box-shadow: 0 2px 8px rgba(114,9,183,0.4);
-    }
-
-    .card-emoji { font-size: 2rem; margin-bottom: 10px; display: block; }
-    .card-tag {
-      position: absolute; top: 13px; right: 13px;
-      font-size: .6rem; font-weight: 800; letter-spacing: .1em;
-      text-transform: uppercase; padding: 3px 9px; border-radius: 99px;
-    }
-    .card.sim   .card-tag { background: var(--sim-bg);   color: var(--sim-icon);   }
-    .card.guide .card-tag { background: var(--guide-bg); color: var(--guide-icon); }
-
-    .card-title {
-      font-size: .9rem; font-weight: 700; color: var(--text);
-      line-height: 1.35; margin-bottom: 5px;
-    }
-    .card-sub {
-      font-size: .72rem; color: var(--muted); font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .card-arrow {
-      margin-top: 12px; display: inline-flex;
-      align-items: center; gap: 4px;
-      font-size: .75rem; font-weight: 700;
-    }
-    .card.sim   .card-arrow { color: var(--sim-icon);   }
-    .card.guide .card-arrow { color: var(--guide-icon); }
-
-    /* ── PDF BIG CARD ── */
-    .pdf-big {
-      grid-column: 1 / -1;
-      display: flex; align-items: center; gap: 22px;
-      padding: 28px 30px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #fffbf0, #fff8e8);
-      border: 1.5px solid #ffd080;
-      border-top: 3px solid var(--pdf-icon);
-      border-radius: var(--radius);
-      box-shadow: 0 4px 18px rgba(217,119,6,0.10);
-      transition: transform .2s ease, box-shadow .2s ease;
-      animation: fadeUp .5s ease both;
-    }
-    .pdf-big:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 32px rgba(217,119,6,0.18);
-    }
-    .pdf-big-icon { font-size: 2.8rem; flex-shrink: 0; }
-    .pdf-big-info { flex: 1; }
-    .pdf-big-title { font-size: 1.15rem; font-weight: 800; color: #92400e; margin-bottom: 4px; }
-    .pdf-big-sub   { font-size: .83rem; color: #b45309; font-weight: 500; }
-    .pdf-big-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: #fef3c7; border: 1px solid #fcd34d;
-      color: var(--pdf-icon); border-radius: 99px;
-      padding: 5px 16px; font-size: .75rem; font-weight: 800; flex-shrink: 0;
-    }
-
-    /* ── VIEWER ── */
-    .viewer-wrap {
-      display: none; flex-direction: column;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden; box-shadow: var(--shadow-md);
-      margin-bottom: 46px;
-      animation: fadeUp .35s ease both;
-    }
-    .viewer-wrap.active { display: flex; }
-    .viewer-bar {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 18px; background: var(--bg2);
-      border-bottom: 1px solid var(--border); flex-wrap: wrap;
-    }
-    .viewer-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .viewer-dot.blue  { background: #1a7fc1; }
-    .viewer-dot.green { background: #16a363; }
-    .viewer-title {
-      flex: 1; font-size: .88rem; font-weight: 700; color: var(--navy);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .viewer-close {
-      background: #fff; border: 1px solid var(--border);
-      color: var(--muted); border-radius: 8px; padding: 5px 14px;
-      font-size: .8rem; cursor: pointer; font-family: inherit; font-weight: 700;
-      transition: background .18s, color .18s, border-color .18s;
-    }
-    .viewer-close:hover { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
-    .viewer-iframe { width: 100%; height: 76vh; border: none; background: #fff; }
-
-    /* ── MODAL PDF ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 9999;
-      background: rgba(15,28,60,0.5);
-      backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal-overlay.active { display: flex; animation: fadeIn .22s ease both; }
-    .modal-box {
-      background: var(--surface); border-radius: 24px;
-      padding: 44px 38px 36px; max-width: 420px; width: 100%;
-      box-shadow: 0 28px 64px rgba(10,20,50,0.22);
-      border: 1px solid var(--border); text-align: center;
-      animation: popUp .3s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    .modal-big-icon { font-size: 3.4rem; display: block; margin-bottom: 14px; }
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem; font-weight: 900; color: var(--navy);
-      margin-bottom: 12px; line-height: 1.2;
-    }
-    .modal-body { font-size: .95rem; color: var(--muted); font-weight: 500; line-height: 1.65; margin-bottom: 22px; }
-    .modal-body strong { color: var(--text); font-weight: 700; }
-    .modal-pill {
-      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-      background: var(--pdf-bg); border: 1.5px solid #ffd080;
-      border-radius: 14px; padding: 13px 22px;
-      font-size: .93rem; font-weight: 800; color: var(--pdf-icon);
-      width: 100%; margin-bottom: 24px;
-    }
-    .modal-btn {
-      display: block; width: 100%;
-      background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-      color: #fff; border: none; border-radius: 14px; padding: 13px 28px;
-      font-size: .92rem; font-weight: 800; cursor: pointer; font-family: inherit;
-      transition: opacity .18s, transform .15s;
-    }
-    .modal-btn:hover { opacity: .88; transform: translateY(-2px); }
+    .hint-pill.sim   { background: var(--sim-bg);   color: var(--sim-icon);   border-color: #b3d9f7;  animation-delay:.1s; }
+    .hint-pill.guide { background: var(--guide-bg); color: var(--guide-icon); border-color: #a8e6c8;  animation-delay:.2s; }
+    .hint-pill.pdf   { background: var(--pdf-bg);   color: var(--pdf-icon);   border-color: #ffd080;  animation-delay:.3s; }
 
     /* ── FOOTER ── */
     footer {
-      text-align: center; padding: 24px 0 8px;
+      text-align: center; padding: 24px 0 10px;
       border-top: 1px solid var(--border);
       font-size: .78rem; color: var(--muted); font-weight: 600;
     }
     footer span { color: var(--navy-mid); }
 
     /* ── ANIMATIONS ── */
-    @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
-    @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
-    @keyframes dropIn   { from { opacity:0; transform:translateY(-10px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
-    @keyframes popUp    { from { opacity:0; transform:scale(.82); } to { opacity:1; transform:scale(1); } }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(16px)}  to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn   { from{opacity:0}                             to{opacity:1} }
+    @keyframes dropIn   { from{opacity:0;transform:translateY(-10px) scale(.97)} to{opacity:1;transform:none} }
+    @keyframes popUp    { from{opacity:0;transform:scale(.82)}        to{opacity:1;transform:scale(1)} }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 760px) {
+    @media (max-width: 680px) {
       .nav-btn .btn-label { display: none; }
-      .nav-btn { padding: 9px 11px; }
-      .nav-brand { max-width: 160px; font-size: .88rem; }
-    }
-    @media (max-width: 640px) {
-      .header-inner { padding: 26px 22px 22px; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .card { padding: 14px 12px 12px; }
-      .card-emoji { font-size: 1.5rem; }
+      .nav-btn { padding: 10px 12px; }
+      .nav-brand { max-width: 140px; font-size: .82rem; }
+      .header-inner { padding: 28px 24px 24px; }
       .viewer-iframe { height: 62vh; }
       .modal-box { padding: 32px 22px 26px; }
-      .pdf-big { flex-direction: column; text-align: center; }
-      .pdf-big-badge { align-self: center; }
-      .dropdown { min-width: 240px; }
-    }
-    @media (max-width: 360px) {
-      .grid { grid-template-columns: 1fr; }
+      .dropdown { width: 260px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════
-       NAVBAR
-  ═══════════════════════════════════════ -->
-  <nav class="navbar" id="navbar">
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar">
     <div class="nav-inner">
-      <div class="nav-brand">📚 <span>Recursos Educativos</span></div>
+      <div class="nav-brand">📚 <em>Recursos Educativos</em></div>
 
       <!-- SIMULADORES -->
       <button class="nav-btn sim-btn" id="btn-sim" onclick="toggleMenu('sim')">
-        🧪 <span class="btn-label">Simuladores</span>
+        <span class="btn-icon">🧪</span>
+        <span class="btn-label">Simuladores</span>
         <span class="caret">▾</span>
+
         <div class="dropdown sim-drop" id="drop-sim">
 
-          <!-- ★ NUEVO DESTACADO PRIMERO -->
-          <div class="drop-item special-item" onclick="handleDropClick(event,'simulador_admision_preescolar_2026.html','Admisión Preescolar 2026')">
-            <div class="drop-new-badge">✨ NUEVO</div>
+          <!-- ★ ESPECIAL PRIMERO ★ -->
+          <div class="di special" onclick="pick(event,'simulador_admision_preescolar_2026.html','Admisión Preescolar 2026')">
+            <div class="di-new-badge">✨ NUEVO</div>
             <span class="di-emoji">🏫</span>
-            <span class="di-text">Admisión Preescolar 2026</span>
+            <span class="di-label">Admisión Preescolar 2026</span>
             <span class="di-tag">Sim</span>
           </div>
           <div class="drop-divider"></div>
 
-          <div class="drop-item" onclick="handleDropClick(event,'Simulador_Acoso_Escolar.html','Acoso Escolar')">
-            <span class="di-emoji">🛡️</span><span class="di-text">Acoso Escolar</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'Simulador_Acoso_Escolar.html','Acoso Escolar')">
+            <span class="di-emoji">🛡️</span><span class="di-label">Acoso Escolar</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_aprendamos_comunidad.html','Aprendamos en Comunidad')">
-            <span class="di-emoji">🤝</span><span class="di-text">Aprendamos en Comunidad</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_aprendamos_comunidad.html','Aprendamos en Comunidad')">
+            <span class="di-emoji">🤝</span><span class="di-label">Aprendamos en Comunidad</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_conflictos_escolares.html','Conflictos Escolares')">
-            <span class="di-emoji">⚖️</span><span class="di-text">Conflictos Escolares</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_conflictos_escolares.html','Conflictos Escolares')">
+            <span class="di-emoji">⚖️</span><span class="di-label">Conflictos Escolares</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_fase2.html','Simulador Fase 2')">
-            <span class="di-emoji">📊</span><span class="di-text">Simulador Fase 2</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_fase2.html','Simulador Fase 2')">
+            <span class="di-emoji">📊</span><span class="di-label">Simulador Fase 2</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'Simulador_LGDNNA.html','LGDNNA')">
-            <span class="di-emoji">📜</span><span class="di-text">LGDNNA</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'Simulador_LGDNNA.html','LGDNNA')">
+            <span class="di-emoji">📜</span><span class="di-label">LGDNNA</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_LGE.html','Ley General de Educación')">
-            <span class="di-emoji">🏫</span><span class="di-text">Ley General de Educación</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_LGE.html','Ley General de Educación')">
+            <span class="di-emoji">🏫</span><span class="di-label">Ley General de Educación</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'Simulador_Metodologias.html','Metodologías de Enseñanza')">
-            <span class="di-emoji">🔬</span><span class="di-text">Metodologías de Enseñanza</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'Simulador_Metodologias.html','Metodologías de Enseñanza')">
+            <span class="di-emoji">🔬</span><span class="di-label">Metodologías de Enseñanza</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_NEM_2022.html','Nueva Escuela Mexicana 2022')">
-            <span class="di-emoji">🇲🇽</span><span class="di-text">Nueva Escuela Mexicana 2022</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_NEM_2022.html','Nueva Escuela Mexicana 2022')">
+            <span class="di-emoji">🇲🇽</span><span class="di-label">Nueva Escuela Mexicana 2022</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_programa_analitico_30.html','Programa Analítico 3.0')">
-            <span class="di-emoji">📋</span><span class="di-text">Programa Analítico 3.0</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_programa_analitico_30.html','Programa Analítico 3.0')">
+            <span class="di-emoji">📋</span><span class="di-label">Programa Analítico 3.0</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_red_seguridad_2_.html','Red de Seguridad')">
-            <span class="di-emoji">🔐</span><span class="di-text">Red de Seguridad</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_red_seguridad_2_.html','Red de Seguridad')">
+            <span class="di-emoji">🔐</span><span class="di-label">Red de Seguridad</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_red_seguridad_responsive.html','Red de Seguridad Responsive')">
-            <span class="di-emoji">🔒</span><span class="di-text">Red de Seguridad Responsive</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_red_seguridad_responsive.html','Red de Seguridad Responsive')">
+            <span class="di-emoji">🔒</span><span class="di-label">Red de Seguridad Responsive</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador_vygotsky.html','Teoría de Vygotsky')">
-            <span class="di-emoji">🧠</span><span class="di-text">Teoría de Vygotsky</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador_vygotsky.html','Teoría de Vygotsky')">
+            <span class="di-emoji">🧠</span><span class="di-label">Teoría de Vygotsky</span><span class="di-tag">Sim</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'simulador-usicamm-responsive_1_.html','USICAMM')">
-            <span class="di-emoji">🎖️</span><span class="di-text">USICAMM</span><span class="di-tag">Sim</span>
+          <div class="di" onclick="pick(event,'simulador-usicamm-responsive_1_.html','USICAMM')">
+            <span class="di-emoji">🎖️</span><span class="di-label">USICAMM</span><span class="di-tag">Sim</span>
           </div>
         </div>
       </button>
 
       <!-- GUÍAS -->
       <button class="nav-btn guide-btn" id="btn-guide" onclick="toggleMenu('guide')">
-        📚 <span class="btn-label">Guías</span>
+        <span class="btn-icon">📚</span>
+        <span class="btn-label">Guías</span>
         <span class="caret">▾</span>
+
         <div class="dropdown guide-drop" id="drop-guide">
-          <div class="drop-item" onclick="handleDropClick(event,'acuerdo-14-12-23-acoso-escolar.html','Acuerdo 14/12/23 — Acoso Escolar')">
-            <span class="di-emoji">📋</span><span class="di-text">Acuerdo 14/12/23 — Acoso Escolar</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'acuerdo-14-12-23-acoso-escolar.html','Acuerdo 14/12/23 — Acoso Escolar')">
+            <span class="di-emoji">📋</span><span class="di-label">Acuerdo 14/12/23 — Acoso Escolar</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'articulo-4-cpeum-parrafos-8-9-10.html','Artículo 4 CPEUM — Párrafos 8–10')">
-            <span class="di-emoji">⚖️</span><span class="di-text">Artículo 4 CPEUM — Párrafos 8–10</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'articulo-4-cpeum-parrafos-8-9-10.html','Artículo 4 CPEUM — Párrafos 8–10')">
+            <span class="di-emoji">⚖️</span><span class="di-label">Artículo 4 CPEUM — Párrafos 8–10</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'CPEUM___Derechos_Fundamentales.html','CPEUM — Derechos Fundamentales')">
-            <span class="di-emoji">🏛️</span><span class="di-text">CPEUM — Derechos Fundamentales</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'CPEUM___Derechos_Fundamentales.html','CPEUM — Derechos Fundamentales')">
+            <span class="di-emoji">🏛️</span><span class="di-label">CPEUM — Derechos Fundamentales</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'ecosistema_equidad_educativa.html','Ecosistema de Equidad Educativa')">
-            <span class="di-emoji">🌱</span><span class="di-text">Ecosistema de Equidad Educativa</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'ecosistema_equidad_educativa.html','Ecosistema de Equidad Educativa')">
+            <span class="di-emoji">🌱</span><span class="di-label">Ecosistema de Equidad Educativa</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'enfoque-formativo-evaluacion.html','Enfoque Formativo de Evaluación')">
-            <span class="di-emoji">📝</span><span class="di-text">Enfoque Formativo de Evaluación</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'enfoque-formativo-evaluacion.html','Enfoque Formativo de Evaluación')">
+            <span class="di-emoji">📝</span><span class="di-label">Enfoque Formativo de Evaluación</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'equidad-inclusion.html','Equidad e Inclusión')">
-            <span class="di-emoji">🤲</span><span class="di-text">Equidad e Inclusión</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'equidad-inclusion.html','Equidad e Inclusión')">
+            <span class="di-emoji">🤲</span><span class="di-label">Equidad e Inclusión</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_acoso_escolar.html','Guía — Acoso Escolar')">
-            <span class="di-emoji">🛡️</span><span class="di-text">Guía — Acoso Escolar</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_acoso_escolar.html','Guía — Acoso Escolar')">
+            <span class="di-emoji">🛡️</span><span class="di-label">Guía — Acoso Escolar</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_CTE_lineamientos.html','Guía CTE — Lineamientos')">
-            <span class="di-emoji">🏫</span><span class="di-text">Guía CTE — Lineamientos</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_CTE_lineamientos.html','Guía CTE — Lineamientos')">
+            <span class="di-emoji">🏫</span><span class="di-label">Guía CTE — Lineamientos</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_entornos_escolares_seguros.html','Entornos Escolares Seguros')">
-            <span class="di-emoji">🔐</span><span class="di-text">Entornos Escolares Seguros</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_entornos_escolares_seguros.html','Entornos Escolares Seguros')">
+            <span class="di-emoji">🔐</span><span class="di-label">Entornos Escolares Seguros</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_fase2_preescolar.html','Guía Fase 2 — Preescolar')">
-            <span class="di-emoji">🌼</span><span class="di-text">Guía Fase 2 — Preescolar</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_fase2_preescolar.html','Guía Fase 2 — Preescolar')">
+            <span class="di-emoji">🌼</span><span class="di-label">Guía Fase 2 — Preescolar</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_ley_general_educacion.html','Guía — Ley General de Educación')">
-            <span class="di-emoji">📖</span><span class="di-text">Guía — Ley General de Educación</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_ley_general_educacion.html','Guía — Ley General de Educación')">
+            <span class="di-emoji">📖</span><span class="di-label">Guía — Ley General de Educación</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_lgdnna.html','Guía — LGDNNA')">
-            <span class="di-emoji">📜</span><span class="di-text">Guía — LGDNNA</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_lgdnna.html','Guía — LGDNNA')">
+            <span class="di-emoji">📜</span><span class="di-label">Guía — LGDNNA</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_metodologias_sociocriticas.html','Metodologías Sociocríticas')">
-            <span class="di-emoji">🔬</span><span class="di-text">Metodologías Sociocríticas</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_metodologias_sociocriticas.html','Metodologías Sociocríticas')">
+            <span class="di-emoji">🔬</span><span class="di-label">Metodologías Sociocríticas</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'guia_resolucion_conflictos.html','Resolución de Conflictos')">
-            <span class="di-emoji">🕊️</span><span class="di-text">Resolución de Conflictos</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'guia_resolucion_conflictos.html','Resolución de Conflictos')">
+            <span class="di-emoji">🕊️</span><span class="di-label">Resolución de Conflictos</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'lgdna-presentacion.html','LGDNA — Presentación')">
-            <span class="di-emoji">🎯</span><span class="di-text">LGDNA — Presentación</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'lgdna-presentacion.html','LGDNA — Presentación')">
+            <span class="di-emoji">🎯</span><span class="di-label">LGDNA — Presentación</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'normas-evaluacion.html','Normas de Evaluación')">
-            <span class="di-emoji">📊</span><span class="di-text">Normas de Evaluación</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'normas-evaluacion.html','Normas de Evaluación')">
+            <span class="di-emoji">📊</span><span class="di-label">Normas de Evaluación</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'nueva-escuela-mexicana.html','Nueva Escuela Mexicana')">
-            <span class="di-emoji">🇲🇽</span><span class="di-text">Nueva Escuela Mexicana</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'nueva-escuela-mexicana.html','Nueva Escuela Mexicana')">
+            <span class="di-emoji">🇲🇽</span><span class="di-label">Nueva Escuela Mexicana</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'piaget_construyendo_la_mente.html','Piaget — Construyendo la Mente')">
-            <span class="di-emoji">🧩</span><span class="di-text">Piaget — Construyendo la Mente</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'piaget_construyendo_la_mente.html','Piaget — Construyendo la Mente')">
+            <span class="di-emoji">🧩</span><span class="di-label">Piaget — Construyendo la Mente</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'programa-sintetico-analitico.html','Programa Sintético y Analítico')">
-            <span class="di-emoji">📐</span><span class="di-text">Programa Sintético y Analítico</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'programa-sintetico-analitico.html','Programa Sintético y Analítico')">
+            <span class="di-emoji">📐</span><span class="di-label">Programa Sintético y Analítico</span><span class="di-tag">Guía</span>
           </div>
-          <div class="drop-item" onclick="handleDropClick(event,'teorias-aprendizaje.html','Teorías del Aprendizaje')">
-            <span class="di-emoji">💡</span><span class="di-text">Teorías del Aprendizaje</span><span class="di-tag">Guía</span>
+          <div class="di" onclick="pick(event,'teorias-aprendizaje.html','Teorías del Aprendizaje')">
+            <span class="di-emoji">💡</span><span class="di-label">Teorías del Aprendizaje</span><span class="di-tag">Guía</span>
           </div>
         </div>
       </button>
 
-      <!-- PDF -->
+      <!-- DOCUMENTOS PDF -->
       <button class="nav-btn pdf-btn" id="btn-pdf" onclick="toggleMenu('pdf')">
-        📄 <span class="btn-label">Documentos PDF</span>
+        <span class="btn-icon">📄</span>
+        <span class="btn-label">Documentos PDF</span>
         <span class="caret">▾</span>
+
         <div class="dropdown pdf-drop" id="drop-pdf">
-          <div class="drop-item" onclick="handlePdfClick(event)">
+          <div class="di" onclick="pickPdf(event)">
             <span class="di-emoji">🖨️</span>
-            <span class="di-text">Documentos Versión Impresa</span>
+            <span class="di-label">Documentos Versión Impresa</span>
             <span class="di-tag">PDF</span>
           </div>
         </div>
@@ -656,9 +507,7 @@
     </div>
   </nav>
 
-  <!-- ══════════════════════════════════════
-       PAGE
-  ═══════════════════════════════════════ -->
+  <!-- ══════════════ PAGE ══════════════ -->
   <div class="page">
 
     <!-- HEADER -->
@@ -671,6 +520,13 @@
           <div class="author-avatar">👨‍🏫</div>
           <strong>Prof. Francisco De Jesus Luna Benitez</strong>
         </div>
+      </div>
+
+      <!-- Indicadores del menú -->
+      <div class="nav-hint">
+        <div class="hint-pill sim">🧪 14 Simuladores</div>
+        <div class="hint-pill guide">📚 20 Guías Interactivas</div>
+        <div class="hint-pill pdf">📄 Documentos PDF</div>
       </div>
     </header>
 
@@ -700,260 +556,6 @@
       </div>
     </div>
 
-    <!-- ══ SIMULADORES ══ -->
-    <div class="section-header" id="sec-sim">
-      <div class="section-icon sim">🧪</div>
-      <div class="section-info">
-        <h2>Simuladores</h2>
-        <p>14 simuladores interactivos</p>
-      </div>
-      <div class="section-line"></div>
-    </div>
-
-    <div class="grid">
-      <!-- ★ ESPECIAL PRIMERO ★ -->
-      <div class="card special" onclick="openViewer('simulador_admision_preescolar_2026.html','Admisión Preescolar 2026')" style="animation-delay:.03s">
-        <div class="card-new-ribbon">NUEVO</div>
-        <span class="card-emoji">🏫</span><span class="card-tag">Sim</span>
-        <div class="card-title">Admisión Preescolar 2026</div>
-        <div class="card-sub">simulador_admision_preescolar_2026.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-
-      <div class="card sim" onclick="openViewer('Simulador_Acoso_Escolar.html','Acoso Escolar')" style="animation-delay:.06s">
-        <span class="card-emoji">🛡️</span><span class="card-tag">Sim</span>
-        <div class="card-title">Acoso Escolar</div>
-        <div class="card-sub">Simulador_Acoso_Escolar.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_aprendamos_comunidad.html','Aprendamos en Comunidad')" style="animation-delay:.09s">
-        <span class="card-emoji">🤝</span><span class="card-tag">Sim</span>
-        <div class="card-title">Aprendamos en Comunidad</div>
-        <div class="card-sub">simulador_aprendamos_comunidad.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_conflictos_escolares.html','Conflictos Escolares')" style="animation-delay:.12s">
-        <span class="card-emoji">⚖️</span><span class="card-tag">Sim</span>
-        <div class="card-title">Conflictos Escolares</div>
-        <div class="card-sub">simulador_conflictos_escolares.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_fase2.html','Simulador Fase 2')" style="animation-delay:.15s">
-        <span class="card-emoji">📊</span><span class="card-tag">Sim</span>
-        <div class="card-title">Simulador Fase 2</div>
-        <div class="card-sub">simulador_fase2.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('Simulador_LGDNNA.html','LGDNNA')" style="animation-delay:.18s">
-        <span class="card-emoji">📜</span><span class="card-tag">Sim</span>
-        <div class="card-title">LGDNNA</div>
-        <div class="card-sub">Simulador_LGDNNA.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_LGE.html','Ley General de Educación')" style="animation-delay:.21s">
-        <span class="card-emoji">🏫</span><span class="card-tag">Sim</span>
-        <div class="card-title">Ley General de Educación</div>
-        <div class="card-sub">simulador_LGE.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('Simulador_Metodologias.html','Metodologías de Enseñanza')" style="animation-delay:.24s">
-        <span class="card-emoji">🔬</span><span class="card-tag">Sim</span>
-        <div class="card-title">Metodologías de Enseñanza</div>
-        <div class="card-sub">Simulador_Metodologias.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_NEM_2022.html','Nueva Escuela Mexicana 2022')" style="animation-delay:.27s">
-        <span class="card-emoji">🇲🇽</span><span class="card-tag">Sim</span>
-        <div class="card-title">Nueva Escuela Mexicana 2022</div>
-        <div class="card-sub">simulador_NEM_2022.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_programa_analitico_30.html','Programa Analítico 3.0')" style="animation-delay:.30s">
-        <span class="card-emoji">📋</span><span class="card-tag">Sim</span>
-        <div class="card-title">Programa Analítico 3.0</div>
-        <div class="card-sub">simulador_programa_analitico_30.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_red_seguridad_2_.html','Red de Seguridad')" style="animation-delay:.33s">
-        <span class="card-emoji">🔐</span><span class="card-tag">Sim</span>
-        <div class="card-title">Red de Seguridad</div>
-        <div class="card-sub">simulador_red_seguridad_2_.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_red_seguridad_responsive.html','Red de Seguridad Responsive')" style="animation-delay:.36s">
-        <span class="card-emoji">🔒</span><span class="card-tag">Sim</span>
-        <div class="card-title">Red de Seguridad Responsive</div>
-        <div class="card-sub">simulador_red_seguridad_responsive.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador_vygotsky.html','Teoría de Vygotsky')" style="animation-delay:.39s">
-        <span class="card-emoji">🧠</span><span class="card-tag">Sim</span>
-        <div class="card-title">Teoría de Vygotsky</div>
-        <div class="card-sub">simulador_vygotsky.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card sim" onclick="openViewer('simulador-usicamm-responsive_1_.html','USICAMM')" style="animation-delay:.42s">
-        <span class="card-emoji">🎖️</span><span class="card-tag">Sim</span>
-        <div class="card-title">USICAMM</div>
-        <div class="card-sub">simulador-usicamm-responsive_1_.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-    </div>
-
-    <!-- ══ GUÍAS ══ -->
-    <div class="section-header" id="sec-guide">
-      <div class="section-icon guide">📚</div>
-      <div class="section-info">
-        <h2>Guías de Estudio Interactivas</h2>
-        <p>20 guías de estudio</p>
-      </div>
-      <div class="section-line"></div>
-    </div>
-
-    <div class="grid">
-      <div class="card guide" onclick="openViewer('acuerdo-14-12-23-acoso-escolar.html','Acuerdo 14/12/23 — Acoso Escolar')" style="animation-delay:.03s">
-        <span class="card-emoji">📋</span><span class="card-tag">Guía</span>
-        <div class="card-title">Acuerdo 14/12/23 — Acoso Escolar</div>
-        <div class="card-sub">acuerdo-14-12-23-acoso-escolar.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('articulo-4-cpeum-parrafos-8-9-10.html','Artículo 4 CPEUM — Párrafos 8–10')" style="animation-delay:.06s">
-        <span class="card-emoji">⚖️</span><span class="card-tag">Guía</span>
-        <div class="card-title">Artículo 4 CPEUM — Párrafos 8–10</div>
-        <div class="card-sub">articulo-4-cpeum-parrafos-8-9-10.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('CPEUM___Derechos_Fundamentales.html','CPEUM — Derechos Fundamentales')" style="animation-delay:.09s">
-        <span class="card-emoji">🏛️</span><span class="card-tag">Guía</span>
-        <div class="card-title">CPEUM — Derechos Fundamentales</div>
-        <div class="card-sub">CPEUM___Derechos_Fundamentales.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('ecosistema_equidad_educativa.html','Ecosistema de Equidad Educativa')" style="animation-delay:.12s">
-        <span class="card-emoji">🌱</span><span class="card-tag">Guía</span>
-        <div class="card-title">Ecosistema de Equidad Educativa</div>
-        <div class="card-sub">ecosistema_equidad_educativa.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('enfoque-formativo-evaluacion.html','Enfoque Formativo de Evaluación')" style="animation-delay:.15s">
-        <span class="card-emoji">📝</span><span class="card-tag">Guía</span>
-        <div class="card-title">Enfoque Formativo de Evaluación</div>
-        <div class="card-sub">enfoque-formativo-evaluacion.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('equidad-inclusion.html','Equidad e Inclusión')" style="animation-delay:.18s">
-        <span class="card-emoji">🤲</span><span class="card-tag">Guía</span>
-        <div class="card-title">Equidad e Inclusión</div>
-        <div class="card-sub">equidad-inclusion.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_acoso_escolar.html','Guía — Acoso Escolar')" style="animation-delay:.21s">
-        <span class="card-emoji">🛡️</span><span class="card-tag">Guía</span>
-        <div class="card-title">Guía — Acoso Escolar</div>
-        <div class="card-sub">guia_acoso_escolar.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_CTE_lineamientos.html','Guía CTE — Lineamientos')" style="animation-delay:.24s">
-        <span class="card-emoji">🏫</span><span class="card-tag">Guía</span>
-        <div class="card-title">Guía CTE — Lineamientos</div>
-        <div class="card-sub">guia_CTE_lineamientos.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_entornos_escolares_seguros.html','Entornos Escolares Seguros')" style="animation-delay:.27s">
-        <span class="card-emoji">🔐</span><span class="card-tag">Guía</span>
-        <div class="card-title">Entornos Escolares Seguros</div>
-        <div class="card-sub">guia_entornos_escolares_seguros.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_fase2_preescolar.html','Guía Fase 2 — Preescolar')" style="animation-delay:.30s">
-        <span class="card-emoji">🌼</span><span class="card-tag">Guía</span>
-        <div class="card-title">Guía Fase 2 — Preescolar</div>
-        <div class="card-sub">guia_fase2_preescolar.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_ley_general_educacion.html','Guía — Ley General de Educación')" style="animation-delay:.33s">
-        <span class="card-emoji">📖</span><span class="card-tag">Guía</span>
-        <div class="card-title">Guía — Ley General de Educación</div>
-        <div class="card-sub">guia_ley_general_educacion.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_lgdnna.html','Guía — LGDNNA')" style="animation-delay:.36s">
-        <span class="card-emoji">📜</span><span class="card-tag">Guía</span>
-        <div class="card-title">Guía — LGDNNA</div>
-        <div class="card-sub">guia_lgdnna.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_metodologias_sociocriticas.html','Metodologías Sociocríticas')" style="animation-delay:.39s">
-        <span class="card-emoji">🔬</span><span class="card-tag">Guía</span>
-        <div class="card-title">Metodologías Sociocríticas</div>
-        <div class="card-sub">guia_metodologias_sociocriticas.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('guia_resolucion_conflictos.html','Resolución de Conflictos')" style="animation-delay:.42s">
-        <span class="card-emoji">🕊️</span><span class="card-tag">Guía</span>
-        <div class="card-title">Resolución de Conflictos</div>
-        <div class="card-sub">guia_resolucion_conflictos.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('lgdna-presentacion.html','LGDNA — Presentación')" style="animation-delay:.45s">
-        <span class="card-emoji">🎯</span><span class="card-tag">Guía</span>
-        <div class="card-title">LGDNA — Presentación</div>
-        <div class="card-sub">lgdna-presentacion.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('normas-evaluacion.html','Normas de Evaluación')" style="animation-delay:.48s">
-        <span class="card-emoji">📊</span><span class="card-tag">Guía</span>
-        <div class="card-title">Normas de Evaluación</div>
-        <div class="card-sub">normas-evaluacion.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('nueva-escuela-mexicana.html','Nueva Escuela Mexicana')" style="animation-delay:.51s">
-        <span class="card-emoji">🇲🇽</span><span class="card-tag">Guía</span>
-        <div class="card-title">Nueva Escuela Mexicana</div>
-        <div class="card-sub">nueva-escuela-mexicana.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('piaget_construyendo_la_mente.html','Piaget — Construyendo la Mente')" style="animation-delay:.54s">
-        <span class="card-emoji">🧩</span><span class="card-tag">Guía</span>
-        <div class="card-title">Piaget — Construyendo la Mente</div>
-        <div class="card-sub">piaget_construyendo_la_mente.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('programa-sintetico-analitico.html','Programa Sintético y Analítico')" style="animation-delay:.57s">
-        <span class="card-emoji">📐</span><span class="card-tag">Guía</span>
-        <div class="card-title">Programa Sintético y Analítico</div>
-        <div class="card-sub">programa-sintetico-analitico.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-      <div class="card guide" onclick="openViewer('teorias-aprendizaje.html','Teorías del Aprendizaje')" style="animation-delay:.60s">
-        <span class="card-emoji">💡</span><span class="card-tag">Guía</span>
-        <div class="card-title">Teorías del Aprendizaje</div>
-        <div class="card-sub">teorias-aprendizaje.html</div>
-        <div class="card-arrow">Abrir →</div>
-      </div>
-    </div>
-
-    <!-- ══ PDF ══ -->
-    <div class="section-header" id="sec-pdf">
-      <div class="section-icon pdf">📄</div>
-      <div class="section-info">
-        <h2>Documentos PDF</h2>
-        <p>Versión impresa de los recursos</p>
-      </div>
-      <div class="section-line"></div>
-    </div>
-
-    <div class="grid">
-      <div class="pdf-big" onclick="openModal()">
-        <span class="pdf-big-icon">🖨️</span>
-        <div class="pdf-big-info">
-          <div class="pdf-big-title">Documentos Versión Impresa</div>
-          <div class="pdf-big-sub">Haz clic para solicitar acceso a los documentos en formato PDF</div>
-        </div>
-        <div class="pdf-big-badge">📬 Solicitar acceso</div>
-      </div>
-    </div>
-
   </div><!-- /page -->
 
   <footer>
@@ -970,38 +572,31 @@
       viewerFrame.src = src;
       viewerTitle.textContent = title;
       viewer.classList.add('active');
-      // scroll past navbar
-      const top = viewer.getBoundingClientRect().top + window.scrollY - 72;
-      window.scrollTo({ top, behavior: 'smooth' });
+      setTimeout(() => {
+        const top = viewer.getBoundingClientRect().top + window.scrollY - 76;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }, 60);
     }
 
     function closeViewer() {
       viewer.classList.remove('active');
       viewerFrame.src = '';
-      document.querySelector('header').scrollIntoView({ behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* ── MODAL PDF ── */
+    /* ── MODAL ── */
     const pdfModal = document.getElementById('pdf-modal');
     function openModal()  { pdfModal.classList.add('active');    document.body.style.overflow = 'hidden'; }
     function closeModal() { pdfModal.classList.remove('active'); document.body.style.overflow = ''; }
     function overlayClick(e) { if (e.target === pdfModal) closeModal(); }
 
-    /* ── DROPDOWN MENU ── */
-    const menus = { sim: null, guide: null, pdf: null };
-
+    /* ── DROPDOWN ── */
     function toggleMenu(key) {
-      const btn  = document.getElementById('btn-'  + key);
       const drop = document.getElementById('drop-' + key);
+      const btn  = document.getElementById('btn-'  + key);
       const isOpen = drop.classList.contains('open');
-
-      // close all
       closeAllMenus();
-
-      if (!isOpen) {
-        drop.classList.add('open');
-        btn.classList.add('open');
-      }
+      if (!isOpen) { drop.classList.add('open'); btn.classList.add('open'); }
     }
 
     function closeAllMenus() {
@@ -1011,27 +606,23 @@
       });
     }
 
-    // click inside dropdown item — open viewer and close menu
-    function handleDropClick(e, src, title) {
+    function pick(e, src, title) {
       e.stopPropagation();
       closeAllMenus();
       openViewer(src, title);
     }
 
-    // pdf item in dropdown
-    function handlePdfClick(e) {
+    function pickPdf(e) {
       e.stopPropagation();
       closeAllMenus();
       openModal();
     }
 
-    // close menus when clicking outside
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', e => {
       if (!e.target.closest('.nav-btn')) closeAllMenus();
     });
 
-    // close menus on Escape
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', e => {
       if (e.key === 'Escape') { closeModal(); closeAllMenus(); }
     });
   </script>
